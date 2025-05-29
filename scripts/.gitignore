@@ -1,0 +1,5 @@
+# Don't commit downloaded and processed data
+data_*/*
+!data_*/.gitkeep
+
+geocoded/*
