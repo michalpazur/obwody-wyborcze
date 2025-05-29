@@ -61,11 +61,12 @@ def process_data():
   if (not path.exists(addresses_path)):
       os.mkdir(addresses_path)
 
-  for i in range(1):
+  for i in range(16):
     teryt = str((i + 1) * 2)
     teryt = teryt.rjust(2, "0")
     print(f"Loding data for voivodeship {teryt}...")
-    addresses = geo.read_file(f"data_in/addresses/{teryt}.zip!PRG_PunktyAdresowe_{teryt}.shp")
+    # For some reason every single file has a different enconding, i.e. CP-1250, UTF-16, or UTF-8, which is not detected properly, in case of woj. podlaskie
+    addresses = geo.read_file(f"data_in/addresses/{teryt}.zip!PRG_PunktyAdresowe_{teryt}.shp", encoding="utf-8" if teryt == "20" else None)
     addresses = addresses[[key for key in addresses_columns]].rename(columns=addresses_columns)
     print(f"Processing data for voivodeship {teryt}...")
     addresses = process_addresses(addresses, True)
