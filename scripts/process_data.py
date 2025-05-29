@@ -40,6 +40,9 @@ def process_addresses(df: pd.DataFrame, is_address: bool = False) -> pd.DataFram
   df["building"] = df["building"].str.replace(r"(\w*)\s?[,-/]\s?(\w*\s?[,-/]\s?)*\w*", r"\1", regex=True)
   # Remove any comments from building number
   df["building"] = df["building"].str.replace(r"(\d+\w*)(\s+.+)$", r"\1", regex=True)
+  # Split building numbers into parts
+  df["building_n"] = df["building"].str.replace(r"(\d+)\w*", r"\1", regex=True)
+  df["building_l"] = df["building"].str.replace(r"\d+(\w*)", r"\1", regex=True)
 
   df["f_address"] = df[["teryt", "town", "street", "building"]].agg(" ".join, axis=1)
   if (is_address):
