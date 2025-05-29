@@ -5,6 +5,7 @@ from shared import head, capitalize
 from const import districts_columns, addresses_columns
 import os
 import os.path as path
+import re
 
 def process_addresses(df: pd.DataFrame, is_address: bool = False) -> pd.DataFrame:
   # Fill empty street names
@@ -15,7 +16,7 @@ def process_addresses(df: pd.DataFrame, is_address: bool = False) -> pd.DataFram
   with open("const/street_prefixes.txt") as prefixes_file:
     prefixes = [f"^{line.strip()}\\.? " for line in prefixes_file.readlines()]
   prefixes_regex = "|".join(prefixes)
-  df["street"] = df["street"].str.replace(prefixes_regex, "", regex=True, case=False)
+  df["street"] = df["street"].str.replace(prefixes_regex, "", regex=True, flags=re.IGNORECASE)
 
   # Remove redundant spaces
   print("Removing redundant spaces...")
