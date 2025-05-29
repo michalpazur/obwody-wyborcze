@@ -22,7 +22,3 @@ addresses_columns = {
   "Numer": "building",
   "geometry": "geometry"
 }
-
-merged_columns = {
-  
-}

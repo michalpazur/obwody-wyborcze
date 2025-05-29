@@ -7,7 +7,7 @@ import os
 import os.path as path
 import re
 
-def process_addresses(df: pd.DataFrame, is_address: bool = False) -> pd.DataFrame:
+def process_addresses(df: pd.DataFrame, column_names: dict[str, str], is_addresses: bool = False) -> pd.DataFrame:
   # Fill empty street names
   print("Filling empty street names...")
   df["street"] = np.where(df["street"].isna(), df["town"], df["street"])
@@ -45,8 +45,17 @@ def process_addresses(df: pd.DataFrame, is_address: bool = False) -> pd.DataFram
   df["building_n"] = df["building"].str.replace(r"(\d+)\w*", r"\1", regex=True)
   df["building_l"] = df["building"].str.replace(r"\d+(\w*)", r"\1", regex=True)
 
+  if (is_addresses):
+    print("Updating TERYT based on spatial data...")
+    gminy = geo.read_file("data_in/gminy_dzielnice.json")
+    gminy.crs = "EPSG:3857"
+    gminy = gminy.to_crs(df.crs)
+    df = df.sjoin(gminy, predicate="within")
+    df = df.rename(columns={ "teryt_right": "teryt" })
+    df = df[[column_names[key] for key in column_names]]
+
   df["f_address"] = df[["teryt", "town", "street", "building"]].agg(" ".join, axis=1)
-  if (is_address):
+  if (is_addresses):
     df = df.drop_duplicates(subset=["f_address"])
   return df
 
@@ -56,7 +65,7 @@ def process_data():
   districts = districts[[key for key in districts_columns]].rename(columns=districts_columns)
   districts = districts[~districts["teryt"].isna()]
   print("Processing districts...")
-  districts = process_addresses(districts)
+  districts = process_addresses(districts, districts_columns)
   districts.to_excel("data_processed/districts.xlsx", index=False)
   print("Address points saved!")
 
@@ -68,12 +77,12 @@ def process_data():
   for i in range(16):
     teryt = str((i + 1) * 2)
     teryt = teryt.rjust(2, "0")
-    print(f"Loding data for voivodeship {teryt}...")
+    print(f"Loading data for voivodeship {teryt}...")
     # For some reason every single file has a different enconding, i.e. CP-1250, UTF-16, or UTF-8, which is not detected properly, in case of woj. podlaskie
     addresses = geo.read_file(f"data_in/addresses/{teryt}.zip!PRG_PunktyAdresowe_{teryt}.shp", encoding="utf-8" if teryt == "20" else None)
     addresses = addresses[[key for key in addresses_columns]].rename(columns=addresses_columns)
     print(f"Processing data for voivodeship {teryt}...")
-    addresses = process_addresses(addresses, True)
+    addresses = process_addresses(addresses, addresses_columns, True)
     addresses.to_file(f"{addresses_path}/{teryt}.shz", driver="ESRI Shapefile")
     os.rename(f"{addresses_path}/{teryt}.shz", f"{addresses_path}/{teryt}.zip")
 
