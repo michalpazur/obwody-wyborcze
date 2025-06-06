@@ -41,9 +41,11 @@ def process_addresses(df: pd.DataFrame, column_names: dict[str, str], is_address
   df["building"] = df["building"].str.replace(r"(\w*)\s?[,-/]\s?(\w*\s?[,-/]\s?)*\w*", r"\1", regex=True)
   # Remove any comments from building number
   df["building"] = df["building"].str.replace(r"(\d+\w*)(\s+.+)$", r"\1", regex=True)
+  # Remove "number" from  building numer
+  df["building"] = df["building"].str.replace(r"(nr\.?|numer)\s+(\d+\w*)$", r"\2", regex=True)
   # Split building numbers into parts
-  df["building_n"] = df["building"].str.replace(r"(\d+)\w*", r"\1", regex=True)
-  df["building_l"] = df["building"].str.replace(r"\d+(\w*)", r"\1", regex=True)
+  df["building_n"] = df["building"].str.replace(r"(\d+)\w*$", r"\1", regex=True)
+  df["building_l"] = df["building"].str.replace(r"\d+(\w*)$", r"\1", regex=True)
 
   if (is_addresses):
     print("Updating TERYT based on spatial data...")
