@@ -1,13 +1,13 @@
 import pandas as pd
 import geopandas as geo
 import numpy as np
-from shared import head, capitalize
+from utils import load_replacements, capitalize
 from const import districts_columns, addresses_columns
 import os
 import os.path as path
 import re
 
-def process_addresses(df: pd.DataFrame, column_names: dict[str, str], is_addresses: bool = False) -> pd.DataFrame:
+def process_addresses(df: pd.DataFrame | geo.GeoDataFrame, column_names: dict[str, str], is_addresses: bool = False) -> pd.DataFrame:
   # Fill empty street names
   print("Filling empty street names...")
   df["street"] = np.where(df["street"].isna(), df["town"], df["street"])
@@ -25,13 +25,13 @@ def process_addresses(df: pd.DataFrame, column_names: dict[str, str], is_address
   # Normalize street names
   print("Normalizing street names...")
   df["street"] = df["street"].map(capitalize)
-  with open("const/street_replacements.csv") as replacements_file:
-    replacements = [line.strip().split(";") for line in replacements_file.readlines()]
-  replacements = dict(zip([x[0] for x in replacements], [x[1] for x in replacements]))
+  replacements = load_replacements()
   for search in replacements:
     df["street"] = df["street"].str.replace(search, replacements[search], case=False)
   # Remove duplicate street types
   df["street"] = df["street"].str.replace(r"^(\S+)\s+\1", r"\1", regex=True)
+  # Normalize quotes in street names
+  df["street"] = df["street"].str.replace(r'[„"](.+)[”"]', r'"\1"', regex=True)
 
   # Normalize building numbers
   print("Normalizing building numbers...")
@@ -47,7 +47,7 @@ def process_addresses(df: pd.DataFrame, column_names: dict[str, str], is_address
   df["building_n"] = df["building"].str.replace(r"(\d+)\w*$", r"\1", regex=True)
   df["building_l"] = df["building"].str.replace(r"\d+(\w*)$", r"\1", regex=True)
 
-  if (is_addresses):
+  if (isinstance(df, geo.GeoDataFrame)):
     print("Updating TERYT based on spatial data...")
     gminy = geo.read_file("data_in/gminy_dzielnice.json")
     gminy.crs = "EPSG:3857"
@@ -68,7 +68,7 @@ def process_data():
   districts = districts[~districts["teryt"].isna()]
   print("Processing districts...")
   districts = process_addresses(districts, districts_columns)
-  districts.to_excel("data_processed/districts.xlsx", index=False)
+  districts.to_csv("data_processed/districts.csv", index=False, sep="|", encoding="utf-8")
   print("Address points saved!")
 
   print("Loading address points...")

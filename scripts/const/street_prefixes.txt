@@ -4,3 +4,4 @@ al
 pl
 os
 rynek
+inne
