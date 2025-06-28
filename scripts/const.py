@@ -22,3 +22,21 @@ addresses_columns = {
   "Numer": "building",
   "geometry": "geometry"
 }
+
+district_types = {
+  "areszt śledczy": 0,
+  "dom pomocy społecznej": 0,
+  "dom studencki": 0,
+  "oddział zewnętrzny aresztu śledczego": 0,
+  "oddział zewnętrzny zakładu karnego": 0,
+  "zakład karny": 0,
+  "zakład leczniczy": 0,
+  "zespół domów studenckich": 0,
+  "stały": 1
+}
+
+building_num_regex = r"((\d+)\w*|\w{1})$"
+building_letter_regex = r"\d+(\w*)$"
+all_regex = r"cał[ae]"
+odd_regex = r"nieparzyst[ae]"
+even_regex = r"parzyst[ae]"

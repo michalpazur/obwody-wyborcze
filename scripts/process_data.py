@@ -1,22 +1,24 @@
 import pandas as pd
 import geopandas as geo
 import numpy as np
-from utils import load_replacements, capitalize
-from const import districts_columns, addresses_columns
+from utils import load_replacements, load_street_prefixes, capitalize, save_zip
+from const import districts_columns, addresses_columns, building_num_regex, building_letter_regex
+from typing import TypeVar
 import os
 import os.path as path
 import re
 
-def process_addresses(df: pd.DataFrame | geo.GeoDataFrame, column_names: dict[str, str], is_addresses: bool = False) -> pd.DataFrame:
+T = TypeVar("T", pd.DataFrame, geo.GeoDataFrame)
+
+def process_addresses(df: T, column_names: dict[str, str], is_addresses: bool = False) -> T:
   # Fill empty street names
   print("Filling empty street names...")
   df["street"] = np.where(df["street"].isna(), df["town"], df["street"])
 
   print("Removing prefixes...")
-  with open("const/street_prefixes.txt") as prefixes_file:
-    prefixes = [f"^{line.strip()}\\.? " for line in prefixes_file.readlines()]
-  prefixes_regex = "|".join(prefixes)
-  df["street"] = df["street"].str.replace(prefixes_regex, "", regex=True, flags=re.IGNORECASE)
+  street_prefixes = load_street_prefixes()
+  for search in street_prefixes:
+    df["street"] = df["street"].str.replace(search, street_prefixes[search], regex=True, flags=re.IGNORECASE)
 
   # Remove redundant spaces
   print("Removing redundant spaces...")
@@ -44,8 +46,8 @@ def process_addresses(df: pd.DataFrame | geo.GeoDataFrame, column_names: dict[st
   # Remove "number" from  building numer
   df["building"] = df["building"].str.replace(r"(nr\.?|numer)\s+(\d+\w*)$", r"\2", regex=True)
   # Split building numbers into parts
-  df["building_n"] = df["building"].str.replace(r"(\d+)\w*$", r"\1", regex=True)
-  df["building_l"] = df["building"].str.replace(r"\d+(\w*)$", r"\1", regex=True)
+  df["building_n"] = df["building"].str.replace(building_num_regex, r"\2", regex=True)
+  df["building_l"] = df["building"].str.replace(building_letter_regex, r"\1", regex=True)
 
   if (isinstance(df, geo.GeoDataFrame)):
     print("Updating TERYT based on spatial data...")
@@ -54,7 +56,7 @@ def process_addresses(df: pd.DataFrame | geo.GeoDataFrame, column_names: dict[st
     gminy = gminy.to_crs(df.crs)
     df = df.sjoin(gminy, predicate="within")
     df = df.rename(columns={ "teryt_right": "teryt" })
-    df = df[[column_names[key] for key in column_names]]
+    df = df[[*[column_names[key] for key in column_names], *["building_n", "building_l"]]]
 
   df["f_address"] = df[["teryt", "town", "street", "building"]].agg(" ".join, axis=1)
   if (is_addresses):
@@ -85,8 +87,7 @@ def process_data():
     addresses = addresses[[key for key in addresses_columns]].rename(columns=addresses_columns)
     print(f"Processing data for voivodeship {teryt}...")
     addresses = process_addresses(addresses, addresses_columns, True)
-    addresses.to_file(f"{addresses_path}/{teryt}.shz", driver="ESRI Shapefile")
-    os.rename(f"{addresses_path}/{teryt}.shz", f"{addresses_path}/{teryt}.zip")
+    save_zip(f"{addresses_path}/{teryt}", addresses)
 
 if (__name__ == "__main__"):
   process_data()
