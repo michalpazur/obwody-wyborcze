@@ -5,8 +5,8 @@ import re
 import regex
 import typing
 from typing import List, NotRequired, TypedDict
-from utils import load_replacements, load_street_prefixes, capitalize
-from const import all_regex, odd_regex, even_regex, building_num_regex, building_letter_regex, district_types
+from utils import load_replacements, load_street_prefixes, capitalize, Utils
+from const import all_regex, odd_regex, even_regex, building_num_regex, building_letter_regex, district_types, ordinal_regex
 
 pandas.options.mode.copy_on_write = True
 
@@ -70,6 +70,7 @@ def main():
   if (os.path.isfile("error.log")):
     os.remove("error.log")
 
+  utils = Utils()
   street_prefixes = load_street_prefixes()
   replacements = load_replacements()
   districts = pandas.read_csv("data_processed/districts.csv", converters={ "teryt": str }, sep="|", encoding="utf-8")
@@ -114,7 +115,7 @@ def main():
       
       borders = district.borders
       borders = streets_regex.sub(r" \1: ", borders)
-      borders = re.sub(r"\s+i\s+", ", ", borders)
+      borders = re.sub(r"(nr|numer)\s+", "", borders)
       split_borders: List[str] = re.split(r",\s*", borders.replace(";", ","))
       last_element = re.split(r"\s+i\s+", split_borders[len(split_borders) - 1])
       # Handle enumerated towns
@@ -179,7 +180,13 @@ def main():
             for search in street_prefixes:
               street_tmp = re.sub(search, street_prefixes[search], street_tmp, flags=re.IGNORECASE)
             for search in replacements:
-              street_tmp = street_tmp.replace(search, replacements[search])
+              street_tmp = re.sub(re.escape(search), replacements[search], street_tmp, flags=re.IGNORECASE)
+            street_tmp = utils.remove_first_name(street_tmp)
+            street_tmp = utils.remove_first_letter(street_tmp)
+            street_tmp = re.sub(ordinal_regex, "", street_tmp)
+            street_tmp = street_tmp.replace(r'[„"](.+)[”"]', r'"\1"')
+            street_tmp = street_tmp.replace("´", "'")
+            street_tmp = re.sub(ordinal_regex, "", street_tmp)
 
             street_tmp = capitalize(street_tmp)
 
@@ -246,9 +253,9 @@ def main():
               parsed_token["num_from"] = get_building_number(prev_word)
             elif (prev_word == "od"):
               parsed_token["num_from"] = get_building_number(word)
-            elif (prev_word == "-"):
+            elif (prev_word == "-" or prev_word == "–"):
               parsed_token["num_to"] = get_building_number(word)
-            elif (word_idx == 1 and prev_word == "do"):
+            elif (len(parsed_tokens) > 0 and word_idx == 1 and prev_word == "do"):
               parsed_token = parsed_tokens.pop()
               parsed_token["num_to"] = get_building_number(word)
             elif (prev_word == "do"):

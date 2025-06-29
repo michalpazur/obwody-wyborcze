@@ -1,16 +1,18 @@
 import pandas as pd
 import geopandas as geo
 import numpy as np
-from utils import load_replacements, load_street_prefixes, capitalize, save_zip
-from const import districts_columns, addresses_columns, building_num_regex, building_letter_regex
+from utils import load_replacements, load_street_prefixes, capitalize, save_zip, Utils
+from const import districts_columns, addresses_columns, building_num_regex, building_letter_regex, ordinal_regex
 from typing import TypeVar
 import os
 import os.path as path
 import re
+import regex
 
 T = TypeVar("T", pd.DataFrame, geo.GeoDataFrame)
 
 def process_addresses(df: T, column_names: dict[str, str], is_addresses: bool = False) -> T:
+  utils = Utils()
   # Fill empty street names
   print("Filling empty street names...")
   df["street"] = np.where(df["street"].isna(), df["town"], df["street"])
@@ -19,6 +21,10 @@ def process_addresses(df: T, column_names: dict[str, str], is_addresses: bool = 
   street_prefixes = load_street_prefixes()
   for search in street_prefixes:
     df["street"] = df["street"].str.replace(search, street_prefixes[search], regex=True, flags=re.IGNORECASE)
+
+  print("Removing names from street names...")
+  df["street"] = df["street"].apply(utils.remove_first_name)
+  df["street"] = df["street"].apply(utils.remove_first_letter)
 
   # Remove redundant spaces
   print("Removing redundant spaces...")
@@ -34,6 +40,9 @@ def process_addresses(df: T, column_names: dict[str, str], is_addresses: bool = 
   df["street"] = df["street"].str.replace(r"^(\S+)\s+\1", r"\1", regex=True)
   # Normalize quotes in street names
   df["street"] = df["street"].str.replace(r'[„"](.+)[”"]', r'"\1"', regex=True)
+  df["street"] = df["street"].str.replace("´", "'")
+  # Remove ordinals (i.e. Mieszka I-go -> Mieszka I)
+  df["street"] = df["street"].str.replace(ordinal_regex, "", regex=True)
 
   # Normalize building numbers
   print("Normalizing building numbers...")
