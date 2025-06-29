@@ -176,11 +176,11 @@ def main():
           for word in split_line[idx:]:
             end_idx += 1
             street_tmp += (" " + word)
-            street_tmp = re.sub(r"\s+", " ", street_tmp.strip()).replace(":", "")
             for search in street_prefixes:
               street_tmp = re.sub(search, street_prefixes[search], street_tmp, flags=re.IGNORECASE)
             for search in replacements:
               street_tmp = re.sub(re.escape(search), replacements[search], street_tmp, flags=re.IGNORECASE)
+            street_tmp = re.sub(r"\s+", " ", street_tmp.strip()).replace(":", "")
             street_tmp = utils.remove_first_name(street_tmp)
             street_tmp = utils.remove_first_letter(street_tmp)
             street_tmp = re.sub(ordinal_regex, "", street_tmp)
@@ -232,6 +232,16 @@ def main():
           prev_word = ""
           word_idx = 0
           for word in split_token:
+            if (word == "i" or word == "oraz"):
+              parsed_tokens.append(parsed_token)
+              parsed_token = parsed_token.copy()
+              parsed_token["is_even"] = False
+              parsed_token["is_odd"] = False
+              parsed_token.pop("num_from", None)
+              parsed_token.pop("num_to", None)
+              parsed_token.pop("number", None)
+              continue
+
             word = re.sub(r"[():]", "", word)
             # Remove multiple building numbers (i.e. 100/102 -> 100)
             if (word != "-"):
@@ -249,13 +259,14 @@ def main():
               parsed_token["is_even"] = True
               parsed_token["is_odd"] = False
 
-            if (word == "-"):
+            prev_token = parsed_tokens[-1] if len(parsed_tokens) > 0 else None
+            if (word == "-" or word == "–"):
               parsed_token["num_from"] = get_building_number(prev_word)
             elif (prev_word == "od"):
               parsed_token["num_from"] = get_building_number(word)
             elif (prev_word == "-" or prev_word == "–"):
               parsed_token["num_to"] = get_building_number(word)
-            elif (len(parsed_tokens) > 0 and word_idx == 1 and prev_word == "do"):
+            elif (prev_token is not None and prev_token["street"] == parsed_token["street"] and word_idx == 1 and prev_word == "do"):
               parsed_token = parsed_tokens.pop()
               parsed_token["num_to"] = get_building_number(word)
             elif (prev_word == "do"):

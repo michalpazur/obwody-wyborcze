@@ -41,5 +41,5 @@ all_regex = r"cał[ae]"
 odd_regex = r"nieparzyst[ae]"
 even_regex = r"parzyst[ae]"
 first_name_letter_regex = r"\p{Lu}ł?\.\s+" # Władysław is sometimes shortened to Wł.
-holy_name_regex = r"(św\.|świętego|świętej)\s+"
+holy_name_regex = r"(św\.|świętego|świętej|świętych)\s+"
 ordinal_regex = r"\s*-\s*go"

@@ -49,7 +49,7 @@ class Utils:
     if (re.search(self.names_exceptions, street)):
       return street
     
-    if (re.search(holy_name_regex, street)):
+    if (re.search(holy_name_regex, street, flags=re.IGNORECASE)):
       return street
     
     return re.sub(self.names_regex, "", street)
