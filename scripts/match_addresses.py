@@ -3,9 +3,8 @@ import geopandas as geo
 import os
 import re
 import regex
-import typing
 from typing import List, NotRequired, TypedDict
-from utils import load_replacements, load_street_prefixes, capitalize, Utils
+from utils import load_replacements, load_street_prefixes, capitalize, concat, Utils
 from const import all_regex, odd_regex, even_regex, building_num_regex, building_letter_regex, district_types, ordinal_regex
 
 pandas.options.mode.copy_on_write = True
@@ -40,17 +39,12 @@ def log_error(district: pandas.Series, reason: str):
   with open("error.log", "a") as log:
     log.write(f"Unable to find addresses for district {district.number} in {district.town} ({district.teryt}). Full address: {district.f_address}, {district.location}. ({reason})\n")
 
-def concat(df1: geo.GeoDataFrame | None, df2: geo.GeoDataFrame):
-  if (df1 is None):
-    return df2
-  return typing.cast(geo.GeoDataFrame, pandas.concat([df1, df2]))
-
 def is_town(addresses: geo.GeoDataFrame, name: str):
   addresses_with_town = addresses[addresses["town"] == name]
   return len(addresses_with_town) > 0
 
-def is_street(addresses: geo.GeoDataFrame, town: str, name: str):
-  addresses_with_street = addresses[(addresses["town"] == town) & (addresses["street"] == name)] 
+def is_street(streets: geo.GeoDataFrame, town: str, name: str):
+  addresses_with_street = streets[(streets["town"] == town) & (streets["street"] == name)]
   return len(addresses_with_street) > 0
 
 def get_building_number(address: str) -> BuildingNumber:
@@ -83,6 +77,7 @@ def main():
     woj_teryt = teryt[:2]
     addresses = geo.read_file(f"data_processed/addresses/{woj_teryt}.zip")
     addresses = addresses[addresses["teryt"] == teryt]
+    streets = geo.read_file(f"data_processed/streets/{woj_teryt}.zip")
     # For easier duplicates search
     addresses = addresses.sort_values(["town", "street", "building_n", "building_l"])
     addresses.loc[addresses["building_n"].isna(), "building_n"] = "-1"
@@ -100,6 +95,8 @@ def main():
       district_id = f"{teryt}_{district.number}"
       district_addresses: geo.GeoDataFrame | None = None
       teryt_addresses = addresses[addresses["teryt"] == district.teryt]
+      # Streets in Warsaw are assigned to city-wide TERYT instead of districts
+      teryt_streets = streets[streets["teryt"] == ("146501" if district.teryt.startswith("1465") else district.teryt)]
       if (district.type != "stały"):
         district_addresses = teryt_addresses[teryt_addresses["f_address"] == district.f_address]
         special_addresses.append(district.f_address)
@@ -173,9 +170,10 @@ def main():
         while idx < len(split_line):
           end_idx = idx
           street_tmp = ""
+          found_street: FoundStreet | None = None
           for word in split_line[idx:]:
             end_idx += 1
-            street_tmp += (" " + word)
+            street_tmp = " ".join(split_line[idx:end_idx])
             for search in street_prefixes:
               street_tmp = re.sub(search, street_prefixes[search], street_tmp, flags=re.IGNORECASE)
             for search in replacements:
@@ -187,20 +185,27 @@ def main():
             street_tmp = street_tmp.replace(r'[„"](.+)[”"]', r'"\1"')
             street_tmp = street_tmp.replace("´", "'")
             street_tmp = re.sub(ordinal_regex, "", street_tmp)
-
             street_tmp = capitalize(street_tmp)
 
-            if (is_street(teryt_addresses, town, street_tmp)):
+            if (is_street(teryt_streets, town, street_tmp)):
               last_street = street_tmp
-              found_street: FoundStreet = {
+              found_street = {
                 "street": street_tmp,
                 "start_index": idx,
                 "end_index": end_idx
               }
-              idx = end_idx
+              # End of line was reached
+              if (end_idx == len(split_line)):
+                streets_in_token.append(found_street)
+                idx = end_idx
+            elif (found_street is not None):
               streets_in_token.append(found_street)
+              idx = end_idx - 1
               break
-          idx += 1
+
+          if (found_street is None):
+            idx += 1
+
         prev_end = len(split_line)
         streets_in_token.reverse()
         if (len(streets_in_token) == 0):

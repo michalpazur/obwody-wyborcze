@@ -1,13 +1,12 @@
 import pandas as pd
 import geopandas as geo
 import numpy as np
-from utils import load_replacements, load_street_prefixes, capitalize, save_zip, Utils
-from const import districts_columns, addresses_columns, building_num_regex, building_letter_regex, ordinal_regex
+from utils import load_replacements, load_street_prefixes, capitalize, save_zip, concat, Utils
+from const import districts_columns, addresses_columns, streets_columns, building_num_regex, building_letter_regex, ordinal_regex
 from typing import TypeVar
 import os
 import os.path as path
 import re
-import regex
 
 T = TypeVar("T", pd.DataFrame, geo.GeoDataFrame)
 
@@ -44,21 +43,23 @@ def process_addresses(df: T, column_names: dict[str, str], is_addresses: bool = 
   # Remove ordinals (i.e. Mieszka I-go -> Mieszka I)
   df["street"] = df["street"].str.replace(ordinal_regex, "", regex=True)
 
-  # Normalize building numbers
-  print("Normalizing building numbers...")
-  df["building"] = df["building"].str.lower()
-  df["building"] = df["building"].str.replace(r"(\d+)\s+(\w+)$", r"\1\2", regex=True)
-  # Remove multiple building numbers
-  df["building"] = df["building"].str.replace(r"(\w*)\s?[,-/]\s?(\w*\s?[,-/]\s?)*\w*", r"\1", regex=True)
-  # Remove any comments from building number
-  df["building"] = df["building"].str.replace(r"(\d+\w*)(\s+.+)$", r"\1", regex=True)
-  # Remove "number" from  building numer
-  df["building"] = df["building"].str.replace(r"(nr\.?|numer)\s+(\d+\w*)$", r"\2", regex=True)
-  # Split building numbers into parts
-  df["building_n"] = df["building"].str.replace(building_num_regex, r"\2", regex=True)
-  df["building_l"] = df["building"].str.replace(building_letter_regex, r"\1", regex=True)
+  has_building_numbers = "building" in df
+  if (has_building_numbers):
+    # Normalize building numbers
+    print("Normalizing building numbers...")
+    df["building"] = df["building"].str.lower()
+    df["building"] = df["building"].str.replace(r"(\d+)\s+(\w+)$", r"\1\2", regex=True)
+    # Remove multiple building numbers
+    df["building"] = df["building"].str.replace(r"(\w*)\s?[,-/]\s?(\w*\s?[,-/]\s?)*\w*", r"\1", regex=True)
+    # Remove any comments from building number
+    df["building"] = df["building"].str.replace(r"(\d+\w*)(\s+.+)$", r"\1", regex=True)
+    # Remove "number" from  building numer
+    df["building"] = df["building"].str.replace(r"(nr\.?|numer)\s+(\d+\w*)$", r"\2", regex=True)
+    # Split building numbers into parts
+    df["building_n"] = df["building"].str.replace(building_num_regex, r"\2", regex=True)
+    df["building_l"] = df["building"].str.replace(building_letter_regex, r"\1", regex=True)
 
-  if (isinstance(df, geo.GeoDataFrame)):
+  if (has_building_numbers and isinstance(df, geo.GeoDataFrame)):
     print("Updating TERYT based on spatial data...")
     gminy = geo.read_file("data_in/gminy_dzielnice.json")
     gminy.crs = "EPSG:3857"
@@ -67,7 +68,8 @@ def process_addresses(df: T, column_names: dict[str, str], is_addresses: bool = 
     df = df.rename(columns={ "teryt_right": "teryt" })
     df = df[[*[column_names[key] for key in column_names], *["building_n", "building_l"]]]
 
-  df["f_address"] = df[["teryt", "town", "street", "building"]].agg(" ".join, axis=1)
+  if (has_building_numbers):
+    df["f_address"] = df[["teryt", "town", "street", "building"]].agg(" ".join, axis=1)
   if (is_addresses):
     df = df.drop_duplicates(subset=["f_address"])
   return df
@@ -86,17 +88,28 @@ def process_data():
   addresses_path = "data_processed/addresses"
   if (not path.exists(addresses_path)):
       os.mkdir(addresses_path)
+  streets_path = "data_processed/streets"
+  if (not path.exists(streets_path)):
+      os.mkdir(streets_path)
 
   for i in range(16):
     teryt = str((i + 1) * 2)
     teryt = teryt.rjust(2, "0")
     print(f"Loading data for voivodeship {teryt}...")
-    # For some reason every single file has a different enconding, i.e. CP-1250, UTF-16, or UTF-8, which is not detected properly, in case of woj. podlaskie
-    addresses = geo.read_file(f"data_in/addresses/{teryt}.zip!PRG_PunktyAdresowe_{teryt}.shp", encoding="utf-8" if teryt == "20" else None)
+    addresses = geo.read_file(f"data_in/addresses/{teryt}.zip!PRG_PunktyAdresowe_{teryt}.shp")
     addresses = addresses[[key for key in addresses_columns]].rename(columns=addresses_columns)
     print(f"Processing data for voivodeship {teryt}...")
     addresses = process_addresses(addresses, addresses_columns, True)
     save_zip(f"{addresses_path}/{teryt}", addresses)
+
+    print(f"Loading streets for voivodeship {teryt}...")
+    streets = geo.read_file(f"data_in/addresses/{teryt}.zip!PRG_Ulice_{teryt}.shp")
+    squares = geo.read_file(f"data_in/addresses/{teryt}.zip!PRG_Place_{teryt}.shp")
+    streets = concat(streets, squares)
+    streets = streets[[key for key in streets_columns]].rename(columns=streets_columns)
+    print(f"Processing streets for voivodeship {teryt}...")
+    streets = process_addresses(streets, streets_columns, False)
+    save_zip(f"{streets_path}/{teryt}", streets)
 
 if (__name__ == "__main__"):
   process_data()

@@ -14,13 +14,17 @@ districts_columns = {
   "Opis granic": "borders",
 }
 
-addresses_columns = {
+streets_columns = {
   "TERYT": "teryt",
-  "PNA": "post_code",
   "SIMC_nazwa": "town",
   "ULIC_nazwa": "street",
-  "Numer": "building",
   "geometry": "geometry"
+}
+
+addresses_columns = {
+  **streets_columns,
+  "PNA": "post_code",
+  "Numer": "building",
 }
 
 district_types = {
@@ -40,6 +44,6 @@ building_letter_regex = r"\d+(\w*)$"
 all_regex = r"cał[ae]"
 odd_regex = r"nieparzyst[ae]"
 even_regex = r"parzyst[ae]"
-first_name_letter_regex = r"\p{Lu}ł?\.\s+" # Władysław is sometimes shortened to Wł.
+first_name_letter_regex = r"\p{Lu}(ł|h)?\.(\s+(i\s+)?\p{Lu}(ł|h)?\.)?\s+"
 holy_name_regex = r"(św\.|świętego|świętej|świętych)\s+"
-ordinal_regex = r"\s*-\s*go"
+ordinal_regex = r"\s*-\s*(go|ej)"
