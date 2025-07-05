@@ -3,7 +3,7 @@ import pandas
 from geopandas import GeoDataFrame
 import os
 import re, regex
-from const import first_name_letter_regex, holy_name_regex
+from const import first_name_letter_regex, holy_name_regex, char_order
 import typing
 
 def head(df: DataFrame, n: int = 5):
@@ -58,6 +58,23 @@ class Utils:
 
   def remove_first_letter(self, street: str):
     return regex.sub(first_name_letter_regex, "", street)
+
+max_letters = 3
+def get_building_order(building_n: int | str, building_l: str):
+  try:
+    number = int(building_n) * pow(10, max_letters * 2)
+    if (building_l == ""):
+      return number
+  except:
+    return 0
+  
+  for i in range(min(len(building_l), max_letters)):
+    curr_pow = (max_letters - i - 1) * 2
+    char = building_l[i:i+1]
+    char_ord = char_order.index(char) + 1
+    number += (char_ord * pow(10, curr_pow))
+  
+  return number
 
 def save_zip(path: str, gdf: GeoDataFrame):
   gdf.to_file(f"{path}.shz", driver="ESRI Shapefile")

@@ -4,7 +4,7 @@ import os
 import re
 import regex
 from typing import List, NotRequired, TypedDict
-from utils import load_replacements, load_street_prefixes, capitalize, concat, Utils
+from utils import load_replacements, load_street_prefixes, capitalize, concat, Utils, get_building_order
 from const import all_regex, odd_regex, even_regex, building_num_regex, building_letter_regex, district_types, ordinal_regex
 
 pandas.options.mode.copy_on_write = True
@@ -315,12 +315,10 @@ def main():
         number = token.get("number")
 
         if (num_from is not None or num_to is not None):
-          if (num_from is not None):
-            if (num_from["building_n"] != ""):
-              token_addresses = token_addresses[token_addresses["building_n"] >= num_from["building_n"]]
-          if (num_to is not None):
-            if (num_to["building_n"] != ""):
-              token_addresses = token_addresses[token_addresses["building_n"] <= num_to["building_n"]]
+          if (num_from is not None and num_from["building_n"] != ""):
+            token_addresses = token_addresses[token_addresses["building_o"] >= get_building_order(num_from["building_n"], num_from["building_l"])]
+          if (num_to is not None and num_to["building_n"] != ""):
+            token_addresses = token_addresses[token_addresses["building_o"] <= get_building_order(num_to["building_n"], num_to["building_l"])]
         elif (number is not None):
           token_addresses = token_addresses[token_addresses["building"] == number]
           

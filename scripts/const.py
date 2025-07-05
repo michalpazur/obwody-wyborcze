@@ -39,6 +39,8 @@ district_types = {
   "stały": 1
 }
 
+char_order = list("aąbcćdefghijklłmnńoópqrstuvwxyzżź0123456789")
+
 building_num_regex = r"((\d+)\w*|\w{1})$"
 building_letter_regex = r"\d+(\w*)$"
 all_regex = r"cał[ae]"

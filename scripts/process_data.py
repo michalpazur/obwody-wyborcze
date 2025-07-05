@@ -1,7 +1,7 @@
 import pandas as pd
 import geopandas as geo
 import numpy as np
-from utils import load_replacements, load_street_prefixes, capitalize, save_zip, concat, Utils
+from utils import load_replacements, load_street_prefixes, capitalize, save_zip, concat, Utils, get_building_order
 from const import districts_columns, addresses_columns, streets_columns, building_num_regex, building_letter_regex, ordinal_regex
 from typing import TypeVar
 import os
@@ -58,6 +58,8 @@ def process_addresses(df: T, column_names: dict[str, str], is_addresses: bool = 
     # Split building numbers into parts
     df["building_n"] = df["building"].str.replace(building_num_regex, r"\2", regex=True)
     df["building_l"] = df["building"].str.replace(building_letter_regex, r"\1", regex=True)
+    # Assign building order
+    df["building_o"] = df.apply(lambda row: get_building_order(row["building_n"], row["building_l"]), axis=1)
 
   if (has_building_numbers and isinstance(df, geo.GeoDataFrame)):
     print("Updating TERYT based on spatial data...")
