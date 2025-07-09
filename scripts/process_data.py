@@ -2,7 +2,7 @@ import pandas as pd
 import geopandas as geo
 import numpy as np
 from utils import load_replacements, load_street_prefixes, capitalize, save_zip, concat, Utils, get_building_order
-from const import districts_columns, addresses_columns, streets_columns, building_num_regex, building_letter_regex, ordinal_regex
+from const import districts_columns, addresses_columns, streets_columns, building_num_regex, building_letter_regex, ordinal_regex, quotation_regex, multiple_number_regex, dash_regex
 from typing import TypeVar
 import os
 import os.path as path
@@ -38,8 +38,10 @@ def process_addresses(df: T, column_names: dict[str, str], is_addresses: bool = 
   # Remove duplicate street types
   df["street"] = df["street"].str.replace(r"^(\S+)\s+\1", r"\1", regex=True)
   # Normalize quotes in street names
-  df["street"] = df["street"].str.replace(r'[„"](.+)[”"]', r'"\1"', regex=True)
+  df["street"] = df["street"].str.replace(quotation_regex, r'"\1"', regex=True)
   df["street"] = df["street"].str.replace("´", "'")
+  # Normalize hyphens in street names
+  df["street"] = df["street"].str.replace(dash_regex, "-", regex=True)
   # Remove ordinals (i.e. Mieszka I-go -> Mieszka I)
   df["street"] = df["street"].str.replace(ordinal_regex, "", regex=True)
 
@@ -50,7 +52,7 @@ def process_addresses(df: T, column_names: dict[str, str], is_addresses: bool = 
     df["building"] = df["building"].str.lower()
     df["building"] = df["building"].str.replace(r"(\d+)\s+(\w+)$", r"\1\2", regex=True)
     # Remove multiple building numbers
-    df["building"] = df["building"].str.replace(r"(\w*)\s?[,-/]\s?(\w*\s?[,-/]\s?)*\w*", r"\1", regex=True)
+    df["building"] = df["building"].str.replace(multiple_number_regex, r"\1", regex=True)
     # Remove any comments from building number
     df["building"] = df["building"].str.replace(r"(\d+\w*)(\s+.+)$", r"\1", regex=True)
     # Remove "number" from  building numer
@@ -68,7 +70,7 @@ def process_addresses(df: T, column_names: dict[str, str], is_addresses: bool = 
     gminy = gminy.to_crs(df.crs)
     df = df.sjoin(gminy, predicate="within")
     df = df.rename(columns={ "teryt_right": "teryt" })
-    df = df[[*[column_names[key] for key in column_names], *["building_n", "building_l"]]]
+    df = df[[*[column_names[key] for key in column_names], *["building_n", "building_l", "building_o"]]]
 
   if (has_building_numbers):
     df["f_address"] = df[["teryt", "town", "street", "building"]].agg(" ".join, axis=1)

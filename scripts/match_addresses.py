@@ -4,8 +4,8 @@ import os
 import re
 import regex
 from typing import List, NotRequired, TypedDict
-from utils import load_replacements, load_street_prefixes, capitalize, concat, Utils, get_building_order
-from const import all_regex, odd_regex, even_regex, building_num_regex, building_letter_regex, district_types, ordinal_regex
+from utils import concat, Utils, get_building_order
+from const import all_regex, odd_regex, even_regex, building_num_regex, building_letter_regex, district_types, dash_regex, multiple_number_regex
 
 pandas.options.mode.copy_on_write = True
 
@@ -16,11 +16,6 @@ street_name_regex = regex.compile(r"^(\p{Lu}\p{L}+\s?)+$", flags=re.IGNORECASE)
 class BuildingNumber(TypedDict):
   building_n: int | str
   building_l: str
-
-class FoundStreet(TypedDict):
-  start_index: int
-  end_index: int
-  street: str
 
 class ParsedToken(TypedDict):
   token: str
@@ -34,6 +29,11 @@ class ParsedToken(TypedDict):
   num_from: NotRequired[BuildingNumber]
   num_to: NotRequired[BuildingNumber]
 
+class FoundStreet(TypedDict):
+  start_index: int
+  end_index: int
+  street: str
+  prev_token: NotRequired[ParsedToken]
 
 def log_error(district: pandas.Series, reason: str):
   with open("error.log", "a") as log:
@@ -47,6 +47,15 @@ def is_street(streets: geo.GeoDataFrame, town: str, name: str):
   addresses_with_street = streets[(streets["town"] == town) & (streets["street"] == name)]
   return len(addresses_with_street) > 0
 
+def process_token_word(word: str):
+  # Remove multiple building numbers (i.e. 100/102 -> 100)
+  if (not re.search(dash_regex, word)):
+    word = re.sub(multiple_number_regex, r"\1", word)
+  word = word.rstrip(",.")
+  word = word.lower()
+
+  return word
+
 def get_building_number(address: str) -> BuildingNumber:
   match = re.match(building_num_regex, address)
   building_n = ""
@@ -59,14 +68,22 @@ def get_building_number(address: str) -> BuildingNumber:
 
   return { "building_n": building_n, "building_l": building_l }
 
+def get_parsed_number(num: BuildingNumber | None):
+  if (not num):
+    return -1
+  
+  try:
+    parsed_num = int(num["building_n"])
+    return parsed_num
+  except:
+    return -1
+
 def main():
   print("Loading data...")
   if (os.path.isfile("error.log")):
     os.remove("error.log")
 
   utils = Utils()
-  street_prefixes = load_street_prefixes()
-  replacements = load_replacements()
   districts = pandas.read_csv("data_processed/districts.csv", converters={ "teryt": str }, sep="|", encoding="utf-8")
   teryts = districts["teryt"].drop_duplicates()
 
@@ -134,7 +151,11 @@ def main():
       last_street = ""
       last_is_odd = False
       last_is_even = False
+      check_after_parity = False
       for token in split_borders:
+        if (len(token) == 0):
+          continue
+
         token = place_type.sub("", token).strip()
         parsed_token: ParsedToken = { 
           "token": token,
@@ -174,18 +195,7 @@ def main():
           for word in split_line[idx:]:
             end_idx += 1
             street_tmp = " ".join(split_line[idx:end_idx])
-            for search in street_prefixes:
-              street_tmp = re.sub(search, street_prefixes[search], street_tmp, flags=re.IGNORECASE)
-            for search in replacements:
-              street_tmp = re.sub(re.escape(search), replacements[search], street_tmp, flags=re.IGNORECASE)
-            street_tmp = re.sub(r"\s+", " ", street_tmp.strip()).replace(":", "")
-            street_tmp = utils.remove_first_name(street_tmp)
-            street_tmp = utils.remove_first_letter(street_tmp)
-            street_tmp = re.sub(ordinal_regex, "", street_tmp)
-            street_tmp = street_tmp.replace(r'[„"](.+)[”"]', r'"\1"')
-            street_tmp = street_tmp.replace("´", "'")
-            street_tmp = re.sub(ordinal_regex, "", street_tmp)
-            street_tmp = capitalize(street_tmp)
+            street_tmp = utils.transform_street_name(street_tmp)
 
             if (is_street(teryt_streets, town, street_tmp)):
               last_street = street_tmp
@@ -194,14 +204,30 @@ def main():
                 "start_index": idx,
                 "end_index": end_idx
               }
+              # Street was found later in the token, but the first part of the token was not included
+              if (idx != 0 and len(streets_in_token) == 0):
+                try:
+                  prev_token = parsed_tokens[-1]
+                  prev_found_street: FoundStreet = {
+                    "street": prev_token["street"],
+                    "start_index": 0,
+                    "end_index": 0, # If street was not found previously that means it's not in the token so nothing will be cut
+                    "prev_token": prev_token
+                  }
+                  streets_in_token.append(prev_found_street)
+                except:
+                  print(f"No previous token found for string \"{" ".join(split_line[0:idx])}\"!")
               # End of line was reached
               if (end_idx == len(split_line)):
                 streets_in_token.append(found_street)
                 idx = end_idx
-            elif (found_street is not None):
+            elif (found_street is not None and end_idx == found_street["end_index"] + 2):
               streets_in_token.append(found_street)
-              idx = end_idx - 1
+              idx = found_street["end_index"]
               break
+            elif (end_idx == len(split_line) and found_street):
+              streets_in_token.append(found_street)
+              idx = found_street["end_index"]
 
           if (found_street is None):
             idx += 1
@@ -220,12 +246,18 @@ def main():
             parsed_token["street"] = street["street"]
             parsed_token["token"] = token
 
+            if ("prev_token" in street):
+              prev_token = street["prev_token"]
+              parsed_token["is_even"] = prev_token["is_even"]
+              parsed_token["is_odd"] = prev_token["is_odd"]
+
             # We found new street, restart token to default settings
             tmp_token["street"] = street["street"]
 
             if (len(rest_of_token) == 0):
               parsed_token["is_street"] = True
               parsed_tokens.append(parsed_token)
+              parsed_token = tmp_token.copy()
               continue
           else:
             parsed_token["street"] = last_street
@@ -236,23 +268,70 @@ def main():
           split_token = re.split(r"\s", rest_of_token)
           prev_word = ""
           word_idx = 0
+          prev_token = parsed_tokens[-1] if len(parsed_tokens) > 0 else None
+          
+          if (prev_token and prev_token["street"] == parsed_token["street"] and prev_token["is_street"]):
+            parsed_token = parsed_tokens.pop()
+            parsed_token["is_street"] = False
+
           for word in split_token:
+            word = re.sub(r"[():]", "", word)
+
+            if (check_after_parity):
+              prev_token = parsed_tokens[-1]
+              check_after_parity = False
+              if (parsed_token["street"] == prev_token["street"]):
+                parsed_token = parsed_tokens.pop()
+
             if (word == "i" or word == "oraz"):
-              parsed_tokens.append(parsed_token)
+              if (word_idx > 0):
+                parsed_tokens.append(parsed_token)
               parsed_token = parsed_token.copy()
               parsed_token["is_even"] = False
               parsed_token["is_odd"] = False
               parsed_token.pop("num_from", None)
               parsed_token.pop("num_to", None)
               parsed_token.pop("number", None)
+              prev_word = word
+              word_idx += 1
               continue
 
-            word = re.sub(r"[():]", "", word)
-            # Remove multiple building numbers (i.e. 100/102 -> 100)
-            if (word != "-"):
-              word = re.sub(r"(\w*)\s?[,-/]\s?(\w*\s?[,-/]\s?)*\w*", r"\1", word)
-            word = word.lower()
+            split_by_dash = re.split(dash_regex, word)
+            is_dash = re.match(f"^{dash_regex}$", word)
+            prev_is_dash = re.match(f"^{dash_regex}$", prev_word)
+            ends_with_dash = not is_dash and re.search(f"({dash_regex})$", word) is not None
+            starts_with_dash = not is_dash and re.search(f"^({dash_regex})", word) is not None
+            starts_with_from = word != "od" and word.startswith("od")
+            starts_with_to = word != "do" and word.startswith("do")
+            ends_with_to = word != "do" and word.endswith("do")
 
+            if (ends_with_dash):
+              word = word[:-1]
+            if (ends_with_to):
+              word = word[:-2]
+
+            if (starts_with_dash):
+              word = word[1:]
+              prev_word = "-"
+              prev_is_dash = True
+            if (starts_with_from or starts_with_to):
+              word = word[2:]
+              word_idx += 1
+              if (starts_with_from):
+                prev_word = "od"
+              else:
+                prev_word = "do"
+
+            if (not is_dash and not ends_with_dash and not starts_with_dash and len(split_by_dash) >= 2):
+              word_from = process_token_word(split_by_dash[0])
+              word_to = process_token_word(split_by_dash[1])
+              parsed_token["num_from"] = get_building_number(word_from)
+              parsed_token["num_to"] = get_building_number(word_to)
+              prev_word = word
+              word_idx += 1
+              continue
+
+            word = process_token_word(word)
             if (re.match(all_regex, word)):
               parsed_token["is_street"] = True
               break
@@ -264,27 +343,66 @@ def main():
               parsed_token["is_even"] = True
               parsed_token["is_odd"] = False
 
+            joined_words = f"{prev_word} {word}"
+            is_end = joined_words == "do końca"
+            is_num_to = (prev_word == "do" and not is_end) or prev_is_dash
+
             prev_token = parsed_tokens[-1] if len(parsed_tokens) > 0 else None
-            if (word == "-" or word == "–"):
+            if (is_dash):
+              parsed_token.pop("number", None)
               parsed_token["num_from"] = get_building_number(prev_word)
+            elif (ends_with_dash):
+              parsed_token["num_from"] = get_building_number(word)
             elif (prev_word == "od"):
               parsed_token["num_from"] = get_building_number(word)
-            elif (prev_word == "-" or prev_word == "–"):
-              parsed_token["num_to"] = get_building_number(word)
-            elif (prev_token is not None and prev_token["street"] == parsed_token["street"] and word_idx == 1 and prev_word == "do"):
+            elif (prev_token is not None and prev_token["street"] == parsed_token["street"] and word_idx == 1 and is_num_to):
               parsed_token = parsed_tokens.pop()
               parsed_token["num_to"] = get_building_number(word)
-            elif (prev_word == "do"):
+            elif (is_num_to):
               parsed_token["num_to"] = get_building_number(word)
-            elif (re.match(building_num_regex, word)):
+              if ("number" in parsed_token):
+                num_from = parsed_token["number"]
+                parsed_token["num_from"] = get_building_number(num_from)
+            elif (not is_end and word != "od" and word != "do" and re.match(building_num_regex, word)):
               parsed_token["number"] = word
             
             word_idx += 1
-            prev_word = word
+            if (not ends_with_dash and not ends_with_to):
+              prev_word = word
+            else:
+              prev_word = "-"
 
-          parsed_tokens.append(parsed_token)
+          num_from = parsed_token.get("num_from")
+          num_to = parsed_token.get("num_to")
+          # Check if building numbers match parity
+          if ((parsed_token["is_even"] or parsed_token["is_odd"]) and (num_from or num_to)):
+            parsed_from = get_parsed_number(num_from)
+            parsed_to = get_parsed_number(num_to)
+            if (parsed_from != -1 or parsed_to != -1):
+              is_odd = parsed_token["is_odd"]
+              if (parsed_token["is_even"]):
+                is_even = True
+                if (parsed_from != -1):
+                  is_even = parsed_from % 2 == 0
+                if (is_even and parsed_to != -1):
+                  is_even = parsed_to % 2 == 0
+                parsed_token["is_even"] = is_even
+                if (is_even):
+                  parsed_token["is_odd"] = False
+              elif (is_odd):
+                if (parsed_from != -1):
+                  is_odd = parsed_from % 2 == 1
+                if (is_odd and parsed_to != -1):
+                  is_odd = parsed_to % 2 == 1
+                parsed_token["is_odd"] = is_odd
+                if (is_odd):
+                  parsed_token["is_even"] = False
+          
           last_is_odd = parsed_token["is_odd"]
           last_is_even = parsed_token["is_even"]
+          if (len(split_token) == 1 and re.search(even_regex, split_token[0])):
+            check_after_parity = True
+          parsed_tokens.append(parsed_token)
           parsed_token = tmp_token.copy()
       
       for token in parsed_tokens:
@@ -299,12 +417,12 @@ def main():
           continue
 
         token_addresses = token_addresses[token_addresses["street"] == token["street"]]
-        if (token["is_street"]):
+        is_even = token["is_even"]
+        is_odd = token["is_odd"]
+        if (token["is_street"] and not is_even and not is_odd):
           district_addresses = concat(district_addresses, token_addresses)
           continue
 
-        is_even = token["is_even"]
-        is_odd = token["is_odd"]
         if (is_even):
           token_addresses = token_addresses[token_addresses["building_n"] % 2 == 0]
         elif (is_odd):

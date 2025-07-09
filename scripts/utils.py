@@ -3,7 +3,7 @@ import pandas
 from geopandas import GeoDataFrame
 import os
 import re, regex
-from const import first_name_letter_regex, holy_name_regex, char_order
+from const import first_name_letter_regex, holy_name_regex, char_order, ordinal_regex, quotation_regex, multiple_number_regex, dash_regex
 import typing
 
 def head(df: DataFrame, n: int = 5):
@@ -42,10 +42,12 @@ class Utils:
   def __init__(self):
     names = load_names()
     self.names = names
-    names = [name + "\\s+" for name in names]
-    names_regex = "|".join(names)
+    names_regex = "(" + "|".join(names) + ")"
+    names_regex = f"{names_regex}(\\s+(i\\s+)?{names_regex})?\\s+"
     self.names_regex = names_regex
     self.names_exceptions = load_names_exceptions()
+    self.replacements = load_replacements()
+    self.street_prefixes = load_street_prefixes()
 
   def remove_first_name(self, street: str):
     if (re.search(self.names_exceptions, street)):
@@ -58,6 +60,24 @@ class Utils:
 
   def remove_first_letter(self, street: str):
     return regex.sub(first_name_letter_regex, "", street)
+  
+  def transform_street_name(self, street: str):
+    for search in self.street_prefixes:
+      street = re.sub(search, self.street_prefixes[search], street, flags=re.IGNORECASE)
+    for search in self.replacements:
+      street = re.sub(re.escape(search), self.replacements[search], street, flags=re.IGNORECASE)
+    street = re.sub(r"\s+", " ", street.strip()).replace(":", "")
+    street = self.remove_first_name(street)
+    street = self.remove_first_letter(street)
+    street = re.sub(ordinal_regex, "", street)
+    street = re.sub(quotation_regex, r'"\1"', street)
+    street = re.sub(multiple_number_regex, r"\1", street)
+    street = street.replace("´", "'")
+    street = re.sub(dash_regex, "-", street)
+    street = re.sub(ordinal_regex, "", street)
+    street = capitalize(street)
+
+    return street
 
 max_letters = 3
 def get_building_order(building_n: int | str, building_l: str):

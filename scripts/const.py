@@ -41,11 +41,14 @@ district_types = {
 
 char_order = list("aąbcćdefghijklłmnńoópqrstuvwxyzżź0123456789")
 
-building_num_regex = r"((\d+)\w*|\w{1})$"
+building_num_regex = r"((\d+)\w*|\w{1,2})$"
 building_letter_regex = r"\d+(\w*)$"
 all_regex = r"cał[ae]"
 odd_regex = r"nieparzyst[ae]"
 even_regex = r"parzyst[ae]"
-first_name_letter_regex = r"\p{Lu}(ł|h)?\.(\s+(i\s+)?\p{Lu}(ł|h)?\.)?\s+"
+first_name_letter_regex = r"\p{Lu}(ł|h|z)?\.(\s+(i\s+)?\p{Lu}(ł|h|z)?\.)?\s+"
 holy_name_regex = r"(św\.|świętego|świętej|świętych)\s+"
 ordinal_regex = r"\s*-\s*(go|ej)"
+multiple_number_regex = r"(\d+\w*)\s?([-,/]|s\.)\s?(\d+\w*\s?([-,/]|s\.)?\s?)+"
+quotation_regex = r'[„"]\s*(\S+)\s*[”"]'
+dash_regex = r"[-–—―−]" # I hate it here.
