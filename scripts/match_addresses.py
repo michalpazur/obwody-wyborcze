@@ -4,7 +4,7 @@ import os
 import re
 import regex
 from typing import List, NotRequired, TypedDict
-from utils import concat, Utils, get_building_order
+from utils import concat, Utils, get_building_order, save_zip
 from const import all_regex, odd_regex, even_regex, building_num_regex, building_letter_regex, district_types, dash_regex, multiple_number_regex
 
 pandas.options.mode.copy_on_write = True
@@ -12,6 +12,8 @@ pandas.options.mode.copy_on_write = True
 place_type = re.compile(r"^(miasto|miasta|wieś|wsie|sołectwo|sołectwa|osada|osady|przysiółek|przysiółki):?\s*", flags=re.IGNORECASE)
 streets_regex = re.compile(r",?.*(ulice|ulica):?\s*", flags=re.IGNORECASE)
 street_name_regex = regex.compile(r"^(\p{Lu}\p{L}+\s?)+$", flags=re.IGNORECASE)
+
+DEBUG = True
 
 class BuildingNumber(TypedDict):
   building_n: int | str
@@ -85,23 +87,47 @@ def main():
 
   utils = Utils()
   districts = pandas.read_csv("data_processed/districts.csv", converters={ "teryt": str }, sep="|", encoding="utf-8")
+  # Force special districts to be first
+  districts = districts.sort_values("type", key=lambda x: x.map(district_types))
   teryts = districts["teryt"].drop_duplicates()
-
+  powiats = []
   for teryt in teryts:
-    print(f"=== {teryt} ===")
+    if (teryt[:4] not in powiats):
+      powiats.append(teryt[:4])
+  
+  powiats = sorted(powiats)
 
-    print("Loading addresses...")
-    woj_teryt = teryt[:2]
+  for i in range(16):
+    woj_teryt = str((i + 1) * 2).rjust(2, "0")
+    woj_powiats = filter(lambda x: x.startswith(woj_teryt), powiats)
+    woj_powiats = list(woj_powiats)
+    print(f"Loading data for voivodeship {woj_teryt}...")
+
     addresses = geo.read_file(f"data_processed/addresses/{woj_teryt}.zip")
-    addresses = addresses[addresses["teryt"] == teryt]
-    streets = geo.read_file(f"data_processed/streets/{woj_teryt}.zip")
     # For easier duplicates search
     addresses = addresses.sort_values(["town", "street", "building_n", "building_l"])
     addresses.loc[addresses["building_n"].isna(), "building_n"] = "-1"
     addresses["building_n"] = addresses["building_n"].astype(int)
 
+    streets = geo.read_file(f"data_processed/streets/{woj_teryt}.zip")
+    for teryt in woj_powiats:
+      powiat_teryts = filter(lambda x: x.startswith(teryt), teryts)
+      powiat_teryts = sorted(list(powiat_teryts))
+      matched_addresses = process_powiat(powiat_teryts, districts, addresses, streets, utils)
+      if (matched_addresses is not None):
+        save_zip(f"matched_addresses/{teryt}", matched_addresses)
+      else:
+        raise ValueError(f"No addresses matched found for powiat {teryt}!")
+
+def process_powiat(teryts: List[str], districts: pandas.DataFrame, addresses: geo.GeoDataFrame, streets: geo.GeoDataFrame, utils: Utils):
+  powiat_addresses: geo.GeoDataFrame | None = None
+
+  for teryt in teryts:
+    print(f"Processing {teryt}...")
     teryt_districts = districts[districts["teryt"] == teryt]
-    teryt_districts = teryt_districts.sort_values("type", key=lambda x: x.map(district_types))
+    teryt_addresses = addresses[addresses["teryt"] == teryt]
+    # Streets in Warsaw are assigned to city-wide TERYT instead of districts
+    teryt_streets = streets[streets["teryt"] == ("146501" if teryt.startswith("1465") else teryt)]
     addresses_out: geo.GeoDataFrame | None = None
     processed_rows = 0
     special_addresses = []
@@ -111,9 +137,6 @@ def main():
 
       district_id = f"{teryt}_{district.number}"
       district_addresses: geo.GeoDataFrame | None = None
-      teryt_addresses = addresses[addresses["teryt"] == district.teryt]
-      # Streets in Warsaw are assigned to city-wide TERYT instead of districts
-      teryt_streets = streets[streets["teryt"] == ("146501" if district.teryt.startswith("1465") else district.teryt)]
       if (district.type != "stały"):
         district_addresses = teryt_addresses[teryt_addresses["f_address"] == district.f_address]
         special_addresses.append(district.f_address)
@@ -122,7 +145,7 @@ def main():
           pass
         if (district_addresses is not None):
           special_addresses.count(district.f_address)
-          district_addresses["district_id"] = district_id
+          district_addresses["district"] = district_id
           addresses_out = concat(addresses_out, district_addresses)
         processed_rows += 1
         continue
@@ -446,17 +469,21 @@ def main():
           district_addresses = concat(district_addresses, token_addresses)
 
       if (district_addresses is not None):
-        district_addresses["district_id"] = district_id
+        district_addresses["district"] = district_id
         addresses_out = concat(addresses_out, district_addresses)
       processed_rows += 1
 
     if (addresses_out is not None):
-      print(f"Found district for {len(addresses_out)} out of {len(addresses)} addresses.")
-      addresses_out.to_file(f"geocoded/{teryt}.json", driver="GeoJSON")
-      duplicated = addresses_out[addresses_out.duplicated(subset=["f_address"], keep=False)]
-      duplicated.to_file(f"geocoded/duplicated_{teryt}.json", driver="GeoJSON")
-      no_district = addresses[~(addresses["f_address"].isin(addresses_out.f_address))]
-      no_district.to_file(f"geocoded/no_address_{teryt}.json", driver="GeoJSON")
+      duplicates = addresses_out.duplicated(subset=["f_address"], keep=False)
+      addresses_to_save = addresses_out[~duplicates]
+      print(f"Found district for {len(addresses_to_save)} out of {len(teryt_addresses)} addresses.")
+      powiat_addresses = concat(powiat_addresses, addresses_to_save)
+      if (DEBUG):
+        duplicated = addresses_out[duplicates]
+        duplicated.to_file(f"matched_addresses/duplicated_{teryt}.json", driver="GeoJSON")
+        no_district = teryt_addresses[~(teryt_addresses["f_address"].isin(addresses_out.f_address))]
+        no_district.to_file(f"matched_addresses/no_district_{teryt}.json", driver="GeoJSON")
 
+  return powiat_addresses
 if (__name__ == "__main__"): 
   main()
