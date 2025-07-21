@@ -86,7 +86,7 @@ def get_building_order(building_n: int | str, building_l: str):
     if (building_l == ""):
       return number
   except:
-    return 0
+    number = 0
   
   for i in range(min(len(building_l), max_letters)):
     curr_pow = (max_letters - i - 1) * 2

@@ -2,13 +2,18 @@ import pandas as pd
 import geopandas as geo
 import numpy as np
 from utils import load_replacements, load_street_prefixes, capitalize, save_zip, concat, Utils, get_building_order
-from const import districts_columns, addresses_columns, streets_columns, building_num_regex, building_letter_regex, ordinal_regex, quotation_regex, multiple_number_regex, dash_regex
+from const import districts_columns, addresses_columns, streets_columns, building_num_regex, building_letter_regex, ordinal_regex, quotation_regex, multiple_number_regex, dash_regex, char_order
 from typing import TypeVar
 import os
 import os.path as path
 import re
 
 T = TypeVar("T", pd.DataFrame, geo.GeoDataFrame)
+
+def process_row(row):
+  print(row["building"], row["building_n"], row["building_l"])
+  return get_building_order(row["building_n"], row["building_l"])
+
 
 def process_addresses(df: T, column_names: dict[str, str], is_addresses: bool = False) -> T:
   utils = Utils()
@@ -51,17 +56,27 @@ def process_addresses(df: T, column_names: dict[str, str], is_addresses: bool = 
     print("Normalizing building numbers...")
     df["building"] = df["building"].str.lower()
     df["building"] = df["building"].str.replace(r"(\d+)\s+(\w+)$", r"\1\2", regex=True)
+    df["building"] = df["building"].str.replace(r"[_\"]", "", regex=True)
     # Remove multiple building numbers
     df["building"] = df["building"].str.replace(multiple_number_regex, r"\1", regex=True)
     # Remove any comments from building number
     df["building"] = df["building"].str.replace(r"(\d+\w*)(\s+.+)$", r"\1", regex=True)
+    # Treat empty address as zero
+    df["building"] = df["building"].str.replace(r"brak\s?.*", "0", regex=True)
+    df["building"] = df["building"].str.replace(r"\s*\.$", "0", regex=True)
+    # Treat plot number as number
+    df["building"] = df["building"].str.replace(r"(numer|nr\.?)\s+działki\s+(\d+\w*)$", r"\2", regex=True)
+    df["building"] = df["building"].str.replace(r"(dz\.?|działka)\s+(\d+\w*)$", r"\2", regex=True)
     # Remove "number" from  building numer
     df["building"] = df["building"].str.replace(r"(nr\.?|numer)\s+(\d+\w*)$", r"\2", regex=True)
+    # Remove block number
+    df["building"] = df["building"].str.replace(r"(bl\.?|blok)\s+(\d+\w*)$", r"\2", regex=True)
+    df["building"] = df["building"].str.replace(r"(\d+)\s*(bl|m)\.?\s*.+$", lambda m: f"{m.group(1)}", regex=True)
     # Split building numbers into parts
     df["building_n"] = df["building"].str.replace(building_num_regex, r"\2", regex=True)
     df["building_l"] = df["building"].str.replace(building_letter_regex, r"\1", regex=True)
     # Assign building order
-    df["building_o"] = df.apply(lambda row: get_building_order(row["building_n"], row["building_l"]), axis=1)
+    df["building_o"] = df.apply(process_row, axis=1)
 
   if (has_building_numbers and isinstance(df, geo.GeoDataFrame)):
     print("Updating TERYT based on spatial data...")
