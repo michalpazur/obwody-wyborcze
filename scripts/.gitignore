@@ -4,3 +4,6 @@ data_*/*
 
 matched_addresses/*
 !matched_addresses/.gitkeep
+
+districts/*
+!districts/.gitkeep
