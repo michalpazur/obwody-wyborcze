@@ -1,7 +1,21 @@
 import geopandas as geo
-from utils import concat, save_zip
+import pandas as pd
+from utils import concat, head
+from const import results_columns, candidates
 import os
-import numpy as np
+
+def get_winner(row: pd.Series):
+  max_ = -1
+  max_name = ""
+  for key in row.index.to_list():
+    value = row[key]
+    if (value > max_):
+      max_ = value
+      max_name = key
+    elif(value == max_):
+      max_name = "tie"
+
+  return max_name
 
 def process_teryt(teryt: str, addresses: geo.GeoDataFrame, districts_df: geo.GeoDataFrame):
   print(f"Processing districts for TERYT {teryt}...")
@@ -34,6 +48,8 @@ def process_teryt(teryt: str, addresses: geo.GeoDataFrame, districts_df: geo.Geo
   districts_df.geometry = districts_df.geometry.buffer(-1)
   return districts_df
 
+elections = "pres_2025_1"
+
 def main():
   districts_df: geo.GeoDataFrame | None = geo.GeoDataFrame()
   districts = geo.read_file(f"data_in/statistical_districts.zip")
@@ -46,10 +62,38 @@ def main():
     for teryt in teryts:
       processed_districts = process_teryt(teryt, addresses, districts)
       districts_df = concat(districts_df, processed_districts)
-      
-  districts_df["votes"] = np.random.randint(0, 1000, size=(len(districts_df), 1)) / 1000
+
+  print("Loading voting results...")
+  results = pd.read_csv(f"data_in/results_{elections}.csv", sep=";", converters={ "Teryt Gminy": lambda x: x.zfill(6) })
+  merged_columns = { **results_columns, **candidates }
+  results = results.rename(columns=merged_columns)
+
+  canidates_columns = [candidates[key] for key in candidates]
+  canidates_columns = list(filter(lambda key: key in results, canidates_columns))
+  merged_columns = filter(lambda key: key in results, [merged_columns[key] for key in merged_columns])
+  merged_columns = list(merged_columns)
+  proc_columns = [name + "_proc" for name in canidates_columns]
+
+  results = results[merged_columns]
+  results = results[results["teryt"] != "000000"]
+  results["gmina"] = results.apply(lambda row: row.gmina if row.gmina.startswith(r"g?m\.") else "m. " + row.powiat, axis=1)
+  results["district"] = results.apply(lambda row: f"{row.teryt}_{row.number}", axis=1)
+  # pd.DataFrame.idxmax doesn't show ties
+  results["winner"] = results[canidates_columns].apply(get_winner, axis=1)
+  for name in canidates_columns:
+    results[name + "_proc"] = results[name] * 100 / results["total"]
+  results["winner_proc"] = results[canidates_columns].max(axis=1) * 100 / results["total"]
+  results["turnout"] = results["all_votes"] * 100 / results["voters"]
+
+  print("Merging results with districts...")
+  districts_df = districts_df[["district", "geometry"]]
+  districts_df = districts_df.merge(results, on="district")
+  districts_df = districts_df[[*merged_columns, *proc_columns, "winner", "winner_proc", "turnout", "district", "geometry"]]
+  districts_df = districts_df.round(2)
   districts_df = districts_df.to_crs("EPSG:4326")
-  districts_df.to_file("districts/districts.json", driver="GeoJSON")
+
+  print("Saving data...")
+  districts_df.to_file(f"districts/{elections}.json", driver="GeoJSON")
 
 if (__name__ == "__main__"):
   main()

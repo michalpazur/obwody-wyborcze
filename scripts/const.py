@@ -39,6 +39,32 @@ district_types = {
   "stały": 1
 }
 
+results_columns = {
+  "Gmina": "gmina",
+  "Powiat": "powiat",
+  "Teryt Gminy": "teryt",
+  "Nr komisji": "number",
+  "Liczba głosów ważnych oddanych łącznie na wszystkich kandydatów (z kart ważnych)": "total",
+  "Liczba kart ważnych": "all_votes",
+  "Liczba wyborców uprawnionych do głosowania (umieszczonych w spisie, z uwzględnieniem dodatkowych formularzy) w chwili zakończenia głosowania": "voters"
+}
+
+candidates = {
+  "BARTOSZEWICZ Artur": "bartosiewicz",
+  "BIEJAT Magdalena Agnieszka": "biejat",
+  "BRAUN Grzegorz Michał": "braun",
+  "HOŁOWNIA Szymon Franciszek": "holownia",
+  "JAKUBIAK Marek": "jakubiak",
+  "MACIAK Maciej": "maciak",
+  "MENTZEN Sławomir Jerzy": "mentzen",
+  "NAWROCKI Karol Tadeusz": "nawrocki",
+  "SENYSZYN Joanna": "senyszyn",
+  "STANOWSKI Krzysztof Jakub": "stanowski",
+  "TRZASKOWSKI Rafał Kazimierz": "trzaskowski",
+  "WOCH Marek Marian": "woch",
+  "ZANDBERG Adrian Tadeusz": "zandberg",
+}
+
 char_order = list("aąbcćdefghijklłmnńoópqrsśtuvwxyzżź0123456789")
 
 building_num_regex = r"(d?(\d+)\w*|\w{1,2})$"
