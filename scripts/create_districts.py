@@ -4,6 +4,8 @@ from utils import concat, head
 from const import results_columns, candidates
 import os
 
+pd.options.mode.copy_on_write = True
+
 def get_winner(row: pd.Series):
   max_ = -1
   max_name = ""
@@ -12,7 +14,7 @@ def get_winner(row: pd.Series):
     if (value > max_):
       max_ = value
       max_name = key
-    elif(value == max_):
+    elif (value == max_):
       max_name = "tie"
 
   return max_name
@@ -86,12 +88,14 @@ def main():
   results["turnout"] = results["all_votes"] * 100 / results["voters"]
 
   print("Merging results with districts...")
+  districts_df = districts_df.reset_index(names="district")
   districts_df = districts_df[["district", "geometry"]]
   districts_df = districts_df.merge(results, on="district")
   districts_df = districts_df[[*merged_columns, *proc_columns, "winner", "winner_proc", "turnout", "district", "geometry"]]
   districts_df = districts_df.round(2)
   districts_df = districts_df.to_crs("EPSG:4326")
 
+  print("Winners:", districts_df["winner"].drop_duplicates().to_list())
   print("Saving data...")
   districts_df.to_file(f"districts/{elections}.json", driver="GeoJSON")
 

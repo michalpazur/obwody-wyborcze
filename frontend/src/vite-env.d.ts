@@ -1,9 +1,11 @@
 /// <reference types="vite/client" />
 
-interface ViteTypeOptions {}
+interface ViteTypeOptions {
+  strictImportMetaEnv: unknown
+}
 
-interface ViteMetaEnv {
-  readonly VITE_MAPTILER_KEY: string;
+interface ImportMetaEnv {
+  readonly VITE_MAPTILER_TOKEN: string;
 }
 
 interface ImportMeta {
