@@ -5,7 +5,7 @@ export const theme = createTheme({
     fontFamily: ["'Work Sans'", "Roboto", "sans-serif"].join(", "),
     h1: {
       fontSize: "40px",
-      fontFamily: "'Bree Serif'"
+      fontFamily: "'Bree Serif'",
     },
     h2: {
       fontSize: "32px",
@@ -14,6 +14,11 @@ export const theme = createTheme({
     h3: {
       fontSize: "28px",
       fontFamily: "'Bree Serif'",
-    }
+    },
+  },
+  palette: {
+    secondary: {
+      main: "#616161",
+    },
   },
 });

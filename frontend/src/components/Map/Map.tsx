@@ -1,5 +1,10 @@
+import {
+  ExpressionSpecification,
+  LngLat,
+  MapLayerMouseEvent,
+} from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { useRef } from "react";
+import { useCallback, useRef, useState } from "react";
 import {
   Layer,
   Map as MapComponent,
@@ -7,10 +12,38 @@ import {
   Source,
 } from "react-map-gl/maplibre";
 import { candidatesConfig, electionsConfig } from "../../config";
-import { ExpressionSpecification } from "maplibre-gl";
+import { DistrictInfo } from "../../types";
+import Popup from "./components/Popup";
 
 const Map = () => {
   const mapRef = useRef<MapRef>(null);
+  const [hovered, setHovered] = useState<DistrictInfo>();
+  const [hoverPosition, setHoverPosition] = useState<LngLat>();
+
+  const onHover = useCallback(
+    (event: MapLayerMouseEvent) => {
+      const feature = event.features?.[0];
+      setHoverPosition(event.lngLat);
+      if (feature) {
+        if (hovered) {
+          mapRef.current?.setFeatureState(
+            {
+              source: "pres_2025_1",
+              sourceLayer: "pres_2025_1",
+              id: hovered.id,
+            },
+            { hovered: false }
+          );
+        }
+        setHovered({ ...feature.properties, id: feature.id } as DistrictInfo);
+        mapRef.current?.setFeatureState(
+          { source: "pres_2025_1", sourceLayer: "pres_2025_1", id: feature.id },
+          { hovered: true }
+        );
+      }
+    },
+    [hovered]
+  );
 
   return (
     <MapComponent
@@ -20,7 +53,8 @@ const Map = () => {
         longitude: 21.0067249,
         zoom: 13,
       }}
-      interactiveLayerIds={["votes"]}
+      onMouseMove={onHover}
+      interactiveLayerIds={[...electionsConfig.pres_2025_1.winners, "tie"]}
       style={{ width: "100%", height: "100%" }}
       mapStyle={`https://api.maptiler.com/maps/dataviz-light/style.json?key=${
         import.meta.env.VITE_MAPTILER_TOKEN
@@ -63,7 +97,35 @@ const Map = () => {
             "fill-opacity": 0.6,
           }}
         />
+        <Layer
+          id="outline"
+          type="line"
+          source-layer="pres_2025_1"
+          paint={{
+            "line-width": [
+              "interpolate",
+              ["linear"],
+              ["zoom"],
+              12,
+              1,
+              14,
+              3,
+              17,
+              6,
+            ],
+            "line-color": "#171717",
+            "line-opacity": [
+              "case",
+              ["boolean", ["feature-state", "hovered"], false],
+              1,
+              0,
+            ],
+          }}
+        />
       </Source>
+      {hovered && hoverPosition ? (
+        <Popup district={hovered} position={hoverPosition} />
+      ) : null}
     </MapComponent>
   );
 };

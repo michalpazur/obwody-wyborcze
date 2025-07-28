@@ -2,3 +2,19 @@ body {
   margin: 0px;
   min-height: 100vh;
 }
+
+.maplibregl-popup-content {
+  background: none;
+  box-shadow: none;
+  border-radius: 0px;
+  padding: 0px;
+  top: -12px;
+  
+  .maplibregl-popup-close-button {
+    display: none;
+  }
+}
+
+.maplibregl-popup-tip {
+  display: none;
+}

@@ -1,4 +1,4 @@
-type CandidateId =
+export type CandidateId =
   | "bartosiewicz"
   | "biejat"
   | "braun"
@@ -63,6 +63,10 @@ export const electionsConfig: Record<ElectionId, ElectionConfig> = {
       "biejat",
       "stanowski",
       "senyszyn",
+      "jakubiak",
+      "bartosiewicz",
+      "maciak",
+      "woch",
     ],
     winners: ["trzaskowski", "nawrocki", "mentzen"],
     tilesetId: "01984855-b44c-75a1-8463-876f2a7f32b3",
