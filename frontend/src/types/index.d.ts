@@ -1,8 +1,9 @@
 import { GeoJSONFeature } from "maplibre-gl";
 import { CandidateId } from "../config";
 
-type VoteCount = Record<CandidateId, number>;
-type VoteResult = Record<`${CandidateId}_proc`, number>;
+type VoteCount = Record<CandidateId | "winner", number>;
+export type ProcentKey = `${CandidateId | "winner"}_proc`
+type VoteResult = Record<ProcentKey, number>;
 
 export type DistrictInfo = {
   id: GeoJSONFeature["id"]; // feature id

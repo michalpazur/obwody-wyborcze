@@ -11,9 +11,13 @@ import {
   MapRef,
   Source,
 } from "react-map-gl/maplibre";
-import { candidatesConfig, electionsConfig } from "../../config";
+import { candidatesConfig, electionsConfig, tieGradient } from "../../config";
 import { DistrictInfo } from "../../types";
+import { generateFillColors } from "../../utils/generateFillColors";
+import Legend from "./components/Legend";
 import Popup from "./components/Popup";
+
+const opacity = 0.6;
 
 const Map = () => {
   const mapRef = useRef<MapRef>(null);
@@ -75,9 +79,15 @@ const Map = () => {
             type="fill"
             source-layer="pres_2025_1"
             paint={{
-              "fill-color": candidatesConfig[winnerId].color,
-              "fill-outline-color": candidatesConfig[winnerId].color,
-              "fill-opacity": 0.6,
+              "fill-color": generateFillColors(
+                `${winnerId}_proc`,
+                candidatesConfig[winnerId].gradient
+              ),
+              "fill-outline-color": generateFillColors(
+                `${winnerId}_proc`,
+                candidatesConfig[winnerId].gradient
+              ),
+              "fill-opacity": opacity,
             }}
           />
         ))}
@@ -92,9 +102,12 @@ const Map = () => {
           type="fill"
           source-layer="pres_2025_1"
           paint={{
-            "fill-color": "#616161",
-            "fill-outline-color": "#616161",
-            "fill-opacity": 0.6,
+            "fill-color": generateFillColors("winner_proc", tieGradient),
+            "fill-outline-color": generateFillColors(
+              "winner_proc",
+              tieGradient
+            ),
+            "fill-opacity": opacity,
           }}
         />
         <Layer
@@ -126,6 +139,7 @@ const Map = () => {
       {hovered && hoverPosition ? (
         <Popup district={hovered} position={hoverPosition} />
       ) : null}
+      <Legend />
     </MapComponent>
   );
 };
