@@ -14,6 +14,7 @@ import {
 import { candidatesConfig, electionsConfig, tieGradient } from "../../config";
 import { DistrictInfo } from "../../types";
 import { generateFillColors } from "../../utils/generateFillColors";
+import DistrictInfoComponent from "./components/DistrictInfo";
 import Legend from "./components/Legend";
 import Popup from "./components/Popup";
 
@@ -22,6 +23,7 @@ const opacity = 0.6;
 const Map = () => {
   const mapRef = useRef<MapRef>(null);
   const [hovered, setHovered] = useState<DistrictInfo>();
+  const [clicked, setClicked] = useState<DistrictInfo>();
   const [hoverPosition, setHoverPosition] = useState<LngLat>();
 
   const onHover = useCallback(
@@ -49,6 +51,18 @@ const Map = () => {
     [hovered]
   );
 
+  const onClick = useCallback(
+    (event: MapLayerMouseEvent) => {
+      const feature = event.features?.[0];
+      if (clicked?.id === feature?.id) {
+        setClicked(undefined);
+      } else if (feature) {
+        setClicked({ ...feature.properties, id: feature.id } as DistrictInfo);
+      }
+    },
+    [clicked]
+  );
+
   return (
     <MapComponent
       ref={mapRef}
@@ -58,6 +72,7 @@ const Map = () => {
         zoom: 13,
       }}
       onMouseMove={onHover}
+      onClick={onClick}
       interactiveLayerIds={[...electionsConfig.pres_2025_1.winners, "tie"]}
       style={{ width: "100%", height: "100%" }}
       mapStyle={`https://api.maptiler.com/maps/dataviz-light/style.json?key=${
@@ -140,6 +155,10 @@ const Map = () => {
         <Popup district={hovered} position={hoverPosition} />
       ) : null}
       <Legend />
+      <DistrictInfoComponent
+        districtInfo={clicked}
+        setDistrictInfo={setClicked}
+      />
     </MapComponent>
   );
 };

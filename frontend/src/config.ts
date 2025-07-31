@@ -26,21 +26,21 @@ export const GRADIENT_COLORS = 5;
 
 export const candidatesConfig: Record<CandidateId, Candidate> = {
   bartosiewicz: { name: "Artur Bartosiewicz", id: "bartosiewicz" },
-  biejat: { name: "Magdalena Biejat", id: "biejat" },
-  braun: { name: "Grzegorz Braun", id: "braun" },
-  holownia: { name: "Szymon Hołownia", id: "holownia" },
+  biejat: { name: "Magdalena Biejat", id: "biejat", color: "#8ACE00" },
+  braun: { name: "Grzegorz Braun", id: "braun", color: "#5D4037" },
+  holownia: { name: "Szymon Hołownia", id: "holownia", color: "#FBC02D" },
   jakubiak: { name: "Marek Jakubiak", id: "jakubiak" },
   maciak: { name: "Maciej Maciak", id: "maciak" },
   mentzen: {
     name: "Sławomir Mentzen",
     id: "mentzen",
-    color: "#1A237E",
+    color: "#303F9F",
     gradient: chroma.scale(["#7986CB", "#1A237E"]).colors(GRADIENT_COLORS),
   },
   nawrocki: {
     name: "Karol Nawrocki",
     id: "nawrocki",
-    color: "#0D47A1",
+    color: "#1976D2",
     gradient: chroma.scale(["#64B5F6", "#0D47A1"]).colors(GRADIENT_COLORS),
   },
   senyszyn: { name: "Joanna Senyszyn", id: "senyszyn" },
@@ -48,11 +48,11 @@ export const candidatesConfig: Record<CandidateId, Candidate> = {
   trzaskowski: {
     name: "Rafał Trzaskowski",
     id: "trzaskowski",
-    color: "#BF360C",
+    color: "#E64A19",
     gradient: chroma.scale(["#FF8A65", "#BF360C"]).colors(GRADIENT_COLORS),
   },
   woch: { name: "Marek Woch", id: "woch" },
-  zandberg: { name: "Adrian Zandberg", id: "zandberg" },
+  zandberg: { name: "Adrian Zandberg", id: "zandberg", color: "#7B1FA2" },
 };
 
 type ElectionId = "pres_2025_1";

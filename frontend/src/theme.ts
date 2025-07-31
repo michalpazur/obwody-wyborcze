@@ -38,9 +38,32 @@ export const theme = createTheme({
         root: ({ ownerState }) => ({
           ...(ownerState.variant === "outlined" && {
             border: "none",
-            backgroundColor: alpha(theme.palette.background.paper, 0.7),
+            backgroundColor: alpha(theme.palette.background.paper, 0.8),
             backdropFilter: "blur(10px)",
           }),
+        }),
+      },
+    },
+    MuiTableCell: {
+      styleOverrides: {
+        root: ({ theme }) => ({
+          borderBottomColor: theme.palette.divider,
+          fontSize: "14px",
+          padding: theme.spacing(1),
+          lineHeight: "1.2",
+        }),
+        body: {
+          "&:last-child": {
+            fontFamily: "'Bree Serif', sans-serif",
+          },
+        },
+        head: ({ theme }) => ({
+          color: theme.palette.secondary.main,
+          fontSize: "12px",
+        }),
+        footer: ({ theme }) => ({
+          color: theme.palette.text.primary,
+          borderBottom: "none",
         }),
       },
     },

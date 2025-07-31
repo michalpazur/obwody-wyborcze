@@ -1,45 +1,24 @@
-import { Paper, Stack, Typography } from "@mui/material";
+import { Card, Typography } from "@mui/material";
 import { LngLat } from "maplibre-gl";
 import React, { useMemo } from "react";
 import { Popup as MapPopup } from "react-map-gl/maplibre";
 import { DistrictInfo } from "../../../../types";
-import {
-  CandidateId,
-  candidatesConfig,
-  electionsConfig,
-} from "../../../../config";
+import { sortResults } from "../../../../utils/sortResults";
+import ResultsTable from "../ResultsTable";
 
 type PopupProps = {
   district: DistrictInfo;
   position: LngLat;
 };
 
-type Results = {
-  candidate: CandidateId;
-  result: number;
-  resultProc: number;
-};
-
 const Popup: React.FC<PopupProps> = ({ district, position }) => {
   const popupContent = useMemo(() => {
-    let results: Results[] = [];
-
-    Object.keys(district).forEach((key) => {
-      const candidate = key as CandidateId;
-      if (electionsConfig.pres_2025_1.candidates.includes(candidate)) {
-        results.push({
-          candidate,
-          result: district[key],
-          resultProc: district[`${key}_proc`],
-        });
-      }
-    });
-
-    results = results.sort((a, b) => b.result - a.result).slice(0, 3);
+    let results = sortResults(district);
+    results = results.slice(0, 3);
 
     return (
-      <Paper sx={{ p: 1 }}>
-        <Typography sx={{ fontFamily: "'Bree Serif'" }}>
+      <Card sx={{ p: 2, borderRadius: "4px" }}>
+        <Typography sx={{ fontFamily: "'Bree Serif', sans-serif" }}>
           {district.gmina}{" "}
           <Typography
             component="span"
@@ -50,12 +29,8 @@ const Popup: React.FC<PopupProps> = ({ district, position }) => {
             OKW {district.number}
           </Typography>
         </Typography>
-        {results.map((result) => (
-          <Typography sx={{ fontSize: "14px" }} key={result.candidate}>
-            {candidatesConfig[result.candidate].name} {result.resultProc}%
-          </Typography>
-        ))}
-      </Paper>
+        <ResultsTable results={results} />
+      </Card>
     );
   }, [district]);
 
@@ -65,6 +40,9 @@ const Popup: React.FC<PopupProps> = ({ district, position }) => {
       longitude={position.lng}
       latitude={position.lat}
       closeOnClick={false}
+      closeButton={false}
+      subpixelPositioning
+      maxWidth="100%"
     >
       {popupContent}
     </MapPopup>

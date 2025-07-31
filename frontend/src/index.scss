@@ -1,6 +1,9 @@
 body {
   margin: 0px;
-  min-height: 100vh;
+}
+
+.maplibregl-popup {
+  max-width: 100%;
 }
 
 .maplibregl-popup-content {
@@ -8,7 +11,7 @@ body {
   box-shadow: none;
   border-radius: 0px;
   padding: 0px;
-  top: -12px;
+  top: -24px;
   
   .maplibregl-popup-close-button {
     display: none;

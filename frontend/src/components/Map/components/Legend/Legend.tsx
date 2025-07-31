@@ -11,13 +11,16 @@ const colors = Array(GRADIENT_COLORS).fill(0);
 const colorBoxWidth = 5;
 const colorBoxSpacing = 0.25;
 
-const root: SxProps<Theme> = {
+const root: SxProps<Theme> = (theme) => ({
   position: "absolute",
   bottom: (theme) => theme.spacing(3),
   left: (theme) => theme.spacing(6),
   p: 2,
-  zIndex: 1,
-};
+  zIndex: 5,
+  [theme.breakpoints.down("sm")]: {
+    left: (theme) => theme.spacing(3),
+  },
+});
 
 const text: SxProps<Theme> = {
   fontSize: "12px",
