@@ -67,12 +67,12 @@ candidates = {
 
 char_order = list("aąbcćdefghijklłmnńoópqrsśtuvwxyzżź0123456789")
 
-building_num_regex = r"(d?(\d+)\w*|\w{1,2})$"
+building_num_regex = r"((\d+)\w*|\w{1,2})$"
 building_letter_regex = r"\d*(\w*)$"
 all_regex = r"cał[ae]"
 odd_regex = r"nieparzyst[ae]"
 even_regex = r"parzyst[ae]"
-first_name_letter_regex = r"^\p{Lu}(ł|h|z)?\s*\.(\s+(i\s+)?\p{Lu}(ł|h|z)?\s*\.)?\s+"
+first_name_letter_regex = r"^(([kK]s\.|[kK]siędza|[bB]p.|[bB]iskupa|[gG]en.|[gG]enerała|[pP]l.|[pP]lac)\s+)?(\p{Lu}(ł|h|z)?\s*\.(\s+(i\s+)?\p{Lu}(ł|h|z)?\s*\.)?\s+)"
 holy_name_regex = r"(św\.|świętego|świętej|świętych)\s+"
 ordinal_regex = r"\s*-\s*(go|ej)"
 multiple_number_regex = r"(\d+\w*|\w+)\s?([-,/._]|s\.)\s?(\d*\w*\s?([-,/._]|s\.)?\s?)+"

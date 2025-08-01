@@ -10,10 +10,17 @@ import re
 
 T = TypeVar("T", pd.DataFrame, geo.GeoDataFrame)
 
-def process_row(row):
-  print(row["building"], row["building_n"], row["building_l"])
-  return get_building_order(row["building_n"], row["building_l"])
+def get_building_number(row: pd.Series):
+  match = re.search(building_num_regex, row["building"])
+  if (match):
+    return match.group(2)
+  return ""
 
+def get_building_letter(row: pd.Series):
+  match = re.search(building_letter_regex, row["building"])
+  if (match):
+    return match.group(1)
+  return ""
 
 def process_addresses(df: T, column_names: dict[str, str], is_addresses: bool = False) -> T:
   utils = Utils()
@@ -73,10 +80,10 @@ def process_addresses(df: T, column_names: dict[str, str], is_addresses: bool = 
     df["building"] = df["building"].str.replace(r"(bl\.?|blok)\s+(\d+\w*)$", r"\2", regex=True)
     df["building"] = df["building"].str.replace(r"(\d+)\s*(bl|m)\.?\s*.+$", lambda m: f"{m.group(1)}", regex=True)
     # Split building numbers into parts
-    df["building_n"] = df["building"].str.replace(building_num_regex, r"\2", regex=True)
-    df["building_l"] = df["building"].str.replace(building_letter_regex, r"\1", regex=True)
+    df["building_n"] = df.apply(get_building_number, axis=1)
+    df["building_l"] = df.apply(get_building_letter, axis=1)
     # Assign building order
-    df["building_o"] = df.apply(process_row, axis=1)
+    df["building_o"] = df.apply(lambda row: get_building_order(row["building_n"], row["building_l"]), axis=1)
 
   if (has_building_numbers and isinstance(df, geo.GeoDataFrame)):
     print("Updating TERYT based on spatial data...")

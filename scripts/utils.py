@@ -59,7 +59,12 @@ class Utils:
     return re.sub(self.names_regex, "", street)
 
   def remove_first_letter(self, street: str):
-    return regex.sub(first_name_letter_regex, "", street)
+    match = regex.search(first_name_letter_regex, street)
+    if (match):
+      name_letter = match.group(3)
+      return street.replace(name_letter, "", 1)
+
+    return street
   
   def transform_street_name(self, street: str):
     for search in self.street_prefixes:
@@ -71,7 +76,6 @@ class Utils:
     street = self.remove_first_letter(street)
     street = re.sub(ordinal_regex, "", street)
     street = re.sub(quotation_regex, r'"\1"', street)
-    street = re.sub(multiple_number_regex, r"\1", street)
     street = street.replace("´", "'")
     street = re.sub(dash_regex, "-", street)
     street = re.sub(ordinal_regex, "", street)
