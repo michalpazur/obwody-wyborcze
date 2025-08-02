@@ -1,16 +1,11 @@
 import {
   ExpressionSpecification,
+  GeoJSONFeature,
   LngLat,
   MapLayerMouseEvent,
 } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Layer,
   Map as MapComponent,
@@ -26,6 +21,7 @@ import Legend from "./components/Legend";
 import Popup from "./components/Popup";
 
 const opacity = 0.75;
+let hoveredId: GeoJSONFeature["id"];
 
 const Map = () => {
   const mapRef = useRef<MapRef>(null);
@@ -39,32 +35,55 @@ const Map = () => {
     setClicked(undefined);
   }, [elections]);
 
-  const onHover = useCallback(
-    (event: MapLayerMouseEvent) => {
-      const feature = event.features?.[0];
-      console.log(feature);
-      setHoverPosition(event.lngLat);
-      const sourceLayer = electionsConfig[elections].sourceLayer;
-      if (feature) {
-        if (hovered) {
-          mapRef.current?.setFeatureState(
-            {
-              source: elections,
-              sourceLayer: sourceLayer,
-              id: hovered.id,
-            },
-            { hovered: false }
-          );
-        }
-        setHovered({ ...feature.properties, id: feature.id } as DistrictInfo);
-        mapRef.current?.setFeatureState(
-          { source: elections, sourceLayer, id: feature.id },
-          { hovered: true }
-        );
-      }
-    },
-    [hovered, elections]
-  );
+  const onMouseMove = (event: MapLayerMouseEvent) => {
+    setHoverPosition(event.lngLat);
+    const feature = event.features?.[0];
+
+    if (feature?.id === hoveredId) {
+      return;
+    }
+
+    const featureSelector = {
+      source: elections,
+      sourceLayer: electionsConfig[elections].sourceLayer,
+    };
+
+    if (hoveredId) {
+      mapRef.current?.setFeatureState(
+        { ...featureSelector, id: hoveredId },
+        { hovered: false }
+      );
+    }
+
+    if (feature) {
+      hoveredId = feature.id;
+      setHovered({ ...feature.properties, id: feature.id } as DistrictInfo);
+      mapRef.current?.setFeatureState(
+        { ...featureSelector, id: feature.id },
+        { hovered: true }
+      );
+    } else {
+      setHovered(undefined);
+      setHoverPosition(undefined);
+    }
+  };
+
+  const onMouseLeave = () => {
+    if (!hoveredId) {
+      return;
+    }
+
+    mapRef.current?.setFeatureState(
+      {
+        source: elections,
+        sourceLayer: electionsConfig[elections].sourceLayer,
+        id: hoveredId,
+      },
+      { hovered: false }
+    );
+    setHovered(undefined);
+    setHoverPosition(undefined);
+  };
 
   const onClick = useCallback(
     (event: MapLayerMouseEvent) => {
@@ -86,6 +105,7 @@ const Map = () => {
         id={elections}
         key={elections}
         type="vector"
+        promoteId="district"
         tiles={[
           `https://api.mapbox.com/v4/${
             selectedElections.tilesetId
@@ -170,7 +190,9 @@ const Map = () => {
         longitude: 21.0067249,
         zoom: 13,
       }}
-      onMouseMove={onHover}
+      onMouseMove={onMouseMove}
+      onMouseLeave={onMouseLeave}
+      onMouseOut={onMouseLeave}
       onClick={onClick}
       interactiveLayerIds={[...electionsConfig.pres_2025_1.winners, "tie"]}
       style={{ width: "100%", height: "100%" }}
