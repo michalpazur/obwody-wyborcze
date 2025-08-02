@@ -75,6 +75,7 @@ const DistrictInfoComponent: React.FC<{
   setDistrictInfo: (districtInfo: DistrictInfo | undefined) => void;
 }> = ({ districtInfo, setDistrictInfo }) => {
   const [open, setOpen] = useState(true);
+  const { elections } = useElectionsStore();
 
   useEffect(() => {
     if (districtInfo) {
@@ -92,11 +93,11 @@ const DistrictInfoComponent: React.FC<{
 
   const results = useMemo(() => {
     if (districtInfo) {
-      return sortResults(districtInfo);
+      return sortResults(districtInfo, elections);
     }
 
     return [];
-  }, [districtInfo]);
+  }, [districtInfo, elections]);
 
   return (
     <CardWithSlide open={open} onExited={onExited}>

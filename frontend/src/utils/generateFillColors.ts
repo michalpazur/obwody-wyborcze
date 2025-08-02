@@ -1,8 +1,12 @@
 import { ExpressionSpecification } from "maplibre-gl";
-import { GRADIENT_COLORS } from "../config";
+import { GRADIENT_COLORS, tieGradient } from "../config";
 import { ProcentKey } from "../types";
 
-export const generateFillColors = (key: ProcentKey, gradient?: string[]) => {
+export const generateFillColors = (
+  key: ProcentKey,
+  gradient: string[] = tieGradient,
+  maxGradient: number = 100
+) => {
   if (!gradient) {
     return "#616161";
   }
@@ -12,7 +16,7 @@ export const generateFillColors = (key: ProcentKey, gradient?: string[]) => {
     .fill(0)
     .forEach((_, idx) => {
       // @ts-ignore
-      arr.push(gradient[idx], ((idx + 1) * 100) / GRADIENT_COLORS);
+      arr.push(gradient[idx], ((idx + 1) * maxGradient) / GRADIENT_COLORS);
     });
   arr.push(gradient[GRADIENT_COLORS - 1]);
   return arr as ExpressionSpecification;

@@ -12,7 +12,12 @@ import {
   MapRef,
   Source,
 } from "react-map-gl/maplibre";
-import { candidatesConfig, electionsConfig, tieGradient } from "../../config";
+import {
+  candidatesConfig,
+  electionsConfig,
+  mapOpacity,
+  tieGradient,
+} from "../../config";
 import { useElectionsStore } from "../../redux/electionsSlice";
 import { DistrictInfo } from "../../types";
 import { generateFillColors } from "../../utils/generateFillColors";
@@ -20,7 +25,6 @@ import DistrictInfoComponent from "./components/DistrictInfo";
 import Legend from "./components/Legend";
 import Popup from "./components/Popup";
 
-const opacity = 0.75;
 let hoveredId: GeoJSONFeature["id"];
 
 const Map = () => {
@@ -28,7 +32,7 @@ const Map = () => {
   const [hovered, setHovered] = useState<DistrictInfo>();
   const [clicked, setClicked] = useState<DistrictInfo>();
   const [hoverPosition, setHoverPosition] = useState<LngLat>();
-  const { elections } = useElectionsStore();
+  const { elections, candidate } = useElectionsStore();
 
   useEffect(() => {
     setHovered(undefined);
@@ -114,46 +118,71 @@ const Map = () => {
           }`,
         ]}
       >
-        {electionsConfig[elections].winners.map((winnerId) => (
+        {candidate === "all" ? (
+          electionsConfig[elections].winners.map((winnerId) => {
+            const fill = generateFillColors(
+              `${winnerId}_proc`,
+              candidatesConfig[winnerId].gradient
+            );
+            return (
+              <Layer
+                key={winnerId}
+                filter={["==", "winner", winnerId]}
+                id={winnerId}
+                type="fill"
+                source-layer={selectedElections.sourceLayer}
+                paint={{
+                  "fill-color": fill,
+                  "fill-outline-color": fill,
+                  "fill-opacity": mapOpacity,
+                }}
+              />
+            );
+          })
+        ) : (
           <Layer
-            key={winnerId}
-            filter={["==", "winner", winnerId]}
-            id={winnerId}
+            key={candidate}
+            id={candidate}
             type="fill"
             source-layer={selectedElections.sourceLayer}
             paint={{
               "fill-color": generateFillColors(
-                `${winnerId}_proc`,
-                candidatesConfig[winnerId].gradient
+                `${candidate}_proc`,
+                candidatesConfig[candidate].gradient,
+                candidatesConfig[candidate].maxGradient
               ),
               "fill-outline-color": generateFillColors(
-                `${winnerId}_proc`,
-                candidatesConfig[winnerId].gradient
+                `${candidate}_proc`,
+                candidatesConfig[candidate].gradient,
+                candidatesConfig[candidate].maxGradient
               ),
-              "fill-opacity": opacity,
+              "fill-opacity": mapOpacity,
             }}
           />
-        ))}
+        )}
+        {candidate === "all" && (
+          <Layer
+            filter={[
+              "all",
+              ...electionsConfig[elections].winners.map(
+                (winner) => ["!=", "winner", winner] as ExpressionSpecification
+              ),
+            ]}
+            id="tie"
+            type="fill"
+            source-layer={selectedElections.sourceLayer}
+            paint={{
+              "fill-color": generateFillColors("winner_proc", tieGradient),
+              "fill-outline-color": generateFillColors(
+                "winner_proc",
+                tieGradient
+              ),
+              "fill-opacity": mapOpacity,
+            }}
+          />
+        )}
         <Layer
-          filter={[
-            "all",
-            ...electionsConfig.pres_2025_1.winners.map(
-              (winner) => ["!=", "winner", winner] as ExpressionSpecification
-            ),
-          ]}
-          id="tie"
-          type="fill"
-          source-layer={selectedElections.sourceLayer}
-          paint={{
-            "fill-color": generateFillColors("winner_proc", tieGradient),
-            "fill-outline-color": generateFillColors(
-              "winner_proc",
-              tieGradient
-            ),
-            "fill-opacity": opacity,
-          }}
-        />
-        <Layer
+          key={candidate + "_outline"}
           id="outline"
           type="line"
           source-layer={selectedElections.sourceLayer}
@@ -180,7 +209,7 @@ const Map = () => {
         />
       </Source>
     );
-  }, [elections]);
+  }, [elections, candidate]);
 
   return (
     <MapComponent
@@ -194,7 +223,11 @@ const Map = () => {
       onMouseLeave={onMouseLeave}
       onMouseOut={onMouseLeave}
       onClick={onClick}
-      interactiveLayerIds={[...electionsConfig.pres_2025_1.winners, "tie"]}
+      interactiveLayerIds={
+        candidate === "all"
+          ? [...electionsConfig[elections].winners, "tie"]
+          : [candidate]
+      }
       style={{ width: "100%", height: "100%" }}
       mapStyle={`https://api.maptiler.com/maps/dataviz-light/style.json?key=${
         import.meta.env.VITE_MAPTILER_TOKEN

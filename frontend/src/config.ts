@@ -28,6 +28,7 @@ type Candidate = {
   color?: string;
   gradient?: string[];
   avatarUrl?: string;
+  maxGradient?: number;
 };
 
 export const GRADIENT_COLORS = 5;
@@ -38,19 +39,25 @@ export const candidatesConfig: Record<CandidateId, Candidate> = {
     name: "Magdalena Biejat",
     id: "biejat",
     color: "#8ACE00",
+    gradient: chroma.scale(["#B4FF1C", "#689B00"]).colors(GRADIENT_COLORS),
     avatarUrl: biejat,
+    maxGradient: 20,
   },
   braun: {
     name: "Grzegorz Braun",
     id: "braun",
     color: "#5D4037",
+    gradient: chroma.scale(["#A1887F", "#3E2723"]).colors(GRADIENT_COLORS),
     avatarUrl: braun,
+    maxGradient: 15,
   },
   holownia: {
     name: "Szymon Hołownia",
     id: "holownia",
     color: "#FBC02D",
+    gradient: chroma.scale(["#FFF176", "#F57F17"]).colors(GRADIENT_COLORS),
     avatarUrl: holownia,
+    maxGradient: 15,
   },
   jakubiak: { name: "Marek Jakubiak", id: "jakubiak" },
   maciak: { name: "Maciej Maciak", id: "maciak" },
@@ -60,6 +67,7 @@ export const candidatesConfig: Record<CandidateId, Candidate> = {
     color: "#303F9F",
     gradient: chroma.scale(["#7986CB", "#1A237E"]).colors(GRADIENT_COLORS),
     avatarUrl: mentzen,
+    maxGradient: 40,
   },
   nawrocki: {
     name: "Karol Nawrocki",
@@ -83,6 +91,8 @@ export const candidatesConfig: Record<CandidateId, Candidate> = {
     id: "zandberg",
     color: "#7B1FA2",
     avatarUrl: zandberg,
+    gradient: chroma.scale(["#BA68C8", "#4A148C"]).colors(GRADIENT_COLORS),
+    maxGradient: 20,
   },
 };
 
@@ -123,10 +133,7 @@ export const electionsConfig: Record<ElectionId, ElectionConfig> = {
   pres_2025_2: {
     id: "pres_2025_2",
     name: "Prezydent 2025 (II tura)",
-    candidates: [
-      "nawrocki",
-      "trzaskowski",
-    ],
+    candidates: ["nawrocki", "trzaskowski"],
     winners: ["nawrocki", "trzaskowski"],
     tilesetId: "michalpazur.17bbkxiq",
     sourceLayer: "pres_2025_2-bqufar",
@@ -134,5 +141,7 @@ export const electionsConfig: Record<ElectionId, ElectionConfig> = {
 };
 
 export const tieGradient = chroma
-  .scale(["#EEEEEE", "#212121"])
+  .scale(["#E0E0E0", "#212121"])
   .colors(GRADIENT_COLORS);
+
+export const mapOpacity = 0.75;

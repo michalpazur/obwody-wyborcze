@@ -1,12 +1,12 @@
-import { CandidateId, electionsConfig } from "../config";
+import { CandidateId, ElectionId, electionsConfig } from "../config";
 import { DistrictInfo, Results } from "../types";
 
-export const sortResults = (district: DistrictInfo) => {
+export const sortResults = (district: DistrictInfo, elections: ElectionId) => {
   let results: Results[] = [];
 
   Object.keys(district).forEach((key) => {
     const candidate = key as CandidateId;
-    if (electionsConfig.pres_2025_1.candidates.includes(candidate)) {
+    if (electionsConfig[elections]?.candidates.includes(candidate)) {
       results.push({
         candidate,
         result: district[key],

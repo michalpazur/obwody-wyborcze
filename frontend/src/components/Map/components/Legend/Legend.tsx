@@ -4,6 +4,7 @@ import {
   candidatesConfig,
   electionsConfig,
   GRADIENT_COLORS,
+  mapOpacity,
   tieGradient,
 } from "../../../../config";
 import { useElectionsStore } from "../../../../redux/electionsSlice";
@@ -28,6 +29,7 @@ const text: SxProps<Theme> = {
   fontSize: "12px",
   color: (theme) => theme.palette.secondary.light,
   flexGrow: "1",
+  minWidth: (theme) => theme.spacing(20),
 };
 
 const legendText: SxProps<Theme> = {
@@ -43,16 +45,23 @@ const legendText: SxProps<Theme> = {
 const colorBox: SxProps<Theme> = {
   width: (theme) => theme.spacing(colorBoxWidth),
   height: (theme) => theme.spacing(2),
+  opacity: mapOpacity,
 };
 
 const Legend: React.FC = () => {
-  const { elections } = useElectionsStore();
+  const { elections, candidate } = useElectionsStore();
+
+  const winners =
+    candidate === "all" ? electionsConfig[elections].winners : [candidate];
+
+  const maxGradient =
+    candidate === "all" ? 100 : candidatesConfig[candidate].maxGradient ?? 100;
 
   return (
     <Card variant="outlined" elevation={1} sx={root}>
       <Typography sx={{ fontFamily: "'Bree Serif'", mb: 2 }}>Wynik</Typography>
       <Stack spacing={1}>
-        {electionsConfig[elections].winners.map((winner) => (
+        {winners.map((winner) => (
           <Stack spacing={2} direction="row" alignItems="center" key={winner}>
             <Typography sx={text}>
               {getLastName(candidatesConfig[winner].name)}
@@ -88,7 +97,7 @@ const Legend: React.FC = () => {
         >
           {colors.slice(0, GRADIENT_COLORS - 1).map((_, idx) => (
             <Typography sx={legendText} key={idx}>
-              {((idx + 1) * 100) / GRADIENT_COLORS}
+              {((idx + 1) * maxGradient) / GRADIENT_COLORS}
             </Typography>
           ))}
         </Stack>

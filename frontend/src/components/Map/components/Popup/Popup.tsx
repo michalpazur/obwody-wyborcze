@@ -2,6 +2,7 @@ import { Card, Typography } from "@mui/material";
 import { LngLat } from "maplibre-gl";
 import React, { useMemo } from "react";
 import { Popup as MapPopup } from "react-map-gl/maplibre";
+import { useElectionsStore } from "../../../../redux/electionsSlice";
 import { DistrictInfo } from "../../../../types";
 import { sortResults } from "../../../../utils/sortResults";
 import ResultsTable from "../ResultsTable";
@@ -12,8 +13,10 @@ type PopupProps = {
 };
 
 const Popup: React.FC<PopupProps> = ({ district, position }) => {
+  const { elections } = useElectionsStore();
+
   const popupContent = useMemo(() => {
-    let results = sortResults(district);
+    let results = sortResults(district, elections);
     results = results.slice(0, 3);
 
     return (
@@ -32,7 +35,7 @@ const Popup: React.FC<PopupProps> = ({ district, position }) => {
         <ResultsTable results={results} />
       </Card>
     );
-  }, [district]);
+  }, [district, elections]);
 
   return (
     <MapPopup
