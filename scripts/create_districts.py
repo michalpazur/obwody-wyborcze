@@ -50,7 +50,7 @@ def process_teryt(teryt: str, addresses: geo.GeoDataFrame, districts_df: geo.Geo
   districts_df.geometry = districts_df.geometry.buffer(-1)
   return districts_df
 
-elections = "pres_2025_1"
+elections = "pres_2025_2"
 
 def main():
   districts_df: geo.GeoDataFrame | None = geo.GeoDataFrame()
@@ -74,6 +74,11 @@ def main():
   canidates_columns = list(filter(lambda key: key in results, canidates_columns))
   merged_columns = filter(lambda key: key in results, [merged_columns[key] for key in merged_columns])
   merged_columns = list(merged_columns)
+  tmp_merged_columns = []
+  for key in merged_columns:
+    if (key not in tmp_merged_columns):
+      tmp_merged_columns.append(key)
+  merged_columns = tmp_merged_columns
   proc_columns = [name + "_proc" for name in canidates_columns]
 
   results = results[merged_columns]

@@ -67,5 +67,34 @@ export const theme = createTheme({
         }),
       },
     },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        input: ({ theme }) => ({
+          padding: theme.spacing(2, 3),
+          background: theme.palette.background.paper,
+        }),
+        notchedOutline: ({ theme }) => ({
+          transition: theme.transitions.create("border-color", {
+            duration: theme.transitions.duration.shortest,
+          }),
+        }),
+      },
+    },
+    MuiSelect: {
+      styleOverrides: {
+        icon: ({ theme }) => ({
+          transition: theme.transitions.create("transform", {
+            duration: theme.transitions.duration.short,
+          }),
+        }),
+      },
+    },
+    MuiPopover: {
+      styleOverrides: {
+        paper: ({ theme }) => ({
+          marginTop: theme.spacing(2),
+        }),
+      },
+    },
   },
 });

@@ -86,7 +86,7 @@ export const candidatesConfig: Record<CandidateId, Candidate> = {
   },
 };
 
-type ElectionId = "pres_2025_1";
+export type ElectionId = "pres_2025_1" | "pres_2025_2";
 
 type ElectionConfig = {
   id: ElectionId;
@@ -94,6 +94,7 @@ type ElectionConfig = {
   candidates: CandidateId[];
   winners: CandidateId[];
   tilesetId: string;
+  sourceLayer: string;
 };
 
 export const electionsConfig: Record<ElectionId, ElectionConfig> = {
@@ -116,7 +117,19 @@ export const electionsConfig: Record<ElectionId, ElectionConfig> = {
       "woch",
     ],
     winners: ["trzaskowski", "nawrocki", "mentzen"],
-    tilesetId: "01984855-b44c-75a1-8463-876f2a7f32b3",
+    tilesetId: "michalpazur.0nra5ryd",
+    sourceLayer: "pres_2025_1-1v7a05",
+  },
+  pres_2025_2: {
+    id: "pres_2025_2",
+    name: "Prezydent 2025 (II tura)",
+    candidates: [
+      "nawrocki",
+      "trzaskowski",
+    ],
+    winners: ["nawrocki", "trzaskowski"],
+    tilesetId: "michalpazur.17bbkxiq",
+    sourceLayer: "pres_2025_2-bqufar",
   },
 };
 

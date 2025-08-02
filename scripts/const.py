@@ -45,6 +45,7 @@ results_columns = {
   "Teryt Gminy": "teryt",
   "Nr komisji": "number",
   "Liczba głosów ważnych oddanych łącznie na wszystkich kandydatów (z kart ważnych)": "total",
+  "Liczba głosów ważnych oddanych łącznie na obu kandydatów (z kart ważnych)": "total",
   "Liczba kart ważnych": "all_votes",
   "Liczba wyborców uprawnionych do głosowania (umieszczonych w spisie, z uwzględnieniem dodatkowych formularzy) w chwili zakończenia głosowania": "voters"
 }

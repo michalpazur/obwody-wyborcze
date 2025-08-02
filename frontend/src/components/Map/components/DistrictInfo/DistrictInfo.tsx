@@ -10,9 +10,11 @@ import {
   Typography,
 } from "@mui/material";
 import React, { useEffect, useMemo, useState } from "react";
+import { useElectionsStore } from "../../../../redux/electionsSlice";
 import { DistrictInfo } from "../../../../types";
 import { sortResults } from "../../../../utils/sortResults";
 import ResultsTable from "../ResultsTable";
+import ElectionsSelects from "./components/ElectionsSelects";
 
 const root: SxProps<Theme> = (theme) => ({
   width: "100%",
@@ -106,11 +108,12 @@ const DistrictInfoComponent: React.FC<{
       >
         <CloseIcon />
       </IconButton>
-      <Typography variant="h2" mb={3} sx={header}>
-        Szczegółowe wyniki
-      </Typography>
-      {districtInfo ? (
-        <Stack spacing={3}>
+      <Stack spacing={4}>
+        <Typography variant="h2" sx={header}>
+          Szczegółowe wyniki
+        </Typography>
+        <ElectionsSelects />
+        {districtInfo ? (
           <Box>
             <Typography sx={text}>
               Okręgowa Komisja Wyborcza {districtInfo.number}
@@ -123,14 +126,14 @@ const DistrictInfoComponent: React.FC<{
               </Typography>
             </Typography>
           </Box>
-          <ResultsTable results={results} full />
-        </Stack>
-      ) : (
-        <Typography sx={text}>
-          Kliknij na mapie żeby zobaczyć szczegółowe wyniki w wybranej Okręgowej
-          Komisji Wyborczej.
-        </Typography>
-      )}
+        ) : (
+          <Typography sx={text}>
+            Kliknij na mapie żeby zobaczyć szczegółowe wyniki w wybranej
+            Okręgowej Komisji Wyborczej.
+          </Typography>
+        )}
+        {districtInfo && <ResultsTable results={results} full />}
+      </Stack>
     </CardWithSlide>
   );
 };

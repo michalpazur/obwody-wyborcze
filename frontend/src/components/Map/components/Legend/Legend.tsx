@@ -4,7 +4,9 @@ import {
   candidatesConfig,
   electionsConfig,
   GRADIENT_COLORS,
+  tieGradient,
 } from "../../../../config";
+import { useElectionsStore } from "../../../../redux/electionsSlice";
 import { getLastName } from "../../../../utils/getLastName";
 
 const colors = Array(GRADIENT_COLORS).fill(0);
@@ -44,12 +46,14 @@ const colorBox: SxProps<Theme> = {
 };
 
 const Legend: React.FC = () => {
+  const { elections } = useElectionsStore();
+
   return (
     <Card variant="outlined" elevation={1} sx={root}>
       <Typography sx={{ fontFamily: "'Bree Serif'", mb: 2 }}>Wynik</Typography>
       <Stack spacing={1}>
-        {electionsConfig.pres_2025_1.winners.map((winner) => (
-          <Stack spacing={2} direction="row" alignItems="center">
+        {electionsConfig[elections].winners.map((winner) => (
+          <Stack spacing={2} direction="row" alignItems="center" key={winner}>
             <Typography sx={text}>
               {getLastName(candidatesConfig[winner].name)}
             </Typography>
@@ -61,7 +65,9 @@ const Legend: React.FC = () => {
                   sx={[
                     colorBox,
                     {
-                      backgroundColor: candidatesConfig[winner].gradient?.[idx],
+                      backgroundColor:
+                        candidatesConfig[winner].gradient?.[idx] ||
+                        tieGradient[idx],
                     },
                   ]}
                 />

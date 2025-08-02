@@ -4,7 +4,13 @@ import {
   MapLayerMouseEvent,
 } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { useCallback, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   Layer,
   Map as MapComponent,
@@ -12,30 +18,39 @@ import {
   Source,
 } from "react-map-gl/maplibre";
 import { candidatesConfig, electionsConfig, tieGradient } from "../../config";
+import { useElectionsStore } from "../../redux/electionsSlice";
 import { DistrictInfo } from "../../types";
 import { generateFillColors } from "../../utils/generateFillColors";
 import DistrictInfoComponent from "./components/DistrictInfo";
 import Legend from "./components/Legend";
 import Popup from "./components/Popup";
 
-const opacity = 0.6;
+const opacity = 0.75;
 
 const Map = () => {
   const mapRef = useRef<MapRef>(null);
   const [hovered, setHovered] = useState<DistrictInfo>();
   const [clicked, setClicked] = useState<DistrictInfo>();
   const [hoverPosition, setHoverPosition] = useState<LngLat>();
+  const { elections } = useElectionsStore();
+
+  useEffect(() => {
+    setHovered(undefined);
+    setClicked(undefined);
+  }, [elections]);
 
   const onHover = useCallback(
     (event: MapLayerMouseEvent) => {
       const feature = event.features?.[0];
+      console.log(feature);
       setHoverPosition(event.lngLat);
+      const sourceLayer = electionsConfig[elections].sourceLayer;
       if (feature) {
         if (hovered) {
           mapRef.current?.setFeatureState(
             {
-              source: "pres_2025_1",
-              sourceLayer: "pres_2025_1",
+              source: elections,
+              sourceLayer: sourceLayer,
               id: hovered.id,
             },
             { hovered: false }
@@ -43,12 +58,12 @@ const Map = () => {
         }
         setHovered({ ...feature.properties, id: feature.id } as DistrictInfo);
         mapRef.current?.setFeatureState(
-          { source: "pres_2025_1", sourceLayer: "pres_2025_1", id: feature.id },
+          { source: elections, sourceLayer, id: feature.id },
           { hovered: true }
         );
       }
     },
-    [hovered]
+    [hovered, elections]
   );
 
   const onClick = useCallback(
@@ -63,36 +78,29 @@ const Map = () => {
     [clicked]
   );
 
-  return (
-    <MapComponent
-      ref={mapRef}
-      initialViewState={{
-        latitude: 52.2319581,
-        longitude: 21.0067249,
-        zoom: 13,
-      }}
-      onMouseMove={onHover}
-      onClick={onClick}
-      interactiveLayerIds={[...electionsConfig.pres_2025_1.winners, "tie"]}
-      style={{ width: "100%", height: "100%" }}
-      mapStyle={`https://api.maptiler.com/maps/dataviz-light/style.json?key=${
-        import.meta.env.VITE_MAPTILER_TOKEN
-      }`}
-    >
+  const mapLayers = useMemo(() => {
+    const selectedElections = electionsConfig[elections];
+
+    return (
       <Source
-        id="pres_2025_1"
+        id={elections}
+        key={elections}
         type="vector"
-        url={`https://api.maptiler.com/tiles/${
-          electionsConfig.pres_2025_1.tilesetId
-        }/tiles.json?key=${import.meta.env.VITE_MAPTILER_TOKEN}`}
+        tiles={[
+          `https://api.mapbox.com/v4/${
+            selectedElections.tilesetId
+          }/{z}/{x}/{y}.vector.pbf?access_token=${
+            import.meta.env.VITE_MAPBOX_TOKEN
+          }`,
+        ]}
       >
-        {electionsConfig.pres_2025_1.winners.map((winnerId) => (
+        {electionsConfig[elections].winners.map((winnerId) => (
           <Layer
             key={winnerId}
             filter={["==", "winner", winnerId]}
             id={winnerId}
             type="fill"
-            source-layer="pres_2025_1"
+            source-layer={selectedElections.sourceLayer}
             paint={{
               "fill-color": generateFillColors(
                 `${winnerId}_proc`,
@@ -115,7 +123,7 @@ const Map = () => {
           ]}
           id="tie"
           type="fill"
-          source-layer="pres_2025_1"
+          source-layer={selectedElections.sourceLayer}
           paint={{
             "fill-color": generateFillColors("winner_proc", tieGradient),
             "fill-outline-color": generateFillColors(
@@ -128,7 +136,7 @@ const Map = () => {
         <Layer
           id="outline"
           type="line"
-          source-layer="pres_2025_1"
+          source-layer={selectedElections.sourceLayer}
           paint={{
             "line-width": [
               "interpolate",
@@ -151,6 +159,26 @@ const Map = () => {
           }}
         />
       </Source>
+    );
+  }, [elections]);
+
+  return (
+    <MapComponent
+      ref={mapRef}
+      initialViewState={{
+        latitude: 52.2319581,
+        longitude: 21.0067249,
+        zoom: 13,
+      }}
+      onMouseMove={onHover}
+      onClick={onClick}
+      interactiveLayerIds={[...electionsConfig.pres_2025_1.winners, "tie"]}
+      style={{ width: "100%", height: "100%" }}
+      mapStyle={`https://api.maptiler.com/maps/dataviz-light/style.json?key=${
+        import.meta.env.VITE_MAPTILER_TOKEN
+      }`}
+    >
+      {mapLayers}
       {hovered && hoverPosition ? (
         <Popup district={hovered} position={hoverPosition} />
       ) : null}
