@@ -57,6 +57,7 @@ const Legend: React.FC = () => {
               {colors.map((_, idx) => (
                 <Box
                   component="span"
+                  key={idx}
                   sx={[
                     colorBox,
                     {
@@ -80,7 +81,7 @@ const Legend: React.FC = () => {
           spacing={colorBoxSpacing}
         >
           {colors.slice(0, GRADIENT_COLORS - 1).map((_, idx) => (
-            <Typography sx={legendText}>
+            <Typography sx={legendText} key={idx}>
               {((idx + 1) * 100) / GRADIENT_COLORS}
             </Typography>
           ))}

@@ -22,12 +22,13 @@ const root: SxProps<Theme> = (theme) => ({
   p: 5,
   zIndex: 6,
   maxWidth: "360px",
-  maxHeight: "calc(100% - 140px)",
-  overflow: "scroll",
+  maxHeight: "calc(100% - 156px)",
+  overflowY: "auto",
   [theme.breakpoints.down("sm")]: {
     maxWidth: `calc(100% - ${theme.spacing(6)})`,
     top: (theme) => theme.spacing(3),
     left: (theme) => theme.spacing(3),
+    maxHeight: "calc(100% - 140px)",
   },
 });
 
