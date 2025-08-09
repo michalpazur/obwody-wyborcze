@@ -126,7 +126,7 @@ export const electionsConfig: Record<ElectionId, ElectionConfig> = {
       "maciak",
       "woch",
     ],
-    winners: ["trzaskowski", "nawrocki", "mentzen"],
+    winners: ["trzaskowski", "nawrocki", "mentzen", "braun", "zandberg"],
     tilesetId: "michalpazur.0nra5ryd",
     sourceLayer: "pres_2025_1-1v7a05",
   },

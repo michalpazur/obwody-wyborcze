@@ -52,7 +52,9 @@ const Legend: React.FC = () => {
   const { elections, candidate } = useElectionsStore();
 
   const winners =
-    candidate === "all" ? electionsConfig[elections].winners : [candidate];
+    candidate === "all"
+      ? electionsConfig[elections].winners.slice(0, 3)
+      : [candidate];
 
   const maxGradient =
     candidate === "all" ? 100 : candidatesConfig[candidate].maxGradient ?? 100;
