@@ -9,7 +9,7 @@ from const import all_regex, odd_regex, even_regex, building_num_regex, building
 
 pandas.options.mode.copy_on_write = True
 
-place_type = re.compile(r"^(miasto|miasta|wieś|wsie|sołectwo|sołectwa|osada|osady|przysiółek|przysiółki):?\s*", flags=re.IGNORECASE)
+place_type = re.compile(r"^(miasto|miasta|wieś|wsie|sołectwo|sołectwa|osada|osady|przysiółek|przysiółki|miejscowość|miejscowości):?\s*", flags=re.IGNORECASE)
 streets_regex = re.compile(r",?.*(ulice|ulica):?\s*", flags=re.IGNORECASE)
 street_name_regex = regex.compile(r"^(\p{Lu}\p{L}+\s?)+$", flags=re.IGNORECASE)
 
@@ -19,7 +19,7 @@ class BuildingNumber(TypedDict):
   building_n: int | str
   building_l: str
 
-class ParsedToken(TypedDict):
+class BaseParsedToken(TypedDict):
   token: str
   is_town: bool
   is_street: bool
@@ -30,6 +30,9 @@ class ParsedToken(TypedDict):
   number: NotRequired[str]
   num_from: NotRequired[BuildingNumber]
   num_to: NotRequired[BuildingNumber]
+
+class ParsedToken(BaseParsedToken):
+  except_addresses: List[BaseParsedToken]
 
 class FoundStreet(TypedDict):
   start_index: int
@@ -79,6 +82,29 @@ def get_parsed_number(num: BuildingNumber | None):
     return parsed_num
   except:
     return -1
+  
+def get_addresses_for_token(token: BaseParsedToken, token_addresses: geo.GeoDataFrame):
+  is_even = token["is_even"]
+  is_odd = token["is_odd"]
+
+  if (is_even):
+    token_addresses = token_addresses[token_addresses["building_n"] % 2 == 0]
+  elif (is_odd):
+    token_addresses = token_addresses[token_addresses["building_n"] % 2 == 1]
+  
+  num_from = token.get("num_from")
+  num_to = token.get("num_to")
+  number = token.get("number")
+
+  if (num_from is not None or num_to is not None):
+    if (num_from is not None and num_from["building_n"] != ""):
+      token_addresses = token_addresses[token_addresses["building_o"] >= get_building_order(num_from["building_n"], num_from["building_l"])]
+    if (num_to is not None and num_to["building_n"] != ""):
+      token_addresses = token_addresses[token_addresses["building_o"] <= get_building_order(num_to["building_n"], num_to["building_l"])]
+  elif (number is not None):
+    token_addresses = token_addresses[token_addresses["building"] == number]
+
+  return token_addresses
 
 def main():
   print("Loading data...")
@@ -87,6 +113,7 @@ def main():
 
   utils = Utils()
   districts = pandas.read_csv("data_processed/districts.csv", converters={ "teryt": str }, sep="|", encoding="utf-8")
+  tokens_to_skip = pandas.read_csv("const/tokens_to_skip.csv", converters={ "teryt": str }, sep=";", encoding="utf-8")
   # Force special districts to be first
   districts = districts.sort_values("type", key=lambda x: x.map(district_types))
   teryts = districts["teryt"].drop_duplicates()
@@ -113,19 +140,20 @@ def main():
     for teryt in woj_powiats:
       powiat_teryts = filter(lambda x: x.startswith(teryt), teryts)
       powiat_teryts = sorted(list(powiat_teryts))
-      matched_addresses = process_powiat(powiat_teryts, districts, addresses, streets, utils)
+      matched_addresses = process_powiat(powiat_teryts, districts, addresses, streets, utils, tokens_to_skip)
       if (matched_addresses is not None):
         save_zip(f"matched_addresses/{teryt}", matched_addresses)
       else:
         raise ValueError(f"No addresses matched found for powiat {teryt}!")
 
-def process_powiat(teryts: List[str], districts: pandas.DataFrame, addresses: geo.GeoDataFrame, streets: geo.GeoDataFrame, utils: Utils):
+def process_powiat(teryts: List[str], districts: pandas.DataFrame, addresses: geo.GeoDataFrame, streets: geo.GeoDataFrame, utils: Utils, tokens_to_skip_df: pandas.DataFrame):
   powiat_addresses: geo.GeoDataFrame | None = None
 
   for teryt in teryts:
     print(f"Processing {teryt}...")
     teryt_districts = districts[districts["teryt"] == teryt]
     teryt_addresses = addresses[addresses["teryt"] == teryt]
+    tokens_to_skip = tokens_to_skip_df[tokens_to_skip_df["teryt"] == teryt]["token"].tolist()
     # Streets in Warsaw are assigned to city-wide TERYT instead of districts
     teryt_streets = streets[streets["teryt"] == ("146501" if teryt.startswith("1465") else teryt)]
     addresses_out: geo.GeoDataFrame | None = None
@@ -153,6 +181,8 @@ def process_powiat(teryts: List[str], districts: pandas.DataFrame, addresses: ge
       borders = district.borders
       borders = streets_regex.sub(r" \1: ", borders)
       borders = re.sub(r"(nr|numer)\s+", "", borders)
+      borders = re.sub(r"[()]", "", borders)
+      borders = re.sub(r"(,\s*|\s+)(bez|oprócz)(\s+numer(u|ów))?", ", bez", borders)
       split_borders: List[str] = re.split(r",\s*", borders.replace(";", ","))
       last_element = re.split(r"\s+i\s+", split_borders[len(split_borders) - 1])
       # Handle enumerated towns
@@ -174,9 +204,11 @@ def process_powiat(teryts: List[str], districts: pandas.DataFrame, addresses: ge
       last_street = ""
       last_is_odd = False
       last_is_even = False
+      is_except = False
       check_after_parity = False
       for token in split_borders:
-        if (len(token) == 0):
+        if (len(token.strip()) == 0 or token.strip() in tokens_to_skip):
+          print(f"Skipping {token}...")
           continue
 
         token = place_type.sub("", token).strip()
@@ -188,6 +220,7 @@ def process_powiat(teryts: List[str], districts: pandas.DataFrame, addresses: ge
           "is_even": False,
           "town": "",
           "street": "",
+          "except_addresses": []
         }
 
         if (parsed_token["is_town"]):
@@ -205,7 +238,7 @@ def process_powiat(teryts: List[str], districts: pandas.DataFrame, addresses: ge
           town = district.town
 
         parsed_token["town"] = town
-        token = streets_regex.sub("", token.replace(town, "")).strip()
+        token = streets_regex.sub("", re.sub(f"^{town}", "", token)).strip()
 
         street_tmp = ""
         split_line = re.split(r"\s", token)
@@ -244,7 +277,8 @@ def process_powiat(teryts: List[str], districts: pandas.DataFrame, addresses: ge
               if (end_idx == len(split_line)):
                 streets_in_token.append(found_street)
                 idx = end_idx
-            elif (found_street is not None and end_idx == found_street["end_index"] + 2):
+            # Account for "name and name surname" case (e.g. Heleny i Leona Patynów in Kraków)
+            elif (found_street is not None and end_idx == found_street["end_index"] + 3):
               streets_in_token.append(found_street)
               idx = found_street["end_index"]
               break
@@ -268,6 +302,7 @@ def process_powiat(teryts: List[str], districts: pandas.DataFrame, addresses: ge
             prev_end = street["start_index"]
             parsed_token["street"] = street["street"]
             parsed_token["token"] = token
+            is_except = False
 
             if ("prev_token" in street):
               prev_token = street["prev_token"]
@@ -288,12 +323,14 @@ def process_powiat(teryts: List[str], districts: pandas.DataFrame, addresses: ge
             parsed_token["is_odd"] = last_is_odd
             rest_of_token = " ".join(split_line)
           
-          split_token = re.split(r"\s", rest_of_token)
+          split_token = re.split(r"\s+", rest_of_token)
           prev_word = ""
           word_idx = 0
           prev_token = parsed_tokens[-1] if len(parsed_tokens) > 0 else None
+          restored_prev_token = False
           
           if (prev_token and prev_token["street"] == parsed_token["street"] and prev_token["is_street"]):
+            restored_prev_token = True
             parsed_token = parsed_tokens.pop()
             parsed_token["is_street"] = False
 
@@ -304,14 +341,18 @@ def process_powiat(teryts: List[str], districts: pandas.DataFrame, addresses: ge
               prev_token = parsed_tokens[-1]
               check_after_parity = False
               if (parsed_token["street"] == prev_token["street"]):
+                restored_prev_token = True
                 parsed_token = parsed_tokens.pop()
 
             if (word == "i" or word == "oraz"):
-              if (word_idx > 0):
+              if (word_idx > 0 and not is_except):
                 parsed_tokens.append(parsed_token)
+              elif (word_idx > 0 and is_except):
+                prev_token = parsed_tokens.pop()
+                prev_token["except_addresses"].append(parsed_token)
+                parsed_tokens.append(prev_token)
+                is_except = False
               parsed_token = parsed_token.copy()
-              parsed_token["is_even"] = False
-              parsed_token["is_odd"] = False
               parsed_token.pop("num_from", None)
               parsed_token.pop("num_to", None)
               parsed_token.pop("number", None)
@@ -368,7 +409,29 @@ def process_powiat(teryts: List[str], districts: pandas.DataFrame, addresses: ge
 
             joined_words = f"{prev_word} {word}"
             is_end = joined_words == "do końca"
+            is_except = is_except or word == "bez" or word == "oprócz"
             is_num_to = (prev_word == "do" and not is_end) or prev_is_dash
+
+            if (is_end and "number" in parsed_token):
+              parsed_token["num_from"] = get_building_number(parsed_token["number"])
+              del parsed_token["number"]
+
+            if (word == "bez" or word == "oprócz" or (is_except and restored_prev_token)):
+              if (restored_prev_token):
+                parsed_token["is_street"] = True
+              if (restored_prev_token or word_idx > 0):
+                parsed_tokens.append(parsed_token)
+                parsed_token = parsed_token.copy()
+                parsed_token["is_street"] = False
+                parsed_token["except_addresses"] = []
+                parsed_token.pop("number", None)
+                restored_prev_token = False
+              if (word == "bez" or word == "oprócz"):
+                prev_word = word
+                continue
+            if (re.match(r"(bez|oprócz) numer(u|ów)", joined_words)):
+              word_idx += 1
+              continue
 
             prev_token = parsed_tokens[-1] if len(parsed_tokens) > 0 else None
             if (is_dash):
@@ -425,7 +488,13 @@ def process_powiat(teryts: List[str], districts: pandas.DataFrame, addresses: ge
           last_is_even = parsed_token["is_even"]
           if (len(split_token) == 1 and re.search(even_regex, split_token[0])):
             check_after_parity = True
-          parsed_tokens.append(parsed_token)
+          
+          if (is_except):
+            prev_token = parsed_tokens.pop()
+            prev_token["except_addresses"].append(parsed_token)
+            parsed_tokens.append(prev_token)
+          else:
+            parsed_tokens.append(parsed_token)
           parsed_token = tmp_token.copy()
       
       for token in parsed_tokens:
@@ -439,29 +508,20 @@ def process_powiat(teryts: List[str], districts: pandas.DataFrame, addresses: ge
           district_addresses = concat(district_addresses, token_addresses)
           continue
 
+        except_addresses = []
+        for except_token in token["except_addresses"]:
+          except_addresses.extend(get_addresses_for_token(except_token, token_addresses)["f_address"].to_list())
+
         token_addresses = token_addresses[token_addresses["street"] == token["street"]]
         is_even = token["is_even"]
         is_odd = token["is_odd"]
         if (token["is_street"] and not is_even and not is_odd):
+          token_addresses = token_addresses[~(token_addresses["f_address"].isin(except_addresses))]
           district_addresses = concat(district_addresses, token_addresses)
           continue
 
-        if (is_even):
-          token_addresses = token_addresses[token_addresses["building_n"] % 2 == 0]
-        elif (is_odd):
-          token_addresses = token_addresses[token_addresses["building_n"] % 2 == 1]
-        
-        num_from = token.get("num_from")
-        num_to = token.get("num_to")
-        number = token.get("number")
-
-        if (num_from is not None or num_to is not None):
-          if (num_from is not None and num_from["building_n"] != ""):
-            token_addresses = token_addresses[token_addresses["building_o"] >= get_building_order(num_from["building_n"], num_from["building_l"])]
-          if (num_to is not None and num_to["building_n"] != ""):
-            token_addresses = token_addresses[token_addresses["building_o"] <= get_building_order(num_to["building_n"], num_to["building_l"])]
-        elif (number is not None):
-          token_addresses = token_addresses[token_addresses["building"] == number]
+        all_token_addresses = get_addresses_for_token(token, token_addresses)
+        token_addresses = all_token_addresses[~(all_token_addresses["f_address"].isin(except_addresses))]
           
         if (len(token_addresses) == 0):
           print("No addresses found for token:", token)

@@ -14,7 +14,7 @@ def capitalize(x):
 
 def load_replacements():
   with open("const/street_replacements.csv") as replacements_file:
-    replacements = [line.strip().split(";") for line in replacements_file.readlines()]
+    replacements = [line.rstrip().split(";") for line in replacements_file.readlines()]
     replacements = dict(zip([x[0] for x in replacements], [x[1] for x in replacements]))
   return replacements
 
@@ -78,6 +78,7 @@ class Utils:
     street = re.sub(quotation_regex, r'"\1"', street)
     street = street.replace("´", "'")
     street = re.sub(dash_regex, "-", street)
+    street = re.sub(r"-$", "", street)
     street = re.sub(ordinal_regex, "", street)
     street = capitalize(street)
 
