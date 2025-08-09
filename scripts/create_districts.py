@@ -2,9 +2,13 @@ import geopandas as geo
 import pandas as pd
 from utils import concat, head
 from const import results_columns, candidates
+import re
 import os
 
 pd.options.mode.copy_on_write = True
+
+# We only have TERYT for districts in Warsaw, however Wrocław, Łódź, Kraków and Poznań have separate TERYTs in their statistical districts
+towns_with_districts = ["0264", "1061", "1261", "3064"]
 
 def get_winner(row: pd.Series):
   max_ = -1
@@ -22,7 +26,14 @@ def get_winner(row: pd.Series):
 def process_teryt(teryt: str, addresses: geo.GeoDataFrame, districts_df: geo.GeoDataFrame):
   print(f"Processing districts for TERYT {teryt}...")
   addresses = addresses[addresses["teryt"] == teryt]
-  teryt_districts = districts_df[districts_df["TERYT"] == teryt]
+  has_extra_teryts = False
+  for town in towns_with_districts:
+    if (teryt.startswith(town)):
+      has_extra_teryts = True
+  if (has_extra_teryts):
+    teryt_districts = districts_df[districts_df["TERYT"].str.startswith(teryt[:-1])]
+  else:
+    teryt_districts = districts_df[districts_df["TERYT"] == teryt]
   districts_df = geo.GeoDataFrame()
   unused_ids = []
   
@@ -40,7 +51,7 @@ def process_teryt(teryt: str, addresses: geo.GeoDataFrame, districts_df: geo.Geo
   print(f"Found {len(unused_ids)} districts with no address points!")
   unused_districts = teryt_districts[teryt_districts["OBWOD"].isin(unused_ids)]
   for i, row in unused_districts.iterrows():
-    touching = districts_df[districts_df["geometry"].touches(row.geometry)]
+    touching = districts_df[districts_df["geometry"].intersects(row.geometry)]
     touching["distance"] = touching.geometry.centroid.distance(row.geometry.centroid)
     touching = touching.sort_values(by=["distance"]).iloc[0]
     districts_df.loc[touching.name, "geometry"] = touching.geometry.union(row.geometry)
@@ -55,6 +66,7 @@ elections = "pres_2025_2"
 def main():
   districts_df: geo.GeoDataFrame | None = geo.GeoDataFrame()
   districts = geo.read_file(f"data_in/statistical_districts.zip")
+  districts["TERYT"] = districts["TERYT"].str[:-1]
 
   file_names = list(filter(lambda x: x.endswith(".zip"), os.listdir("matched_addresses")))
 
