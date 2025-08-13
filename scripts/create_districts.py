@@ -30,6 +30,8 @@ def process_teryt(teryt: str, addresses: geo.GeoDataFrame, districts_df: geo.Geo
   for town in towns_with_districts:
     if (teryt.startswith(town)):
       has_extra_teryts = True
+      break
+
   if (has_extra_teryts):
     teryt_districts = districts_df[districts_df["TERYT"].str.startswith(teryt[:-1])]
   else:
@@ -37,7 +39,10 @@ def process_teryt(teryt: str, addresses: geo.GeoDataFrame, districts_df: geo.Geo
   districts_df = geo.GeoDataFrame()
   unused_ids = []
   
+  processed_districts = 0
   for i, row in teryt_districts.iterrows():
+    if (processed_districts != 0 and processed_districts % 50 == 0):
+      print(f"Processed {processed_districts} out of {len(teryt_districts)} statistical districts...")
     geom = row.geometry
     district_addresses = addresses[addresses.geometry.covered_by(geom)]
     if (len(district_addresses) == 0):
@@ -46,6 +51,7 @@ def process_teryt(teryt: str, addresses: geo.GeoDataFrame, districts_df: geo.Geo
     vornoroi = district_addresses.voronoi_polygons(extend_to=geom).clip(geom)
     district_addresses = geo.GeoDataFrame(geometry=vornoroi, crs=district_addresses.crs).sjoin(district_addresses, predicate="covers")
     districts_df = concat(district_addresses, districts_df)
+    processed_districts += 1
 
   districts_df = districts_df.reset_index()
   print(f"Found {len(unused_ids)} districts with no address points!")
