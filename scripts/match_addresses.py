@@ -123,6 +123,7 @@ def main():
   utils = Utils()
   districts = pandas.read_csv("data_processed/districts.csv", converters={ "teryt": str }, sep="|", encoding="utf-8")
   tokens_to_skip = pandas.read_csv("const/tokens_to_skip.csv", converters={ "teryt": str }, sep=";", encoding="utf-8")
+  extra_streets = pandas.read_csv("const/extra_streets.csv", converters={ "teryt": str }, sep=";", encoding="utf-8")
   # Force special districts to be first
   districts = districts.sort_values("type", key=lambda x: x.map(district_types))
   teryts = districts["teryt"].drop_duplicates()
@@ -149,13 +150,21 @@ def main():
     for teryt in woj_powiats:
       powiat_teryts = filter(lambda x: x.startswith(teryt), teryts)
       powiat_teryts = sorted(list(powiat_teryts))
-      matched_addresses = process_powiat(powiat_teryts, districts, addresses, streets, utils, tokens_to_skip)
+      matched_addresses = process_powiat(powiat_teryts, districts, addresses, streets, utils, tokens_to_skip, extra_streets)
       if (matched_addresses is not None):
         save_zip(f"matched_addresses/{teryt}", matched_addresses)
       else:
         raise ValueError(f"No addresses matched found for powiat {teryt}!")
 
-def process_powiat(teryts: List[str], districts: pandas.DataFrame, addresses: geo.GeoDataFrame, streets: geo.GeoDataFrame, utils: Utils, tokens_to_skip_df: pandas.DataFrame):
+def process_powiat(
+    teryts: List[str],
+    districts: pandas.DataFrame,
+    addresses: geo.GeoDataFrame,
+    streets: geo.GeoDataFrame,
+    utils: Utils,
+    tokens_to_skip_df: pandas.DataFrame,
+    extra_streets_df: pandas.DataFrame
+  ):
   powiat_addresses: geo.GeoDataFrame | None = None
 
   for teryt in teryts:
@@ -163,8 +172,12 @@ def process_powiat(teryts: List[str], districts: pandas.DataFrame, addresses: ge
     teryt_districts = districts[districts["teryt"] == teryt]
     teryt_addresses = addresses[addresses["teryt"] == teryt]
     tokens_to_skip = tokens_to_skip_df[tokens_to_skip_df["teryt"] == teryt]["token"].tolist()
+    # Extra streets have to be parsed but will be discarded anyway
+    extra_streets = extra_streets_df[extra_streets_df["teryt"] == teryt]
+    extra_streets_list = extra_streets["street"].to_list()
     # Streets in Warsaw are assigned to city-wide TERYT instead of districts
     teryt_streets = streets[streets["teryt"] == ("146501" if teryt.startswith("1465") else teryt)]
+    teryt_streets = concat(teryt_streets, extra_streets)
     addresses_out: geo.GeoDataFrame | None = None
     processed_rows = 0
     special_addresses = []
@@ -340,6 +353,10 @@ def process_powiat(teryts: List[str], districts: pandas.DataFrame, addresses: ge
             parsed_token["is_even"] = last_is_even
             parsed_token["is_odd"] = last_is_odd
             rest_of_token = " ".join(split_line)
+
+          if (parsed_token["street"] in extra_streets_list):
+            continue
+          
           rest_of_token = re.sub(dash_regex, "-", rest_of_token)
           split_token = re.split(r"\s+", rest_of_token)
           prev_word = ""
