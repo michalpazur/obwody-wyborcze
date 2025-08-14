@@ -3,8 +3,9 @@ import pandas
 from geopandas import GeoDataFrame
 import os
 import re, regex
-from const import first_name_letter_regex, holy_name_regex, char_order, ordinal_regex, quotation_regex, multiple_number_regex, dash_regex
+from const import first_name_letter_regex, holy_name_regex, char_order, ordinal_regex, quotation_regex, apostrophe_regex, dash_regex
 import typing
+from typing import Dict
 
 def head(df: DataFrame, n: int = 5):
   print(df.head(n))
@@ -18,6 +19,11 @@ def load_replacements():
     replacements = dict(zip([f"{re.escape(x[0])}\\.?(\\s+|$)" for x in replacements], [x[1] if x == "" else f"{x[1]} " for x in replacements]))
   return replacements
 
+def get_replacement_values(replacements: Dict[str, str]):
+  values = replacements.values()
+  values = filter(lambda x: x != "" and x != " ", values)
+  return list(values)
+
 def load_replacements_exceptions():
   return pandas.read_csv("const/replacements_exceptions.csv", sep=";", converters={ "teryt": str })
 
@@ -26,6 +32,11 @@ def load_street_prefixes():
     lines = [line.strip().split(";") for line in prefixes_file.readlines()]
     prefixes = dict(zip([f"{x[0]}\\.?\\s+" for x in lines], [x[1] if x == "" else f"{x[1]} " for x in lines]))
   return prefixes
+
+def get_street_types(prefixes: Dict[str, str]):
+  types = prefixes.values()
+  types = filter(lambda x: x != "" and x != " ", types)
+  return list(types)
 
 def load_names():
   with open("const/names.csv") as names_file:
@@ -39,7 +50,7 @@ def load_names_exceptions():
     lines = [line.strip() for line in exceptions_file.readlines()]
     regexes = ["\\s+".join(name.split(" ")) for name in lines]
 
-  return "|".join(regexes)
+  return f"({"|".join(regexes)})$"
 
 class Utils:
   def __init__(self):
@@ -50,8 +61,10 @@ class Utils:
     self.names_regex = names_regex
     self.names_exceptions = load_names_exceptions()
     self.replacements = load_replacements()
+    self.replacements_values = get_replacement_values(self.replacements)
     self.replacements_exceptions = load_replacements_exceptions()
     self.street_prefixes = load_street_prefixes()
+    self.street_types = get_street_types(self.street_prefixes)
 
   def remove_first_name(self, street: str):
     if (re.search(self.names_exceptions, street)):
@@ -70,6 +83,21 @@ class Utils:
 
     return street
 
+  def remove_replacements(self, street: str):
+    for replacement in self.replacements_values:
+      if (re.search(replacement, street, flags=re.IGNORECASE)):
+        street = re.sub(replacement, "", street, flags=re.IGNORECASE)
+
+    return street.strip()
+  
+  def remove_street_type(self, street: str):
+    for street_type in self.street_types:
+      if (re.match(street_type, street, flags=re.IGNORECASE)):
+        street = re.sub(street_type, "", street, flags=re.IGNORECASE)
+        break
+
+    return street.strip()
+
   def transform_street_name(self, street: str, teryt: str):
     for search in self.street_prefixes:
       street = re.sub(search, self.street_prefixes[search], street, flags=re.IGNORECASE)
@@ -83,9 +111,10 @@ class Utils:
     street = self.remove_first_letter(street)
     street = re.sub(ordinal_regex, "", street)
     street = re.sub(quotation_regex, r'"\1"', street)
-    street = street.replace("´", "'")
+    street = re.sub(apostrophe_regex, "'", street)
     street = re.sub(dash_regex, "-", street)
     street = re.sub(r"-$", "", street)
+    street = re.sub(r"\s+-\s+", "-", street)
     street = re.sub(ordinal_regex, "", street)
     street = capitalize(street)
 

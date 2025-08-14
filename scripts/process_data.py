@@ -2,7 +2,7 @@ import pandas as pd
 import geopandas as geo
 import numpy as np
 from utils import load_replacements, load_replacements_exceptions, load_street_prefixes, capitalize, save_zip, concat, Utils, get_building_order
-from const import districts_columns, addresses_columns, streets_columns, building_num_regex, building_letter_regex, ordinal_regex, quotation_regex, multiple_number_regex, dash_regex, char_order
+from const import districts_columns, addresses_columns, streets_columns, building_num_regex, building_letter_regex, ordinal_regex, quotation_regex, multiple_number_regex, dash_regex, apostrophe_regex
 from typing import TypeVar
 import os
 import os.path as path
@@ -66,12 +66,19 @@ def process_addresses(df: T, column_names: dict[str, str], is_addresses: bool = 
   df["street"] = df["street"].str.replace(r"^(\S+)\s+\1", r"\1", regex=True)
   # Normalize quotes in street names
   df["street"] = df["street"].str.replace(quotation_regex, r'"\1"', regex=True)
-  df["street"] = df["street"].str.replace("´", "'")
+  df["street"] = df["street"].str.replace(apostrophe_regex, "'", regex=True)
   # Normalize hyphens in street names
   df["street"] = df["street"].str.replace(dash_regex, "-", regex=True)
+  df["street"] = df["street"].str.replace(r"\s+-\s+", "-", regex=True)
   # Remove ordinals (i.e. Mieszka I-go -> Mieszka I)
   df["street"] = df["street"].str.replace(ordinal_regex, "", regex=True)
   df["street"] = df["street"].map(capitalize)
+  # Remove street type e.g. Aleja Generała Maczka -> Generała Maczka
+  df["no_type"] = df["street"].apply(utils.remove_street_type)
+  # Remove custom replacements e.g. Aleja Generała Maczka -> Aleja Maczka
+  df["no_repl"] = df["street"].apply(utils.remove_replacements)
+  # Remove street type as well e.g. Aleja Generała Maczka -> Maczka
+  df["no_rep_typ"] = df["no_repl"].apply(utils.remove_street_type)
 
   has_building_numbers = "building" in df
   if (has_building_numbers):

@@ -3,13 +3,13 @@ import geopandas as geo
 import os
 import re
 import regex
-from typing import List, NotRequired, TypedDict
+from typing import List, NotRequired, TypedDict, cast
 from utils import concat, Utils, get_building_order, save_zip
 from const import all_regex, odd_regex, even_regex, building_num_regex, building_letter_regex, district_types, dash_regex, multiple_number_regex, districts as town_districts
 
 pandas.options.mode.copy_on_write = True
 
-place_type = re.compile(r"^(miasto|miasta|wieś|wsie|sołectwo|sołectwa|osada|osady|przysiółek|przysiółki|miejscowość|miejscowości):?\s*", flags=re.IGNORECASE)
+place_type = re.compile(r"^(miasto|miasta|wieś|wsie|sołectwo|sołectwa|osada|osady|przysiółek|przysiółki|miejscowość|miejscowości)(:\s*|\s+)", flags=re.IGNORECASE)
 streets_regex = re.compile(r",?.*(ulice|ulica):?\s*", flags=re.IGNORECASE)
 street_name_regex = regex.compile(r"^(\p{Lu}\p{L}+\s?)+$", flags=re.IGNORECASE)
 
@@ -48,9 +48,18 @@ def is_town(addresses: geo.GeoDataFrame, name: str):
   addresses_with_town = addresses[addresses["town"] == name]
   return len(addresses_with_town) > 0
 
-def is_street(streets: geo.GeoDataFrame, town: str, name: str):
-  addresses_with_street = streets[(streets["town"] == town) & (streets["street"] == name)]
-  return len(addresses_with_street) > 0
+def check_street(streets: geo.GeoDataFrame, town: str, street: str, key: str):
+  addresses_with_street = streets[(streets["town"] == town) & (streets[key] == street)]
+  if (len(addresses_with_street) > 0):
+    return addresses_with_street.index[0]
+  return -1
+
+def is_street(streets: geo.GeoDataFrame, town: str, street: str):
+  for key in ["street", "no_repl", "no_type", "no_rep_typ"]:
+    idx = check_street(streets, town, street, key)
+    if (idx > -1):
+      return streets.loc[idx, "street"]
+  return ""
 
 def process_token_word(word: str):
   # Remove multiple building numbers (i.e. 100/102 -> 100)
@@ -257,15 +266,20 @@ def process_powiat(teryts: List[str], districts: pandas.DataFrame, addresses: ge
             street_tmp = " ".join(split_line[idx:end_idx])
             street_tmp = utils.transform_street_name(street_tmp, teryt)
 
-            if (is_street(teryt_streets, town, street_tmp)):
-              last_street = street_tmp
+            street_name = cast(str, is_street(teryt_streets, town, street_tmp))
+            if (street_name != ""):
+              last_street = street_name
               found_street = {
-                "street": street_tmp,
+                "street": street_name,
                 "start_index": idx,
                 "end_index": end_idx
               }
+              start_of_token = " ".join(split_line[0:idx]) + " "
+              start_of_token = utils.transform_street_name(start_of_token, teryt) + " "
+              start_of_token = utils.remove_street_type(start_of_token) + " "
+              start_of_token = utils.remove_replacements(start_of_token)
               # Street was found later in the token, but the first part of the token was not included
-              if (idx != 0 and len(streets_in_token) == 0):
+              if (len(start_of_token) > 0 and idx != 0 and len(streets_in_token) == 0):
                 try:
                   prev_token = parsed_tokens[-1]
                   prev_found_street: FoundStreet = {
@@ -368,7 +382,6 @@ def process_powiat(teryts: List[str], districts: pandas.DataFrame, addresses: ge
               parsed_token.pop("num_to", None)
               parsed_token.pop("number", None)
               prev_word = word
-              word_idx += 1
               continue
 
             split_by_dash = re.split(dash_regex, word)
@@ -449,7 +462,7 @@ def process_powiat(teryts: List[str], districts: pandas.DataFrame, addresses: ge
               parsed_token["num_from"] = get_building_number(prev_word)
             elif (ends_with_dash):
               parsed_token["num_from"] = get_building_number(word)
-            elif (prev_word == "od"):
+            elif (prev_word == "od" or next_word == "-"):
               parsed_token["num_from"] = get_building_number(word)
             elif (prev_token is not None and prev_token["street"] == parsed_token["street"] and word_idx == 1 and is_num_to):
               parsed_token = parsed_tokens.pop()

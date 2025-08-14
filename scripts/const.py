@@ -68,14 +68,23 @@ candidates = {
 
 char_order = list("aąbcćdefghijklłmnńoópqrsśtuvwxyzżź0123456789")
 
+districts = [
+  "Poznań-Grunwald",
+  "Poznań-Jeżyce",
+  "Poznań-Nowe Miasto",
+  "Poznań-Stare Miasto",
+  "Poznań-Wilda"
+]
+
 building_num_regex = r"((\d+)\w*|\w{1,2})$"
 building_letter_regex = r"\d*(\w*)$"
 all_regex = r"cał[ae]"
 odd_regex = r"nieparzyst[ae]"
 even_regex = r"parzyst[ae]"
-first_name_letter_regex = r"^(([kK]s\.|[kK]siędza|[bB]p.|[bB]iskupa|[gG]en.|[gG]enerała|[pP]l.|[pP]lac)\s+)?(\p{Lu}(ł|h|z)?\s*\.(\s+(i\s+)?\p{Lu}(ł|h|z)?\s*\.)?\s+)"
-holy_name_regex = r"(św\.|świętego|świętej|świętych)\s+"
+first_name_letter_regex = r"^(([kK]s\.|[kK]siędza|[bB]p.|[bB]iskupa|[gG]en.|[gG]enerała|[pP]l.|[pP]lac|[aA]l\.|[aA]leja)\s+)?(\p{Lu}(ł|h|t|z)?\s*\.(\s+(i\s+)?\p{Lu}(ł|h|t|z)?\s*\.)?\s+)"
+holy_name_regex = r"(św\.|świętego|świętej|świętych|bł\.|błogosławion(ego|ej|ych))\s+"
 ordinal_regex = r"\s*-\s*(go|ej)"
 multiple_number_regex = r"(\d+\w*|\w+)\s?([-,/._]|s\.)\s?(\d*\w*\s?([-,/._]|s\.)?\s?)+"
 quotation_regex = r'[„"]\s*(\S+)\s*[”"]'
+apostrophe_regex = r"[`'´]"
 dash_regex = r"[-–—―−]" # I hate it here.
