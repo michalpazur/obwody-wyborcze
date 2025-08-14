@@ -15,8 +15,11 @@ def capitalize(x):
 def load_replacements():
   with open("const/street_replacements.csv") as replacements_file:
     replacements = [line.rstrip().split(";") for line in replacements_file.readlines()]
-    replacements = dict(zip([x[0] for x in replacements], [x[1] for x in replacements]))
+    replacements = dict(zip([f"{re.escape(x[0])}\\.?(\\s+|$)" for x in replacements], [x[1] if x == "" else f"{x[1]} " for x in replacements]))
   return replacements
+
+def load_replacements_exceptions():
+  return pandas.read_csv("const/replacements_exceptions.csv", sep=";", converters={ "teryt": str })
 
 def load_street_prefixes():
   with open("const/street_prefixes.csv") as prefixes_file:
@@ -47,6 +50,7 @@ class Utils:
     self.names_regex = names_regex
     self.names_exceptions = load_names_exceptions()
     self.replacements = load_replacements()
+    self.replacements_exceptions = load_replacements_exceptions()
     self.street_prefixes = load_street_prefixes()
 
   def remove_first_name(self, street: str):
@@ -65,14 +69,17 @@ class Utils:
       return street.replace(name_letter, "", 1)
 
     return street
-  
-  def transform_street_name(self, street: str):
+
+  def transform_street_name(self, street: str, teryt: str):
     for search in self.street_prefixes:
       street = re.sub(search, self.street_prefixes[search], street, flags=re.IGNORECASE)
-    for search in self.replacements:
-      street = re.sub(re.escape(search), self.replacements[search], street, flags=re.IGNORECASE)
+    replacements_exceptions = self.replacements_exceptions[self.replacements_exceptions["teryt"] == teryt]
+    if (street not in replacements_exceptions["street"].to_list()):
+      for search in self.replacements:
+        street = re.sub(search, self.replacements[search], street, flags=re.IGNORECASE)
     street = re.sub(r"\s+", " ", street.strip()).replace(":", "")
-    street = self.remove_first_name(street)
+    if (street not in replacements_exceptions["street"].to_list()):
+      street = self.remove_first_name(street)
     street = self.remove_first_letter(street)
     street = re.sub(ordinal_regex, "", street)
     street = re.sub(quotation_regex, r'"\1"', street)

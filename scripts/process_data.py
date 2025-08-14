@@ -1,7 +1,7 @@
 import pandas as pd
 import geopandas as geo
 import numpy as np
-from utils import load_replacements, load_street_prefixes, capitalize, save_zip, concat, Utils, get_building_order
+from utils import load_replacements, load_replacements_exceptions, load_street_prefixes, capitalize, save_zip, concat, Utils, get_building_order
 from const import districts_columns, addresses_columns, streets_columns, building_num_regex, building_letter_regex, ordinal_regex, quotation_regex, multiple_number_regex, dash_regex, char_order
 from typing import TypeVar
 import os
@@ -22,6 +22,23 @@ def get_building_letter(row: pd.Series):
     return match.group(1)
   return ""
 
+def handle_replacements(row: pd.Series, replacements: dict[str, str], exceptions: pd.DataFrame):
+  exceptions = exceptions[(exceptions["teryt"] == row.teryt) & (exceptions["street"] == row.street)]
+  if (len(exceptions) > 0):
+    return row.street
+  
+  street = row.street
+  for search in replacements:
+    street = re.sub(search, replacements[search], street, flags=re.IGNORECASE)
+  return street
+
+def handle_name_replacements(row: pd.Series, utils: Utils, exceptions: pd.DataFrame):
+  exceptions = exceptions[(exceptions["teryt"] == row.teryt) & (exceptions["street"] == row.street)]
+  if (len(exceptions) > 0):
+    return row.street
+  
+  return utils.remove_first_name(row.street)
+
 def process_addresses(df: T, column_names: dict[str, str], is_addresses: bool = False) -> T:
   utils = Utils()
   # Fill empty street names
@@ -33,20 +50,18 @@ def process_addresses(df: T, column_names: dict[str, str], is_addresses: bool = 
   for search in street_prefixes:
     df["street"] = df["street"].str.replace(search, street_prefixes[search], regex=True, flags=re.IGNORECASE)
 
-  print("Removing names from street names...")
-  df["street"] = df["street"].apply(utils.remove_first_name)
-  df["street"] = df["street"].apply(utils.remove_first_letter)
-
   # Remove redundant spaces
   print("Removing redundant spaces...")
   df["street"] = df["street"].str.strip().replace(r"\s+", " ", regex=True)
 
   # Normalize street names
   print("Normalizing street names...")
-  df["street"] = df["street"].map(capitalize)
   replacements = load_replacements()
-  for search in replacements:
-    df["street"] = df["street"].str.replace(search, replacements[search], case=False)
+  exceptions = load_replacements_exceptions()
+  df["street"] = df.apply(lambda row: handle_replacements(row, replacements, exceptions), axis=1)
+  print("Removing names from street names...")
+  df["street"] = df.apply(lambda row: handle_name_replacements(row, utils, exceptions), axis=1)
+  df["street"] = df["street"].apply(utils.remove_first_letter)
   # Remove duplicate street types
   df["street"] = df["street"].str.replace(r"^(\S+)\s+\1", r"\1", regex=True)
   # Normalize quotes in street names
@@ -56,6 +71,7 @@ def process_addresses(df: T, column_names: dict[str, str], is_addresses: bool = 
   df["street"] = df["street"].str.replace(dash_regex, "-", regex=True)
   # Remove ordinals (i.e. Mieszka I-go -> Mieszka I)
   df["street"] = df["street"].str.replace(ordinal_regex, "", regex=True)
+  df["street"] = df["street"].map(capitalize)
 
   has_building_numbers = "building" in df
   if (has_building_numbers):
