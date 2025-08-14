@@ -5,7 +5,7 @@ import re
 import regex
 from typing import List, NotRequired, TypedDict
 from utils import concat, Utils, get_building_order, save_zip
-from const import all_regex, odd_regex, even_regex, building_num_regex, building_letter_regex, district_types, dash_regex, multiple_number_regex
+from const import all_regex, odd_regex, even_regex, building_num_regex, building_letter_regex, district_types, dash_regex, multiple_number_regex, districts as town_districts
 
 pandas.options.mode.copy_on_write = True
 
@@ -179,10 +179,9 @@ def process_powiat(teryts: List[str], districts: pandas.DataFrame, addresses: ge
         continue
       
       borders = district.borders
-      borders = streets_regex.sub(r" \1: ", borders)
-      borders = re.sub(r"(nr|numer)\s+", "", borders)
+      borders = re.sub(r"(nr\.?|numer)\s+", "", borders)
       borders = re.sub(r"[()]", "", borders)
-      borders = re.sub(r"(,\s*|\s+)(bez|oprócz)(\s+numer(u|ów))?", ", bez", borders)
+      borders = re.sub(r"(,\s*|\s+)(bez|oprócz|z wyłączeniem)(\s+(numer|nr\.?)(u|ów))?", ", bez", borders)
       split_borders: List[str] = re.split(r",\s*", borders.replace(";", ","))
       last_element = re.split(r"\s+i\s+", split_borders[len(split_borders) - 1])
       # Handle enumerated towns
@@ -231,14 +230,19 @@ def process_powiat(teryts: List[str], districts: pandas.DataFrame, addresses: ge
 
         token = place_type.sub("", token).strip()
 
-        if (is_town(teryt_addresses, token.split("-")[0])):
+        for town_district in town_districts:
+          if (re.match(town_district, token)):
+            token = token.replace(town_district, "").strip()
+            town = town_district.split("-")[0]
+            break
+        if (not town and is_town(teryt_addresses, token.split("-")[0])):
           town = token.split("-")[0]
         
         if (town is None):
           town = district.town
 
         parsed_token["town"] = town
-        token = streets_regex.sub("", re.sub(f"^{town}", "", token)).strip()
+        token = streets_regex.sub("", token).strip()
 
         street_tmp = ""
         split_line = re.split(r"\s", token)
@@ -251,7 +255,7 @@ def process_powiat(teryts: List[str], districts: pandas.DataFrame, addresses: ge
           for word in split_line[idx:]:
             end_idx += 1
             street_tmp = " ".join(split_line[idx:end_idx])
-            street_tmp = utils.transform_street_name(street_tmp)
+            street_tmp = utils.transform_street_name(street_tmp, teryt)
 
             if (is_street(teryt_streets, town, street_tmp)):
               last_street = street_tmp
@@ -322,12 +326,14 @@ def process_powiat(teryts: List[str], districts: pandas.DataFrame, addresses: ge
             parsed_token["is_even"] = last_is_even
             parsed_token["is_odd"] = last_is_odd
             rest_of_token = " ".join(split_line)
-          
+          rest_of_token = re.sub(dash_regex, "-", rest_of_token)
           split_token = re.split(r"\s+", rest_of_token)
           prev_word = ""
-          word_idx = 0
+          next_word = ""
+          word_idx = -1
           prev_token = parsed_tokens[-1] if len(parsed_tokens) > 0 else None
           restored_prev_token = False
+          skip_token = False
           
           if (prev_token and prev_token["street"] == parsed_token["street"] and prev_token["is_street"]):
             restored_prev_token = True
@@ -335,6 +341,8 @@ def process_powiat(teryts: List[str], districts: pandas.DataFrame, addresses: ge
             parsed_token["is_street"] = False
 
           for word in split_token:
+            word_idx += 1
+            next_word = split_token[word_idx + 1] if word_idx < len(split_token) - 1 else ""
             word = re.sub(r"[():]", "", word)
 
             if (check_after_parity):
@@ -351,7 +359,10 @@ def process_powiat(teryts: List[str], districts: pandas.DataFrame, addresses: ge
                 prev_token = parsed_tokens.pop()
                 prev_token["except_addresses"].append(parsed_token)
                 parsed_tokens.append(prev_token)
-                is_except = False
+                is_except = next_word != ""
+              if (next_word == ""):
+                # This token has already been handled, no need to add it later
+                skip_token = True
               parsed_token = parsed_token.copy()
               parsed_token.pop("num_from", None)
               parsed_token.pop("num_to", None)
@@ -380,7 +391,6 @@ def process_powiat(teryts: List[str], districts: pandas.DataFrame, addresses: ge
               prev_is_dash = True
             if (starts_with_from or starts_with_to):
               word = word[2:]
-              word_idx += 1
               if (starts_with_from):
                 prev_word = "od"
               else:
@@ -389,10 +399,11 @@ def process_powiat(teryts: List[str], districts: pandas.DataFrame, addresses: ge
             if (not is_dash and not ends_with_dash and not starts_with_dash and len(split_by_dash) >= 2):
               word_from = process_token_word(split_by_dash[0])
               word_to = process_token_word(split_by_dash[1])
-              parsed_token["num_from"] = get_building_number(word_from)
-              parsed_token["num_to"] = get_building_number(word_to)
-              prev_word = word
-              word_idx += 1
+              if ("num_from" not in parsed_token):
+                parsed_token["num_from"] = get_building_number(word_from)
+              if ("num_to" not in parsed_token):
+                parsed_token["num_to"] = get_building_number(word_to)
+              prev_word = word_from
               continue
 
             word = process_token_word(word)
@@ -430,7 +441,6 @@ def process_powiat(teryts: List[str], districts: pandas.DataFrame, addresses: ge
                 prev_word = word
                 continue
             if (re.match(r"(bez|oprócz) numer(u|ów)", joined_words)):
-              word_idx += 1
               continue
 
             prev_token = parsed_tokens[-1] if len(parsed_tokens) > 0 else None
@@ -449,10 +459,11 @@ def process_powiat(teryts: List[str], districts: pandas.DataFrame, addresses: ge
               if ("number" in parsed_token):
                 num_from = parsed_token["number"]
                 parsed_token["num_from"] = get_building_number(num_from)
-            elif (not is_end and word != "od" and word != "do" and re.match(building_num_regex, word)):
+            elif (not is_end and word != "od" and word != "-" and word != "do" and re.match(building_num_regex, word)):
               parsed_token["number"] = word
+              parsed_token["is_even"] = False
+              parsed_token["is_odd"] = False
             
-            word_idx += 1
             if (not ends_with_dash and not ends_with_to):
               prev_word = word
             else:
@@ -489,12 +500,13 @@ def process_powiat(teryts: List[str], districts: pandas.DataFrame, addresses: ge
           if (len(split_token) == 1 and re.search(even_regex, split_token[0])):
             check_after_parity = True
           
-          if (is_except):
-            prev_token = parsed_tokens.pop()
-            prev_token["except_addresses"].append(parsed_token)
-            parsed_tokens.append(prev_token)
-          else:
-            parsed_tokens.append(parsed_token)
+          if (not skip_token):
+            if (is_except):
+              prev_token = parsed_tokens.pop()
+              prev_token["except_addresses"].append(parsed_token)
+              parsed_tokens.append(prev_token)
+            else:
+              parsed_tokens.append(parsed_token)
           parsed_token = tmp_token.copy()
       
       for token in parsed_tokens:
