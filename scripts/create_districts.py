@@ -73,7 +73,7 @@ def main():
   districts_df: geo.GeoDataFrame | None = geo.GeoDataFrame()
   districts = geo.read_file(f"data_in/statistical_districts.zip")
   districts["TERYT"] = districts["TERYT"].str[:-1]
-
+  districts["OBWOD"] = districts["OBWOD"].apply(lambda x: str(uuid.uuid4()))
   file_names = list(filter(lambda x: x.endswith(".zip"), os.listdir("matched_addresses")))
 
   for file_name in file_names:
