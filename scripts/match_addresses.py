@@ -235,6 +235,7 @@ def process_powiat(
       last_is_even = False
       is_except = False
       check_after_parity = False
+      restored_token: ParsedToken | None = None
       for token in split_borders:
         if (len(token.strip()) == 0 or token.strip() in tokens_to_skip):
           print(f"Skipping {token}...")
@@ -245,6 +246,7 @@ def process_powiat(
           token = token_to_replace.iloc[0].replacement
         token = place_type.sub("", token).strip()
         token = re.sub(r"(\s*-\s*|\s+)oficyn[ay]", "", token, flags=re.IGNORECASE)
+        token = re.sub(r"\.$", "", token)
 
         parsed_token: ParsedToken = { 
           "token": token,
@@ -394,7 +396,8 @@ def process_powiat(
               check_after_parity = False
               if (parsed_token["street"] == prev_token["street"]):
                 restored_prev_token = True
-                parsed_token = parsed_tokens.pop()
+                restored_token = parsed_tokens.pop()
+                parsed_token = restored_token.copy()
 
             if (word == "i" or word == "oraz"):
               if (word_idx > 0 and not is_except):
@@ -457,9 +460,15 @@ def process_powiat(
             if (re.match(odd_regex, word)):
               parsed_token["is_odd"] = True
               parsed_token["is_even"] = False
+              if (restored_token and not restored_token["is_odd"]):
+                parsed_tokens.append(restored_token)
+                restored_token = None
             elif (re.match(even_regex, word)):
               parsed_token["is_even"] = True
               parsed_token["is_odd"] = False
+              if (restored_token and not restored_token["is_even"]):
+                parsed_tokens.append(restored_token)
+                restored_token = None
 
             joined_words = f"{prev_word} {word}"
             is_end = joined_words == "do końca"
