@@ -121,9 +121,15 @@ def main():
     os.remove("error.log")
 
   utils = Utils()
+  args = { 
+    "converters": { "teryt": str },
+    "encoding": "utf-8",
+    "sep": ";",
+  }
   districts = pandas.read_csv("data_processed/districts.csv", converters={ "teryt": str }, sep="|", encoding="utf-8")
-  tokens_to_skip = pandas.read_csv("const/tokens_to_skip.csv", converters={ "teryt": str }, sep=";", encoding="utf-8")
-  extra_streets = pandas.read_csv("const/extra_streets.csv", converters={ "teryt": str }, sep=";", encoding="utf-8")
+  tokens_to_skip = pandas.read_csv("const/tokens_to_skip.csv", **args)
+  extra_streets = pandas.read_csv("const/extra_streets.csv", **args)
+  tokens_to_replace = pandas.read_csv("const/tokens_to_replace.csv", **args)
   # Force special districts to be first
   districts = districts.sort_values("type", key=lambda x: x.map(district_types))
   teryts = districts["teryt"].drop_duplicates()
@@ -150,7 +156,7 @@ def main():
     for teryt in woj_powiats:
       powiat_teryts = filter(lambda x: x.startswith(teryt), teryts)
       powiat_teryts = sorted(list(powiat_teryts))
-      matched_addresses = process_powiat(powiat_teryts, districts, addresses, streets, utils, tokens_to_skip, extra_streets)
+      matched_addresses = process_powiat(powiat_teryts, districts, addresses, streets, utils, tokens_to_skip, extra_streets, tokens_to_replace)
       if (matched_addresses is not None):
         save_zip(f"matched_addresses/{teryt}", matched_addresses)
       else:
@@ -163,7 +169,8 @@ def process_powiat(
     streets: geo.GeoDataFrame,
     utils: Utils,
     tokens_to_skip_df: pandas.DataFrame,
-    extra_streets_df: pandas.DataFrame
+    extra_streets_df: pandas.DataFrame,
+    tokens_to_replace: pandas.DataFrame,
   ):
   powiat_addresses: geo.GeoDataFrame | None = None
 
@@ -175,6 +182,7 @@ def process_powiat(
     # Extra streets have to be parsed but will be discarded anyway
     extra_streets = extra_streets_df[extra_streets_df["teryt"] == teryt]
     extra_streets_list = extra_streets["street"].to_list()
+    tokens_to_replace = tokens_to_replace[tokens_to_replace["teryt"] == teryt]
     # Streets in Warsaw are assigned to city-wide TERYT instead of districts
     teryt_streets = streets[streets["teryt"] == ("146501" if teryt.startswith("1465") else teryt)]
     teryt_streets = concat(teryt_streets, extra_streets)
@@ -232,7 +240,12 @@ def process_powiat(
           print(f"Skipping {token}...")
           continue
 
+        token_to_replace = tokens_to_replace[tokens_to_replace["token"] == token]
+        if (len(token_to_replace) > 0):
+          token = token_to_replace.iloc[0].replacement
         token = place_type.sub("", token).strip()
+        token = re.sub(r"(\s*-\s*|\s+)oficyn[ay]", "", token, flags=re.IGNORECASE)
+
         parsed_token: ParsedToken = { 
           "token": token,
           "is_town": is_town(teryt_addresses, token),
