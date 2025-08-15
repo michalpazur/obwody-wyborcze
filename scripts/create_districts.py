@@ -1,8 +1,8 @@
 import geopandas as geo
 import pandas as pd
-from utils import concat, head
+from utils import concat
 from const import results_columns, candidates
-import re
+import uuid
 import os
 
 pd.options.mode.copy_on_write = True
@@ -59,7 +59,12 @@ def process_teryt(teryt: str, addresses: geo.GeoDataFrame, districts_df: geo.Geo
   for i, row in unused_districts.iterrows():
     touching = districts_df[districts_df["geometry"].intersects(row.geometry)]
     touching["distance"] = touching.geometry.centroid.distance(row.geometry.centroid)
-    touching = touching.sort_values(by=["distance"]).iloc[0]
+    if (len(touching) > 0):
+      touching = touching.sort_values(by=["distance"]).iloc[0]
+    else:
+      touching = districts_df.copy()
+      touching["distance"] = touching.geometry.centroid.distance(row.geometry.centroid)
+      touching = touching.sort_values(by=["distance"]).iloc[0]
     districts_df.loc[touching.name, "geometry"] = touching.geometry.union(row.geometry)
 
   districts_df.geometry = districts_df.geometry.buffer(1)
@@ -67,7 +72,7 @@ def process_teryt(teryt: str, addresses: geo.GeoDataFrame, districts_df: geo.Geo
   districts_df.geometry = districts_df.geometry.buffer(-1)
   return districts_df
 
-elections = "pres_2025_2"
+elections = "pres_2025_1"
 
 def main():
   districts_df: geo.GeoDataFrame | None = geo.GeoDataFrame()
