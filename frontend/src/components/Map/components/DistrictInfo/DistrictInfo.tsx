@@ -117,7 +117,7 @@ const DistrictInfoComponent: React.FC<{
         {districtInfo ? (
           <Box>
             <Typography sx={text}>
-              Okręgowa Komisja Wyborcza {districtInfo.number}
+              Obwodowa Komisja Wyborcza {districtInfo.number}
             </Typography>
             <Typography sx={countyName}>{districtInfo.gmina}</Typography>
             <Typography sx={text}>
@@ -130,7 +130,7 @@ const DistrictInfoComponent: React.FC<{
         ) : (
           <Typography sx={text}>
             Kliknij na mapie żeby zobaczyć szczegółowe wyniki w wybranej
-            Okręgowej Komisji Wyborczej.
+            Obwodowej Komisji Wyborczej.
           </Typography>
         )}
         {districtInfo && <ResultsTable results={results} full />}
