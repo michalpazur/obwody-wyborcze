@@ -85,6 +85,7 @@ const Map = () => {
       },
       { hovered: false }
     );
+    hoveredId = undefined;
     setHovered(undefined);
     setHoverPosition(undefined);
   };
