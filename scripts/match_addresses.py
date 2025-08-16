@@ -179,10 +179,10 @@ def process_powiat(
     teryt_districts = districts[districts["teryt"] == teryt]
     teryt_addresses = addresses[addresses["teryt"] == teryt]
     tokens_to_skip = tokens_to_skip_df[tokens_to_skip_df["teryt"] == teryt]["token"].tolist()
+    tokens_to_replace = tokens_to_replace[tokens_to_replace["teryt"] == teryt]
     # Extra streets have to be parsed but will be discarded anyway
     extra_streets = extra_streets_df[extra_streets_df["teryt"] == teryt]
     extra_streets_list = extra_streets["street"].to_list()
-    tokens_to_replace = tokens_to_replace[tokens_to_replace["teryt"] == teryt]
     # Streets in Warsaw are assigned to city-wide TERYT instead of districts
     teryt_streets = streets[streets["teryt"] == ("146501" if teryt.startswith("1465") else teryt)]
     teryt_streets = concat(teryt_streets, extra_streets)
@@ -285,6 +285,7 @@ def process_powiat(
         split_line = re.split(r"\s", token)
         streets_in_token: List[FoundStreet | None] = []
         idx = 0
+        skipped_token = False
         while idx < len(split_line):
           end_idx = idx
           street_tmp = ""
@@ -292,6 +293,12 @@ def process_powiat(
           for word in split_line[idx:]:
             end_idx += 1
             street_tmp = " ".join(split_line[idx:end_idx])
+            ends_with_dot = street_tmp.endswith(".")
+            if (street_tmp in tokens_to_skip):
+              print(f"Skipping {street_tmp}...")
+              skipped_token = True
+              idx = end_idx - 1
+              break
             street_tmp = utils.transform_street_name(street_tmp, teryt)
 
             street_name = cast(str, is_street(teryt_streets, town, street_tmp))
@@ -307,7 +314,7 @@ def process_powiat(
               start_of_token = utils.remove_street_type(start_of_token) + " "
               start_of_token = utils.remove_replacements(start_of_token)
               # Street was found later in the token, but the first part of the token was not included
-              if (len(start_of_token) > 0 and idx != 0 and len(streets_in_token) == 0):
+              if (not skipped_token and len(start_of_token) > 0 and idx != 0 and len(streets_in_token) == 0):
                 try:
                   prev_token = parsed_tokens[-1]
                   prev_found_street: FoundStreet = {
@@ -319,8 +326,10 @@ def process_powiat(
                   streets_in_token.append(prev_found_street)
                 except:
                   print(f"No previous token found for string \"{" ".join(split_line[0:idx])}\"!")
+              elif (skipped_token):
+                skipped_token = False
               # End of line was reached
-              if (end_idx == len(split_line)):
+              if (end_idx == len(split_line) or ends_with_dot):
                 streets_in_token.append(found_street)
                 idx = end_idx
             # Account for "name and name surname" case (e.g. Heleny i Leona Patynów in Kraków)
