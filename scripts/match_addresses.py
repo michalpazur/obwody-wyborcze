@@ -186,6 +186,8 @@ def process_powiat(
     # Streets in Warsaw are assigned to city-wide TERYT instead of districts
     teryt_streets = streets[streets["teryt"] == ("146501" if teryt.startswith("1465") else teryt)]
     teryt_streets = concat(teryt_streets, extra_streets)
+    teryt_streets = concat(teryt_streets, teryt_addresses)
+    teryt_streets = teryt_streets.drop_duplicates(["town", "street"])
     addresses_out: geo.GeoDataFrame | None = None
     processed_rows = 0
     special_addresses = []
