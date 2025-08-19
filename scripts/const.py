@@ -18,6 +18,8 @@ streets_columns = {
   "TERYT": "teryt",
   "SIMC_nazwa": "town",
   "ULIC_nazwa": "street",
+  "ULIC_id": "ULIC_id",
+  "Cecha": "str_type",
   "geometry": "geometry"
 }
 

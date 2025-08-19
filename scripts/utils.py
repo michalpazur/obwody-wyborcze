@@ -10,8 +10,11 @@ from typing import Dict
 def head(df: DataFrame, n: int = 5):
   print(df.head(n))
 
-def capitalize(x):
+def capitalize(x: str):
   return x[:1].upper() + x[1:]
+
+def capitalize_every_word(x: str):
+  return regex.sub(r"(\s+|^)(\p{L})(\S?)", lambda match: f"{match.group(1)}{capitalize(match.group(2)) if match.group(3) else match.group(2)}{match.group(3)}", x)
 
 def load_replacements():
   with open("const/street_replacements.csv") as replacements_file:
