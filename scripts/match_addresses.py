@@ -130,6 +130,7 @@ def main():
   tokens_to_skip = pandas.read_csv("const/tokens_to_skip.csv", **args)
   extra_streets = pandas.read_csv("const/extra_streets.csv", **args)
   tokens_to_replace = pandas.read_csv("const/tokens_to_replace.csv", **args)
+  addresses_to_skip = pandas.read_csv("const/addresses_to_skip.csv", **args)
   # Force special districts to be first
   districts = districts.sort_values("type", key=lambda x: x.map(district_types))
   teryts = districts["teryt"].drop_duplicates()
@@ -156,7 +157,7 @@ def main():
     for teryt in woj_powiats:
       powiat_teryts = filter(lambda x: x.startswith(teryt), teryts)
       powiat_teryts = sorted(list(powiat_teryts))
-      matched_addresses = process_powiat(powiat_teryts, districts, addresses, streets, utils, tokens_to_skip, extra_streets, tokens_to_replace)
+      matched_addresses = process_powiat(powiat_teryts, districts, addresses, streets, utils, tokens_to_skip, extra_streets, tokens_to_replace, addresses_to_skip)
       if (matched_addresses is not None):
         save_zip(f"matched_addresses/{teryt}", matched_addresses)
       else:
@@ -171,6 +172,7 @@ def process_powiat(
     tokens_to_skip_df: pandas.DataFrame,
     extra_streets_df: pandas.DataFrame,
     tokens_to_replace: pandas.DataFrame,
+    addresses_to_skip_df: pandas.DataFrame,
   ):
   powiat_addresses: geo.GeoDataFrame | None = None
 
@@ -180,6 +182,7 @@ def process_powiat(
     teryt_addresses = addresses[addresses["teryt"] == teryt]
     tokens_to_skip = tokens_to_skip_df[tokens_to_skip_df["teryt"] == teryt]["token"].tolist()
     tokens_to_replace = tokens_to_replace[tokens_to_replace["teryt"] == teryt]
+    addresses_to_skip = addresses_to_skip_df[addresses_to_skip_df["teryt"] == teryt]["f_address"].tolist()
     # Extra streets have to be parsed but will be discarded anyway
     extra_streets = extra_streets_df[extra_streets_df["teryt"] == teryt]
     extra_streets_list = extra_streets["street"].to_list()
@@ -575,6 +578,7 @@ def process_powiat(
       for token in parsed_tokens:
         token_addresses = teryt_addresses[teryt_addresses["town"] == token["town"]]
         token_addresses = token_addresses[~(token_addresses["f_address"].isin(special_addresses))]
+        token_addresses = token_addresses[~(token_addresses["f_address"].isin(addresses_to_skip))]
         if (district_addresses is not None):
           # Ignore duplicate addresses
           token_addresses = token_addresses[~(token_addresses["f_address"].isin(district_addresses.f_address))]
