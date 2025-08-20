@@ -166,9 +166,9 @@ def process_data():
 
     print(f"Loading data for voivodeship {teryt}...")
     addresses = geo.read_file(f"data_in/addresses/{teryt}.zip!PRG_PunktyAdresowe_{teryt}.shp")
-    streets = streets.drop_duplicates(subset=["str_type", "ULIC_id"])
-    streets = streets[["str_type", "ULIC_id"]]
-    addresses = addresses.merge(streets, on="ULIC_id", how="left")
+    streets = streets.drop_duplicates(subset=["teryt", "str_type", "ULIC_id"])
+    streets = streets[["str_type", "ULIC_id", "teryt"]]
+    addresses = addresses.merge(streets, left_on=["TERYT", "ULIC_id"], right_on=["teryt", "ULIC_id"], how="left")
     del addresses_columns["Cecha"]
     addresses = addresses[[*[key for key in addresses_columns], "str_type"]].rename(columns=addresses_columns)
     print(f"Processing data for voivodeship {teryt}...")
