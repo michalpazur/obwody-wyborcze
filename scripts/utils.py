@@ -3,7 +3,7 @@ import pandas
 from geopandas import GeoDataFrame
 import os
 import re, regex
-from const import first_name_letter_regex, holy_name_regex, char_order, ordinal_regex, quotation_regex, apostrophe_regex, dash_regex
+from const import first_name_letter_regex, holy_name_regex, char_order, ordinal_regex, quotation_regex, apostrophe_regex, dash_regex, building_types_regex
 import typing
 from typing import Dict
 
@@ -14,7 +14,7 @@ def capitalize(x: str):
   return x[:1].upper() + x[1:]
 
 def capitalize_every_word(x: str):
-  return regex.sub(r"(\s+|^)(\p{L})(\S?)", lambda match: f"{match.group(1)}{capitalize(match.group(2)) if match.group(3) else match.group(2)}{match.group(3)}", x)
+  return regex.sub(r"(\s+|^)(\p{L})(\S?)", lambda match: f"{match.group(1)}{capitalize(match.group(2)) if match.group(2) != "i" or match.group(3) else match.group(2)}{match.group(3)}", x)
 
 def load_replacements():
   with open("const/street_replacements.csv") as replacements_file:
@@ -33,7 +33,7 @@ def load_replacements_exceptions():
 def load_street_prefixes():
   with open("const/street_prefixes.csv") as prefixes_file:
     lines = [line.strip().split(";") for line in prefixes_file.readlines()]
-    prefixes = dict(zip([f"{x[0]}\\.?\\s+" for x in lines], [x[1] if x == "" else f"{x[1]} " for x in lines]))
+    prefixes = dict(zip([f"{x[0]}(\\.\\s*|\\s+)" for x in lines], [x[1] if x == "" else f"{x[1]} " for x in lines]))
   return prefixes
 
 def get_street_types(prefixes: Dict[str, str]):
@@ -60,7 +60,7 @@ class Utils:
     names = load_names()
     self.names = names
     names_regex = "(" + "|".join(names) + ")"
-    names_regex = f"{names_regex}(\\s+(i\\s+)?{names_regex})?\\s+"
+    names_regex = f"{names_regex}(\\s+([iI]\\s+)?{names_regex})?(\\s+|$)"
     self.names_regex = names_regex
     self.names_exceptions = load_names_exceptions()
     self.replacements = load_replacements()
@@ -76,7 +76,10 @@ class Utils:
     if (re.search(holy_name_regex, street, flags=re.IGNORECASE)):
       return street
     
-    return re.sub(self.names_regex, "", street)
+    name_removed = re.sub(self.names_regex, "", street)
+    if (len(name_removed.strip()) > 0):
+      return name_removed
+    return street
 
   def remove_first_letter(self, street: str):
     match = regex.search(first_name_letter_regex, street)
@@ -116,10 +119,12 @@ class Utils:
     street = re.sub(quotation_regex, r'"\1"', street)
     street = re.sub(apostrophe_regex, "'", street)
     street = re.sub(dash_regex, "-", street)
+    street = re.sub(building_types_regex, "", street)
     street = re.sub(r"-$", "", street)
-    street = re.sub(r"\s+-\s+", "-", street)
+    street = re.sub(r"\s*-\s*", "-", street)
+    street = re.sub(r"\.$", "", street)
     street = re.sub(ordinal_regex, "", street)
-    street = capitalize(street)
+    street = capitalize_every_word(street)
 
     return street
 

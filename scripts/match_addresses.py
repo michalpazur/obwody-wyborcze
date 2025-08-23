@@ -5,12 +5,12 @@ import re
 import regex
 from typing import List, NotRequired, TypedDict, cast
 from utils import concat, Utils, get_building_order, save_zip
-from const import all_regex, odd_regex, even_regex, building_num_regex, building_letter_regex, district_types, dash_regex, multiple_number_regex, districts as town_districts
+from const import all_regex, odd_regex, even_regex, building_num_regex, building_letter_regex, district_types, dash_regex, multiple_number_regex, districts as town_districts, building_types_regex
 
 pandas.options.mode.copy_on_write = True
 
 place_type = re.compile(r"^(miasto|miasta|wieś|wsie|sołectwo|sołectwa|osada|osady|przysiółek|przysiółki|miejscowość|miejscowości)(:\s*|\s+)", flags=re.IGNORECASE)
-streets_regex = re.compile(r",?.*(ulice|ulica):?\s*", flags=re.IGNORECASE)
+streets_regex = re.compile(r"(,\s*|^)(ul\.|ulice|ulica):?\s*", flags=re.IGNORECASE)
 street_name_regex = regex.compile(r"^(\p{Lu}\p{L}+\s?)+$", flags=re.IGNORECASE)
 
 DEBUG = True
@@ -132,6 +132,7 @@ def main():
   tokens_to_replace = pandas.read_csv("const/tokens_to_replace.csv", **args)
   addresses_to_skip = pandas.read_csv("const/addresses_to_skip.csv", **args)
   # Force special districts to be first
+  districts.loc[districts["borders"].str.contains("Dom Pomocy Społecznej"), "type"] = "dom pomocy społecznej"
   districts = districts.sort_values("type", key=lambda x: x.map(district_types))
   teryts = districts["teryt"].drop_duplicates()
   powiats = []
@@ -242,7 +243,8 @@ def process_powiat(
       check_after_parity = False
       restored_token: ParsedToken | None = None
       for token in split_borders:
-        if (len(token.strip()) == 0 or token.strip() in tokens_to_skip):
+        token = token.strip()
+        if (len(token) == 0 or token in tokens_to_skip):
           print(f"Skipping {token}...")
           continue
 
@@ -251,6 +253,7 @@ def process_powiat(
           token = token_to_replace.iloc[0].replacement
         token = place_type.sub("", token).strip()
         token = re.sub(r"(\s*-\s*|\s+)oficyn[ay]", "", token, flags=re.IGNORECASE)
+        token = re.sub(r"\s*/\.?$", "", token) # See: Olsztyn
         token = re.sub(r"\.$", "", token)
 
         parsed_token: ParsedToken = { 
@@ -387,7 +390,9 @@ def process_powiat(
             continue
           
           rest_of_token = re.sub(dash_regex, "-", rest_of_token)
-          split_token = re.split(r"\s+", rest_of_token)
+          rest_of_token = re.sub(r"^/", "", rest_of_token) # See: Olsztyn
+          rest_of_token = re.sub(building_types_regex, "", rest_of_token)
+          split_token = re.split(r"\s+", rest_of_token.strip())
           prev_word = ""
           next_word = ""
           word_idx = -1
