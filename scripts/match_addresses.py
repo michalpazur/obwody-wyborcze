@@ -399,6 +399,7 @@ def process_powiat(
           prev_token = parsed_tokens[-1] if len(parsed_tokens) > 0 else None
           restored_prev_token = False
           skip_token = False
+          set_parity = False
           
           if (prev_token and prev_token["street"] == parsed_token["street"] and prev_token["is_street"]):
             restored_prev_token = True
@@ -434,6 +435,13 @@ def process_powiat(
               parsed_token.pop("num_to", None)
               parsed_token.pop("number", None)
               prev_word = word
+              set_parity = False
+              continue
+
+            if (word == "wszystkie"):
+              if (not set_parity):
+                parsed_token["is_odd"] = False
+                parsed_token["is_even"] = False
               continue
 
             split_by_dash = re.split(dash_regex, word)
@@ -454,12 +462,15 @@ def process_powiat(
               word = word[1:]
               prev_word = "-"
               prev_is_dash = True
+              word_idx += 1
             if (starts_with_from or starts_with_to):
               word = word[2:]
               if (starts_with_from):
                 prev_word = "od"
+                word_idx += 1
               else:
                 prev_word = "do"
+                word_idx += 1
 
             if (not is_dash and not ends_with_dash and not starts_with_dash and len(split_by_dash) >= 2):
               word_from = process_token_word(split_by_dash[0])
@@ -479,24 +490,30 @@ def process_powiat(
             if (re.match(odd_regex, word)):
               parsed_token["is_odd"] = True
               parsed_token["is_even"] = False
+              set_parity = True
               if (restored_token and not restored_token["is_odd"]):
                 parsed_tokens.append(restored_token)
                 restored_token = None
             elif (re.match(even_regex, word)):
               parsed_token["is_even"] = True
               parsed_token["is_odd"] = False
+              set_parity = True
               if (restored_token and not restored_token["is_even"]):
                 parsed_tokens.append(restored_token)
                 restored_token = None
 
             joined_words = f"{prev_word} {word}"
+            is_start = joined_words == "od początku"
             is_end = joined_words == "do końca"
             is_except = is_except or word == "bez" or word == "oprócz"
-            is_num_to = (prev_word == "do" and not is_end) or prev_is_dash
+            is_num_to = (prev_word == "do" and not is_end) or (prev_is_dash and "num_from" in parsed_token) or starts_with_dash
 
             if (is_end and "number" in parsed_token):
               parsed_token["num_from"] = get_building_number(parsed_token["number"])
               del parsed_token["number"]
+
+            if (is_start or is_end):
+              continue
 
             if (word == "bez" or word == "oprócz" or (is_except and restored_prev_token)):
               if (restored_prev_token):
@@ -515,22 +532,28 @@ def process_powiat(
               continue
 
             prev_token = parsed_tokens[-1] if len(parsed_tokens) > 0 else None
-            if (is_dash):
+
+            if (prev_word == "od" and "num_from" in parsed_token):
+              parsed_tokens.append(parsed_token)
+              parsed_token = parsed_token.copy()
+
+            if (is_dash and prev_word != "" and not re.search(even_regex, prev_word)):
               parsed_token.pop("number", None)
               parsed_token["num_from"] = get_building_number(prev_word)
             elif (ends_with_dash):
               parsed_token["num_from"] = get_building_number(word)
-            elif (prev_word == "od" or next_word == "-"):
+            elif (prev_word == "od"):
               parsed_token["num_from"] = get_building_number(word)
-            elif (prev_token is not None and prev_token["street"] == parsed_token["street"] and word_idx == 1 and is_num_to):
+            elif (prev_token is not None and prev_token["street"] == parsed_token["street"] and (prev_token["is_street"] or "num_from" in prev_token) and word_idx == 1 and is_num_to):
               parsed_token = parsed_tokens.pop()
+              parsed_token["is_street"] = False
               parsed_token["num_to"] = get_building_number(word)
             elif (is_num_to):
               parsed_token["num_to"] = get_building_number(word)
               if ("number" in parsed_token):
                 num_from = parsed_token["number"]
                 parsed_token["num_from"] = get_building_number(num_from)
-            elif (not is_end and word != "od" and word != "-" and word != "do" and re.match(building_num_regex, word)):
+            elif (word != "od" and word != "-" and word != "do" and next_word != "-" and re.match(building_num_regex, word)):
               parsed_token["number"] = word
               parsed_token["is_even"] = False
               parsed_token["is_odd"] = False
