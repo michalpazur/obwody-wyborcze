@@ -93,8 +93,8 @@ def main():
   merged_columns = { **results_columns, **candidates }
   results = results.rename(columns=merged_columns)
 
-  canidates_columns = [candidates[key] for key in candidates]
-  canidates_columns = list(filter(lambda key: key in results, canidates_columns))
+  candidates_columns = [candidates[key] for key in candidates]
+  candidates_columns = list(filter(lambda key: key in results, candidates_columns))
   merged_columns = filter(lambda key: key in results, [merged_columns[key] for key in merged_columns])
   merged_columns = list(merged_columns)
   tmp_merged_columns = []
@@ -102,17 +102,17 @@ def main():
     if (key not in tmp_merged_columns):
       tmp_merged_columns.append(key)
   merged_columns = tmp_merged_columns
-  proc_columns = [name + "_proc" for name in canidates_columns]
+  proc_columns = [name + "_proc" for name in candidates_columns]
 
   results = results[merged_columns]
   results = results[results["teryt"] != "000000"]
   results["gmina"] = results.apply(lambda row: row.gmina if row.gmina.startswith(r"g?m\.") else "m. " + row.powiat, axis=1)
   results["district"] = results.apply(lambda row: f"{row.teryt}_{row.number}", axis=1)
   # pd.DataFrame.idxmax doesn't show ties
-  results["winner"] = results[canidates_columns].apply(get_winner, axis=1)
-  for name in canidates_columns:
+  results["winner"] = results[candidates_columns].apply(get_winner, axis=1)
+  for name in candidates_columns:
     results[name + "_proc"] = results[name] * 100 / results["total"]
-  results["winner_proc"] = results[canidates_columns].max(axis=1) * 100 / results["total"]
+  results["winner_proc"] = results[candidates_columns].max(axis=1) * 100 / results["total"]
   results["turnout"] = results["all_votes"] * 100 / results["voters"]
 
   print("Merging results with districts...")
