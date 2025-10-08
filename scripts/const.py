@@ -23,6 +23,13 @@ streets_columns = {
   "geometry": "geometry"
 }
 
+towns_columns = {
+  "idGminy": "teryt",
+  "nazwaGlown": "town",
+  "rodzaj": "type",
+  "geometry": "geometry" 
+}
+
 addresses_columns = {
   **streets_columns,
   "PNA": "post_code",

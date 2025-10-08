@@ -10,7 +10,7 @@ from const import all_regex, odd_regex, even_regex, building_num_regex, building
 pandas.options.mode.copy_on_write = True
 
 place_type = re.compile(r"^(miasto|miasta|wieś|wsie|sołectwo|sołectwa|osada|osady|przysiółek|przysiółki|miejscowość|miejscowości)(:\s*|\s+)", flags=re.IGNORECASE)
-streets_regex = re.compile(r"(,\s*|^)(ul\.|ulice|ulica):?\s*", flags=re.IGNORECASE)
+streets_regex = re.compile(r"(\s+|,\s*|^)(ul\.|ulic[aey]):?\s*", flags=re.IGNORECASE)
 street_name_regex = regex.compile(r"^(\p{Lu}\p{L}+\s?)+$", flags=re.IGNORECASE)
 
 DEBUG = True
@@ -34,6 +34,11 @@ class BaseParsedToken(TypedDict):
 class ParsedToken(BaseParsedToken):
   except_addresses: List[BaseParsedToken]
 
+class FoundTown(TypedDict):
+  start_index: int
+  end_index: int
+  town: str
+
 class FoundStreet(TypedDict):
   start_index: int
   end_index: int
@@ -44,9 +49,8 @@ def log_error(district: pandas.Series, reason: str):
   with open("error.log", "a") as log:
     log.write(f"Unable to find addresses for district {district.number} in {district.town} ({district.teryt}). Full address: {district.f_address}, {district.location}. ({reason})\n")
 
-def is_town(addresses: geo.GeoDataFrame, name: str):
-  addresses_with_town = addresses[addresses["town"] == name]
-  return len(addresses_with_town) > 0
+def is_town(towns: List[str], name: str):
+  return name in towns
 
 def check_street(streets: geo.GeoDataFrame, town: str, street: str, key: str):
   addresses_with_street = streets[(streets["town"] == town) & (streets[key] == street)]
@@ -131,6 +135,7 @@ def main():
   extra_streets = pandas.read_csv("const/extra_streets.csv", **args)
   tokens_to_replace = pandas.read_csv("const/tokens_to_replace.csv", **args)
   addresses_to_skip = pandas.read_csv("const/addresses_to_skip.csv", **args)
+  towns = geo.read_file("data_processed/addresses/prng.zip")
   # Force special districts to be first
   districts.loc[districts["borders"].str.contains("Dom Pomocy Społecznej"), "type"] = "dom pomocy społecznej"
   districts = districts.sort_values("type", key=lambda x: x.map(district_types))
@@ -155,10 +160,11 @@ def main():
     addresses["building_n"] = addresses["building_n"].astype(int)
 
     streets = geo.read_file(f"data_processed/streets/{woj_teryt}.zip")
+
     for teryt in woj_powiats:
       powiat_teryts = filter(lambda x: x.startswith(teryt), teryts)
       powiat_teryts = sorted(list(powiat_teryts))
-      matched_addresses = process_powiat(powiat_teryts, districts, addresses, streets, utils, tokens_to_skip, extra_streets, tokens_to_replace, addresses_to_skip)
+      matched_addresses = process_powiat(powiat_teryts, districts, addresses, towns, streets, utils, tokens_to_skip, extra_streets, tokens_to_replace, addresses_to_skip)
       if (matched_addresses is not None):
         save_zip(f"matched_addresses/{teryt}", matched_addresses)
       else:
@@ -168,11 +174,12 @@ def process_powiat(
     teryts: List[str],
     districts: pandas.DataFrame,
     addresses: geo.GeoDataFrame,
+    towns: geo.GeoDataFrame,
     streets: geo.GeoDataFrame,
     utils: Utils,
     tokens_to_skip_df: pandas.DataFrame,
     extra_streets_df: pandas.DataFrame,
-    tokens_to_replace: pandas.DataFrame,
+    tokens_to_replace_df: pandas.DataFrame,
     addresses_to_skip_df: pandas.DataFrame,
   ):
   powiat_addresses: geo.GeoDataFrame | None = None
@@ -181,8 +188,10 @@ def process_powiat(
     print(f"Processing {teryt}...")
     teryt_districts = districts[districts["teryt"] == teryt]
     teryt_addresses = addresses[addresses["teryt"] == teryt]
+    teryt_towns = towns[towns["teryt"] == teryt]
+    town_list = [ *teryt_towns["town"].to_list(), *teryt_addresses["town"].to_list() ]
     tokens_to_skip = tokens_to_skip_df[tokens_to_skip_df["teryt"] == teryt]["token"].tolist()
-    tokens_to_replace = tokens_to_replace[tokens_to_replace["teryt"] == teryt]
+    tokens_to_replace = tokens_to_replace_df[tokens_to_replace_df["teryt"] == teryt]
     addresses_to_skip = addresses_to_skip_df[addresses_to_skip_df["teryt"] == teryt]["f_address"].tolist()
     # Extra streets have to be parsed but will be discarded anyway
     extra_streets = extra_streets_df[extra_streets_df["teryt"] == teryt]
@@ -215,393 +224,466 @@ def process_powiat(
         continue
       
       borders = district.borders
-      borders = re.sub(r"(nr\.?|numer)\s+", "", borders)
+      borders = re.sub(r"(nr\.?|numer(u|y|ów)?)\s+(posesji\s+)?", "", borders, flags=re.IGNORECASE)
       borders = re.sub(r"[()]", "", borders)
-      borders = re.sub(r"(,\s*|\s+)(bez|oprócz|z wyłączeniem)(\s+(numer|nr\.?)(u|ów))?", ", bez", borders)
+      borders = re.sub(r"(,\s*|\s+)(bez|oprócz|z wyłączeniem)(\s+(numer|nr\.?)(u|ów))?(\s+(blok|bl\.?)(u|ów))?", ", bez", borders, flags=re.IGNORECASE)
       split_borders: List[str] = re.split(r",\s*", borders.replace(";", ","))
-      last_element = re.split(r"\s+i\s+", split_borders[len(split_borders) - 1])
-      # Handle enumerated towns
-      if (len(last_element) > 1):
-        all_towns = True
-        for token in last_element:
-          if (all_towns):
-            all_towns = is_town(teryt_addresses, token)
-          else:
-            all_towns = False
-            break
-
-        if (all_towns):
-          split_borders = split_borders[:-1]
-          split_borders.extend(last_element)
 
       parsed_tokens: List[ParsedToken] = []
       town = None
+      last_town = ""
       last_street = ""
       last_is_odd = False
       last_is_even = False
       is_except = False
       check_after_parity = False
       restored_token: ParsedToken | None = None
+      restored_town = ""
       for token in split_borders:
         token = token.strip()
         if (len(token) == 0 or token in tokens_to_skip):
           print(f"Skipping {token}...")
           continue
 
-        token_to_replace = tokens_to_replace[tokens_to_replace["token"] == token]
-        if (len(token_to_replace) > 0):
-          token = token_to_replace.iloc[0].replacement
-        token = place_type.sub("", token).strip()
+        token_replacement = tokens_to_replace[tokens_to_replace["token"] == token]
+        if (len(token_replacement) > 0):
+          token_replacement = token_replacement.iloc[0].replacement
+          print(f"Replacing {token} with {token_replacement}...")
+          token = token_replacement
+
         token = re.sub(r"(\s*-\s*|\s+)oficyn[ay]", "", token, flags=re.IGNORECASE)
+        token = re.sub(r"(\s*-\s*|\s+)bloki?", "", token, flags=re.IGNORECASE)
         token = re.sub(r"\s*/\.?$", "", token) # See: Olsztyn
+        token = re.sub(r"\s*:", "", token)
         token = re.sub(r"\.$", "", token)
 
-        parsed_token: ParsedToken = { 
-          "token": token,
-          "is_town": is_town(teryt_addresses, token),
-          "is_street": False,
-          "is_odd": False,
-          "is_even": False,
-          "town": "",
-          "street": "",
-          "except_addresses": []
-        }
-
-        if (parsed_token["is_town"]):
-          # Found entire town
-          parsed_token["town"] = token
-          parsed_tokens.append(parsed_token)
-          continue
-
-        token = place_type.sub("", token).strip()
-
-        for town_district in town_districts:
-          if (re.match(town_district, token)):
-            token = token.replace(town_district, "").strip()
-            town = town_district.split("-")[0]
-            break
-        if (not town and is_town(teryt_addresses, token.split("-")[0])):
-          town = token.split("-")[0]
-        
-        if (town is None):
-          town = district.town
-
-        parsed_token["town"] = town
-        token = streets_regex.sub("", token).strip()
-
-        street_tmp = ""
-        split_line = re.split(r"\s", token)
-        streets_in_token: List[FoundStreet | None] = []
+        town_tmp = ""
+        split_line = re.split(r"\s+", token)
         idx = 0
-        skipped_token = False
-        while idx < len(split_line):
+        towns_in_token: List[FoundTown | None] = []
+        while (idx < len(split_line)):
           end_idx = idx
-          street_tmp = ""
-          found_street: FoundStreet | None = None
+          found_town: FoundTown | None = None
           for word in split_line[idx:]:
             end_idx += 1
-            street_tmp = " ".join(split_line[idx:end_idx])
-            ends_with_dot = street_tmp.endswith(".")
-            if (street_tmp in tokens_to_skip):
-              print(f"Skipping {street_tmp}...")
-              skipped_token = True
-              idx = end_idx - 1
-              break
-            street_tmp = utils.transform_street_name(street_tmp, teryt)
+            town_tmp = " ".join(split_line[idx:end_idx])
+            ends_with_dot = town_tmp.endswith(".")
+            town_tmp = re.sub(r"\.$", "", town_tmp)
+            town_tmp_replaced = re.sub(place_type, "", town_tmp + " ").strip()
+            if (len(town_tmp_replaced) != 0):
+              town_tmp = town_tmp_replaced
+            
+            town_split = town_tmp.split("-")[0]
+            found_token_split = found_town["town"].split("-")[0] if found_town else ""
+            if (town_split != found_token_split and is_town(town_list, town_split) and not is_town(town_list, town_tmp)):
+              town_tmp = town_split
 
-            street_name = cast(str, is_street(teryt_streets, town, street_tmp))
-            if (street_name != ""):
-              last_street = street_name
-              found_street = {
-                "street": street_name,
+            town_with_dash = "-".join(town_tmp.split(" "))
+            if (is_town(town_list, town_with_dash)):
+              town_tmp = town_with_dash
+
+            if (is_town(town_list, town_tmp) and not is_street(teryt_streets, last_town, town_tmp) and (not found_town or found_town["town"] != town_tmp)):
+              last_town = town_tmp
+              found_town = {
+                "town": town_tmp,
                 "start_index": idx,
                 "end_index": end_idx
               }
-              start_of_token = " ".join(split_line[0:idx]) + " "
-              start_of_token = utils.transform_street_name(start_of_token, teryt) + " "
-              start_of_token = utils.remove_street_type(start_of_token) + " "
-              start_of_token = utils.remove_replacements(start_of_token)
-              # Street was found later in the token, but the first part of the token was not included
-              if (not skipped_token and len(start_of_token) > 0 and idx != 0 and len(streets_in_token) == 0):
-                try:
-                  prev_token = parsed_tokens[-1]
-                  prev_found_street: FoundStreet = {
-                    "street": prev_token["street"],
-                    "start_index": 0,
-                    "end_index": 0, # If street was not found previously that means it's not in the token so nothing will be cut
-                    "prev_token": prev_token
-                  }
-                  streets_in_token.append(prev_found_street)
-                except:
-                  print(f"No previous token found for string \"{" ".join(split_line[0:idx])}\"!")
-              elif (skipped_token):
-                skipped_token = False
+              if (idx != 0 and len(towns_in_token) == 0):
+                  try:
+                    prev_token = parsed_tokens[-1]
+                    prev_found_town: FoundTown = {
+                      "town": prev_token["town"],
+                      "start_index": 0,
+                      "end_index": 0,
+                    }
+                    towns_in_token.append(prev_found_town)
+                  except:
+                    print(f"No previous token found for string \"{" ".join(split_line[0:idx])}\"!")
               # End of line was reached
               if (end_idx == len(split_line) or ends_with_dot):
-                streets_in_token.append(found_street)
+                towns_in_token.append(found_town)
                 idx = end_idx
-            # Account for "name and name surname" case (e.g. Heleny i Leona Patynów in Kraków)
-            elif (found_street is not None and end_idx == found_street["end_index"] + 3):
-              streets_in_token.append(found_street)
-              idx = found_street["end_index"]
-              break
-            elif (end_idx == len(split_line) and found_street):
-              streets_in_token.append(found_street)
-              idx = found_street["end_index"]
 
-          if (found_street is None):
+            # Handle cases such as Grabów nad Pilicą
+            elif (found_town is not None and (end_idx == found_town["end_index"] + 2 or end_idx == len(split_line))):
+              towns_in_token.append(found_town)
+              idx = found_town["end_index"]
+              break
+
+          if (found_town is None):
             idx += 1
 
         prev_end = len(split_line)
-        streets_in_token.reverse()
-        if (len(streets_in_token) == 0):
-          streets_in_token = [None]
+        towns_in_token.reverse()
+        if (len(towns_in_token) == 0):
+          towns_in_token = [None]
 
-        for street in streets_in_token:
-          tmp_token = parsed_token.copy()
-          if (street is not None):
-            token = " ".join(split_line[street["start_index"]:prev_end])
-            rest_of_token = " ".join(split_line[street["end_index"]:prev_end])
-            prev_end = street["start_index"]
-            parsed_token["street"] = street["street"]
+        for town in towns_in_token:
+          parsed_token: ParsedToken = {
+            "token": token,
+            "is_town": False,
+            "is_street": False,
+            "is_odd": False,
+            "is_even": False,
+            "town": "",
+            "street": "",
+            "except_addresses": []
+          }
+
+          if (town is not None):
+            token = " ".join(split_line[town["start_index"]:prev_end])
+            rest_of_token = " ".join(split_line[town["end_index"]:prev_end])
+            rest_of_token = re.sub(r"(^|\s+)i$", "", rest_of_token)
+            prev_end = town["start_index"]
+            parsed_token["town"] = town["town"]
+            parsed_token["street"] = town["town"]
+            last_street = town["town"]
             parsed_token["token"] = token
             is_except = False
 
-            if ("prev_token" in street):
-              prev_token = street["prev_token"]
-              parsed_token["is_even"] = prev_token["is_even"]
-              parsed_token["is_odd"] = prev_token["is_odd"]
-
-            # We found new street, restart token to default settings
-            tmp_token["street"] = street["street"]
-
             if (len(rest_of_token) == 0):
-              parsed_token["is_street"] = True
+              parsed_token["is_town"] = True
               parsed_tokens.append(parsed_token)
-              parsed_token = tmp_token.copy()
               continue
           else:
+            parsed_token["town"] = last_town
             parsed_token["street"] = last_street
-            parsed_token["is_even"] = last_is_even
-            parsed_token["is_odd"] = last_is_odd
             rest_of_token = " ".join(split_line)
 
-          if (parsed_token["street"] in extra_streets_list):
-            continue
+          token = place_type.sub("", rest_of_token).strip()
           
-          rest_of_token = re.sub(dash_regex, "-", rest_of_token)
-          rest_of_token = re.sub(r"^/", "", rest_of_token) # See: Olsztyn
-          rest_of_token = re.sub(building_types_regex, "", rest_of_token)
-          split_token = re.split(r"\s+", rest_of_token.strip())
-          prev_word = ""
-          next_word = ""
-          word_idx = -1
+          if (parsed_token["town"] == ""):
+            parsed_token["town"] = district.town
+          
+          token = streets_regex.sub("", token).strip()
+          token = re.sub(f"^{dash_regex}\\s*", "", token)
           prev_token = parsed_tokens[-1] if len(parsed_tokens) > 0 else None
           restored_prev_token = False
-          skip_token = False
-          set_parity = False
-          
-          if (prev_token and prev_token["street"] == parsed_token["street"] and prev_token["is_street"]):
+
+          if ((town is not None or restored_town != parsed_token["town"]) and prev_token and prev_token["town"] == parsed_token["town"] and prev_token["is_town"]):
             restored_prev_token = True
-            parsed_token = parsed_tokens.pop()
-            parsed_token["is_street"] = False
+            restored_town = parsed_token["town"]
+            if (restored_town not in parsed_token["token"]):
+              parsed_token = parsed_tokens.pop()
+              parsed_token["is_town"] = False
+            else:
+              continue
 
-          for word in split_token:
-            word_idx += 1
-            next_word = split_token[word_idx + 1] if word_idx < len(split_token) - 1 else ""
-            word = re.sub(r"[():]", "", word)
+          street_tmp = ""
+          split_line = re.split(r"\s+", token)
+          streets_in_token: List[FoundStreet | None] = []
+          idx = 0
+          skipped_token = False
+          while idx < len(split_line):
+            end_idx = idx
+            found_street: FoundStreet | None = None
+            for word in split_line[idx:]:
+              end_idx += 1
+              street_tmp = " ".join(split_line[idx:end_idx])
+              ends_with_dot = street_tmp.endswith(".")
+              if (street_tmp in tokens_to_skip):
+                print(f"Skipping {street_tmp}...")
+                skipped_token = True
+                idx = end_idx - 1
+                break
+              street_tmp = utils.transform_street_name(street_tmp, teryt)
 
-            if (check_after_parity):
-              prev_token = parsed_tokens[-1]
-              check_after_parity = False
-              if (parsed_token["street"] == prev_token["street"]):
-                restored_prev_token = True
-                restored_token = parsed_tokens.pop()
-                parsed_token = restored_token.copy()
+              street_name = cast(str, is_street(teryt_streets, parsed_token["town"], street_tmp))
+              if (street_name != ""):
+                last_street = street_name
+                found_street = {
+                  "street": street_name,
+                  "start_index": idx,
+                  "end_index": end_idx
+                }
+                start_of_token = " ".join(split_line[0:idx]) + " "
+                start_of_token = utils.transform_street_name(start_of_token, teryt) + " "
+                start_of_token = utils.remove_street_type(start_of_token) + " "
+                start_of_token = utils.remove_replacements(start_of_token)
+                # Street was found later in the token, but the first part of the token was not included
+                if (not skipped_token and len(start_of_token) > 0 and idx != 0 and len(streets_in_token) == 0):
+                  try:
+                    prev_token = parsed_tokens[-1]
+                    prev_found_street: FoundStreet = {
+                      "street": prev_token["street"],
+                      "start_index": 0,
+                      "end_index": 0, # If street was not found previously that means it's not in the token so nothing will be cut
+                      "prev_token": prev_token
+                    }
+                    streets_in_token.append(prev_found_street)
+                  except:
+                    print(f"No previous token found for string \"{" ".join(split_line[0:idx])}\"!")
+                elif (skipped_token):
+                  skipped_token = False
+                # End of line was reached
+                if (end_idx == len(split_line) or ends_with_dot):
+                  streets_in_token.append(found_street)
+                  idx = end_idx
+              # Account for "name and name surname" case (e.g. Heleny i Leona Patynów in Kraków)
+              elif (found_street is not None and (end_idx == found_street["end_index"] + 3 or end_idx == len(split_line))):
+                streets_in_token.append(found_street)
+                idx = found_street["end_index"]
+                break
 
-            if (word == "i" or word == "oraz"):
-              if (word_idx > 0 and not is_except):
+            if (found_street is None):
+              idx += 1
+
+          prev_end = len(split_line)
+          streets_in_token.reverse()
+          if (len(streets_in_token) == 0):
+            streets_in_token = [None]
+
+          for street in streets_in_token:
+            tmp_token = parsed_token.copy()
+            if (street is not None):
+              token = " ".join(split_line[street["start_index"]:prev_end])
+              rest_of_token = " ".join(split_line[street["end_index"]:prev_end])
+              rest_of_token = re.sub(r"(^|\s+)i$", "", rest_of_token)
+              prev_end = street["start_index"]
+              parsed_token["street"] = street["street"]
+              parsed_token["token"] = token
+              is_except = False
+
+              if ("prev_token" in street):
+                prev_token = street["prev_token"]
+                parsed_token["is_even"] = prev_token["is_even"]
+                parsed_token["is_odd"] = prev_token["is_odd"]
+
+              # We found new street, restart token to default settings
+              tmp_token["street"] = street["street"]
+
+              if (len(rest_of_token) == 0):
+                parsed_token["is_street"] = True
                 parsed_tokens.append(parsed_token)
-              elif (word_idx > 0 and is_except):
+                parsed_token = tmp_token.copy()
+                continue
+            else:
+              parsed_token["street"] = last_street
+              parsed_token["is_even"] = last_is_even
+              parsed_token["is_odd"] = last_is_odd
+              rest_of_token = " ".join(split_line)
+
+            if (parsed_token["street"] in extra_streets_list):
+              continue
+            
+            rest_of_token = re.sub(dash_regex, "-", rest_of_token)
+            rest_of_token = re.sub(r"^/", "", rest_of_token) # See: Olsztyn
+            rest_of_token = re.sub(building_types_regex, "", rest_of_token)
+            split_token = re.split(r"\s+", rest_of_token.strip())
+            prev_word = ""
+            next_word = ""
+            word_idx = -1
+            skip_token = False
+            set_parity = False
+            prev_token = parsed_tokens[-1] if len(parsed_tokens) > 0 else None
+            
+            if (prev_token and prev_token["street"] == parsed_token["street"] and prev_token["is_street"]):
+              if (not restored_prev_token):
+                parsed_token = parsed_tokens.pop()
+                restored_prev_token = True
+              parsed_token["is_street"] = False
+
+            for word in split_token:
+              word_idx += 1
+              next_word = split_token[word_idx + 1] if word_idx < len(split_token) - 1 else ""
+              word = re.sub(r"[():]", "", word)
+
+              if (check_after_parity):
+                prev_token = parsed_tokens[-1]
+                check_after_parity = False
+                if (parsed_token["street"] == prev_token["street"]):
+                  restored_prev_token = True
+                  restored_token = parsed_tokens.pop()
+                  parsed_token = restored_token.copy()
+
+              if (word == "i" or word == "oraz"):
+                if (word_idx > 0 and not is_except):
+                  parsed_tokens.append(parsed_token)
+                elif (word_idx > 0 and is_except):
+                  prev_token = parsed_tokens.pop()
+                  prev_token["except_addresses"].append(parsed_token)
+                  parsed_tokens.append(prev_token)
+                  is_except = next_word != ""
+                if (next_word == ""):
+                  # This token has already been handled, no need to add it later
+                  skip_token = True
+                parsed_token = parsed_token.copy()
+                parsed_token.pop("num_from", None)
+                parsed_token.pop("num_to", None)
+                parsed_token.pop("number", None)
+                prev_word = word
+                set_parity = False
+                continue
+
+              if (word == "wszystkie"):
+                if (not set_parity):
+                  parsed_token["is_odd"] = False
+                  parsed_token["is_even"] = False
+                continue
+
+              split_by_dash = re.split(dash_regex, word)
+              is_dash = re.match(f"^{dash_regex}$", word)
+              prev_is_dash = re.match(f"^{dash_regex}$", prev_word)
+              ends_with_dash = not is_dash and re.search(f"({dash_regex})$", word) is not None
+              starts_with_dash = not is_dash and re.search(f"^({dash_regex})", word) is not None
+              starts_with_from = word != "od" and word.startswith("od")
+              starts_with_to = word != "do" and word.startswith("do")
+              ends_with_to = word != "do" and word.endswith("do")
+
+              if (ends_with_dash):
+                word = word[:-1]
+              if (ends_with_to):
+                word = word[:-2]
+
+              if (starts_with_dash):
+                word = word[1:]
+                prev_word = "-"
+                prev_is_dash = True
+                word_idx += 1
+              if (starts_with_from or starts_with_to):
+                word = word[2:]
+                if (starts_with_from):
+                  prev_word = "od"
+                  word_idx += 1
+                else:
+                  prev_word = "do"
+                  word_idx += 1
+
+              if (not is_dash and not ends_with_dash and not starts_with_dash and len(split_by_dash) >= 2):
+                word_from = process_token_word(split_by_dash[0])
+                word_to = process_token_word(split_by_dash[1])
+                if ("num_from" not in parsed_token):
+                  parsed_token["num_from"] = get_building_number(word_from)
+                if ("num_to" not in parsed_token):
+                  parsed_token["num_to"] = get_building_number(word_to)
+                prev_word = word_from
+                continue
+
+              word = process_token_word(word)
+              if (re.match(all_regex, word)):
+                parsed_token["is_street"] = True
+                break
+
+              if (re.match(odd_regex, word)):
+                parsed_token["is_odd"] = True
+                parsed_token["is_even"] = False
+                set_parity = True
+                if (restored_token and not restored_token["is_odd"]):
+                  parsed_tokens.append(restored_token)
+                  restored_token = None
+              elif (re.match(even_regex, word)):
+                parsed_token["is_even"] = True
+                parsed_token["is_odd"] = False
+                set_parity = True
+                if (restored_token and not restored_token["is_even"]):
+                  parsed_tokens.append(restored_token)
+                  restored_token = None
+
+              joined_words = f"{prev_word} {word}"
+              is_start = joined_words == "od początku"
+              is_end = joined_words == "do końca"
+              is_except = is_except or word == "bez" or word == "oprócz"
+              is_num_to = (prev_word == "do" and not is_end) or (prev_is_dash and "num_from" in parsed_token) or starts_with_dash
+
+              if (is_end and "number" in parsed_token):
+                parsed_token["num_from"] = get_building_number(parsed_token["number"])
+                del parsed_token["number"]
+
+              if (is_end and "num_from" in parsed_token and parsed_token["num_from"]["building_n"] == 1):
+                  parsed_token["is_street"] = True
+
+              if (is_start or is_end):
+                prev_word = word
+                continue
+
+              if (word == "bez" or word == "oprócz" or (is_except and restored_prev_token)):
+                if (restored_prev_token):
+                  parsed_token["is_street"] = True
+                if (restored_prev_token or word_idx > 0):
+                  parsed_tokens.append(parsed_token)
+                  parsed_token = parsed_token.copy()
+                  parsed_token["is_street"] = False
+                  parsed_token["except_addresses"] = []
+                  parsed_token.pop("number", None)
+                  restored_prev_token = False
+                if (word == "bez" or word == "oprócz"):
+                  prev_word = word
+                  continue
+              if (re.match(r"(bez|oprócz) numer(u|ów)", joined_words)):
+                continue
+
+              prev_token = parsed_tokens[-1] if len(parsed_tokens) > 0 else None
+
+              if (prev_word == "od" and "num_from" in parsed_token):
+                parsed_tokens.append(parsed_token)
+                parsed_token = parsed_token.copy()
+
+              if (is_dash and prev_word != "" and not re.search(even_regex, prev_word)):
+                parsed_token.pop("number", None)
+                parsed_token["num_from"] = get_building_number(prev_word)
+              elif (ends_with_dash):
+                parsed_token["num_from"] = get_building_number(word)
+              elif (prev_word == "od"):
+                parsed_token["num_from"] = get_building_number(word)
+              elif (prev_token is not None and prev_token["street"] == parsed_token["street"] and (prev_token["is_street"] or "num_from" in prev_token) and word_idx == 1 and is_num_to):
+                parsed_token = parsed_tokens.pop()
+                parsed_token["is_street"] = False
+                parsed_token["num_to"] = get_building_number(word)
+              elif (is_num_to):
+                parsed_token["num_to"] = get_building_number(word)
+                if ("number" in parsed_token):
+                  num_from = parsed_token["number"]
+                  parsed_token["num_from"] = get_building_number(num_from)
+              elif (word != "od" and word != "-" and word != "do" and next_word != "-" and re.match(building_num_regex, word)):
+                parsed_token["number"] = word
+                parsed_token["is_even"] = False
+                parsed_token["is_odd"] = False
+              
+              if (not ends_with_dash and not ends_with_to):
+                prev_word = word
+              else:
+                prev_word = "-"
+
+            num_from = parsed_token.get("num_from")
+            num_to = parsed_token.get("num_to")
+            # Check if building numbers match parity
+            if ((parsed_token["is_even"] or parsed_token["is_odd"]) and (num_from or num_to)):
+              parsed_from = get_parsed_number(num_from)
+              parsed_to = get_parsed_number(num_to)
+              if (parsed_from != -1 or parsed_to != -1):
+                is_odd = parsed_token["is_odd"]
+                if (parsed_token["is_even"]):
+                  is_even = True
+                  if (parsed_from != -1):
+                    is_even = parsed_from % 2 == 0
+                  if (is_even and parsed_to != -1):
+                    is_even = parsed_to % 2 == 0
+                  parsed_token["is_even"] = is_even
+                  if (is_even):
+                    parsed_token["is_odd"] = False
+                elif (is_odd):
+                  if (parsed_from != -1):
+                    is_odd = parsed_from % 2 == 1
+                  if (is_odd and parsed_to != -1):
+                    is_odd = parsed_to % 2 == 1
+                  parsed_token["is_odd"] = is_odd
+                  if (is_odd):
+                    parsed_token["is_even"] = False
+            
+            last_is_odd = parsed_token["is_odd"]
+            last_is_even = parsed_token["is_even"]
+            if (len(split_token) == 1 and re.search(even_regex, split_token[0])):
+              check_after_parity = True
+            
+            if (not skip_token):
+              if (is_except):
                 prev_token = parsed_tokens.pop()
                 prev_token["except_addresses"].append(parsed_token)
                 parsed_tokens.append(prev_token)
-                is_except = next_word != ""
-              if (next_word == ""):
-                # This token has already been handled, no need to add it later
-                skip_token = True
-              parsed_token = parsed_token.copy()
-              parsed_token.pop("num_from", None)
-              parsed_token.pop("num_to", None)
-              parsed_token.pop("number", None)
-              prev_word = word
-              set_parity = False
-              continue
-
-            if (word == "wszystkie"):
-              if (not set_parity):
-                parsed_token["is_odd"] = False
-                parsed_token["is_even"] = False
-              continue
-
-            split_by_dash = re.split(dash_regex, word)
-            is_dash = re.match(f"^{dash_regex}$", word)
-            prev_is_dash = re.match(f"^{dash_regex}$", prev_word)
-            ends_with_dash = not is_dash and re.search(f"({dash_regex})$", word) is not None
-            starts_with_dash = not is_dash and re.search(f"^({dash_regex})", word) is not None
-            starts_with_from = word != "od" and word.startswith("od")
-            starts_with_to = word != "do" and word.startswith("do")
-            ends_with_to = word != "do" and word.endswith("do")
-
-            if (ends_with_dash):
-              word = word[:-1]
-            if (ends_with_to):
-              word = word[:-2]
-
-            if (starts_with_dash):
-              word = word[1:]
-              prev_word = "-"
-              prev_is_dash = True
-              word_idx += 1
-            if (starts_with_from or starts_with_to):
-              word = word[2:]
-              if (starts_with_from):
-                prev_word = "od"
-                word_idx += 1
               else:
-                prev_word = "do"
-                word_idx += 1
-
-            if (not is_dash and not ends_with_dash and not starts_with_dash and len(split_by_dash) >= 2):
-              word_from = process_token_word(split_by_dash[0])
-              word_to = process_token_word(split_by_dash[1])
-              if ("num_from" not in parsed_token):
-                parsed_token["num_from"] = get_building_number(word_from)
-              if ("num_to" not in parsed_token):
-                parsed_token["num_to"] = get_building_number(word_to)
-              prev_word = word_from
-              continue
-
-            word = process_token_word(word)
-            if (re.match(all_regex, word)):
-              parsed_token["is_street"] = True
-              break
-
-            if (re.match(odd_regex, word)):
-              parsed_token["is_odd"] = True
-              parsed_token["is_even"] = False
-              set_parity = True
-              if (restored_token and not restored_token["is_odd"]):
-                parsed_tokens.append(restored_token)
-                restored_token = None
-            elif (re.match(even_regex, word)):
-              parsed_token["is_even"] = True
-              parsed_token["is_odd"] = False
-              set_parity = True
-              if (restored_token and not restored_token["is_even"]):
-                parsed_tokens.append(restored_token)
-                restored_token = None
-
-            joined_words = f"{prev_word} {word}"
-            is_start = joined_words == "od początku"
-            is_end = joined_words == "do końca"
-            is_except = is_except or word == "bez" or word == "oprócz"
-            is_num_to = (prev_word == "do" and not is_end) or (prev_is_dash and "num_from" in parsed_token) or starts_with_dash
-
-            if (is_end and "number" in parsed_token):
-              parsed_token["num_from"] = get_building_number(parsed_token["number"])
-              del parsed_token["number"]
-
-            if (is_start or is_end):
-              continue
-
-            if (word == "bez" or word == "oprócz" or (is_except and restored_prev_token)):
-              if (restored_prev_token):
-                parsed_token["is_street"] = True
-              if (restored_prev_token or word_idx > 0):
                 parsed_tokens.append(parsed_token)
-                parsed_token = parsed_token.copy()
-                parsed_token["is_street"] = False
-                parsed_token["except_addresses"] = []
-                parsed_token.pop("number", None)
-                restored_prev_token = False
-              if (word == "bez" or word == "oprócz"):
-                prev_word = word
-                continue
-            if (re.match(r"(bez|oprócz) numer(u|ów)", joined_words)):
-              continue
-
-            prev_token = parsed_tokens[-1] if len(parsed_tokens) > 0 else None
-
-            if (prev_word == "od" and "num_from" in parsed_token):
-              parsed_tokens.append(parsed_token)
-              parsed_token = parsed_token.copy()
-
-            if (is_dash and prev_word != "" and not re.search(even_regex, prev_word)):
-              parsed_token.pop("number", None)
-              parsed_token["num_from"] = get_building_number(prev_word)
-            elif (ends_with_dash):
-              parsed_token["num_from"] = get_building_number(word)
-            elif (prev_word == "od"):
-              parsed_token["num_from"] = get_building_number(word)
-            elif (prev_token is not None and prev_token["street"] == parsed_token["street"] and (prev_token["is_street"] or "num_from" in prev_token) and word_idx == 1 and is_num_to):
-              parsed_token = parsed_tokens.pop()
-              parsed_token["is_street"] = False
-              parsed_token["num_to"] = get_building_number(word)
-            elif (is_num_to):
-              parsed_token["num_to"] = get_building_number(word)
-              if ("number" in parsed_token):
-                num_from = parsed_token["number"]
-                parsed_token["num_from"] = get_building_number(num_from)
-            elif (word != "od" and word != "-" and word != "do" and next_word != "-" and re.match(building_num_regex, word)):
-              parsed_token["number"] = word
-              parsed_token["is_even"] = False
-              parsed_token["is_odd"] = False
-            
-            if (not ends_with_dash and not ends_with_to):
-              prev_word = word
-            else:
-              prev_word = "-"
-
-          num_from = parsed_token.get("num_from")
-          num_to = parsed_token.get("num_to")
-          # Check if building numbers match parity
-          if ((parsed_token["is_even"] or parsed_token["is_odd"]) and (num_from or num_to)):
-            parsed_from = get_parsed_number(num_from)
-            parsed_to = get_parsed_number(num_to)
-            if (parsed_from != -1 or parsed_to != -1):
-              is_odd = parsed_token["is_odd"]
-              if (parsed_token["is_even"]):
-                is_even = True
-                if (parsed_from != -1):
-                  is_even = parsed_from % 2 == 0
-                if (is_even and parsed_to != -1):
-                  is_even = parsed_to % 2 == 0
-                parsed_token["is_even"] = is_even
-                if (is_even):
-                  parsed_token["is_odd"] = False
-              elif (is_odd):
-                if (parsed_from != -1):
-                  is_odd = parsed_from % 2 == 1
-                if (is_odd and parsed_to != -1):
-                  is_odd = parsed_to % 2 == 1
-                parsed_token["is_odd"] = is_odd
-                if (is_odd):
-                  parsed_token["is_even"] = False
-          
-          last_is_odd = parsed_token["is_odd"]
-          last_is_even = parsed_token["is_even"]
-          if (len(split_token) == 1 and re.search(even_regex, split_token[0])):
-            check_after_parity = True
-          
-          if (not skip_token):
-            if (is_except):
-              prev_token = parsed_tokens.pop()
-              prev_token["except_addresses"].append(parsed_token)
-              parsed_tokens.append(prev_token)
-            else:
-              parsed_tokens.append(parsed_token)
-          parsed_token = tmp_token.copy()
+            parsed_token = tmp_token.copy()
       
       for token in parsed_tokens:
         token_addresses = teryt_addresses[teryt_addresses["town"] == token["town"]]

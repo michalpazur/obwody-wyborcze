@@ -2,7 +2,7 @@ import pandas as pd
 import geopandas as geo
 import numpy as np
 from utils import load_replacements, load_replacements_exceptions, load_street_prefixes, capitalize_every_word, save_zip, concat, Utils, get_building_order
-from const import districts_columns, addresses_columns, streets_columns, building_num_regex, building_letter_regex, ordinal_regex, quotation_regex, multiple_number_regex, dash_regex, apostrophe_regex
+from const import districts_columns, addresses_columns, streets_columns, towns_columns, building_num_regex, building_letter_regex, ordinal_regex, quotation_regex, multiple_number_regex, dash_regex, apostrophe_regex
 from typing import TypeVar, cast
 import os
 import os.path as path
@@ -174,6 +174,13 @@ def process_data():
     print(f"Processing data for voivodeship {teryt}...")
     addresses = process_addresses(addresses, addresses_columns, True)
     save_zip(f"{addresses_path}/{teryt}", addresses)
+
+  print("Processing town names...")
+  towns = geo.read_file(f"data_in/addresses/prng.zip")
+  towns = towns[[key for key in towns_columns]].rename(columns=towns_columns)
+  towns = towns[towns["type"] != "część miasta"]
+  towns["teryt"] = towns["teryt"].str[0:6]
+  save_zip(f"{addresses_path}/prng", towns)
 
 if (__name__ == "__main__"):
   process_data()
