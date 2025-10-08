@@ -3,7 +3,7 @@ import pandas
 from geopandas import GeoDataFrame
 import os
 import re, regex
-from const import first_name_letter_regex, holy_name_regex, char_order, ordinal_regex, quotation_regex, apostrophe_regex, dash_regex, building_types_regex
+from const import first_name_letter_regex, holy_name_regex, prince_queen_regex, char_order, ordinal_regex, quotation_regex, apostrophe_regex, dash_regex, building_types_regex
 import typing
 from typing import Dict
 
@@ -74,6 +74,9 @@ class Utils:
       return street
     
     if (re.search(holy_name_regex, street, flags=re.IGNORECASE)):
+      return street
+    
+    if (re.search(prince_queen_regex, street, flags=re.IGNORECASE)):
       return street
     
     name_removed = re.sub(self.names_regex, "", street)
