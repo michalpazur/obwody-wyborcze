@@ -3,6 +3,7 @@ import pandas
 from geopandas import GeoDataFrame
 import os
 import re, regex
+from regex import Match
 from const import first_name_letter_regex, holy_name_regex, prince_queen_regex, char_order, ordinal_regex, quotation_regex, apostrophe_regex, dash_regex, building_types_regex
 import typing
 from typing import Dict
@@ -10,11 +11,25 @@ from typing import Dict
 def head(df: DataFrame, n: int = 5):
   print(df.head(n))
 
+def handle_capitalize(match: Match[str]):
+  text = ""
+  if (match.group(1)):
+    text += match.group(1)
+  text += match.group(2)[:1].capitalize() + match.group(2)[1:].lower()
+  if (match.group(3)):
+    text += match.group(3)
+  elif (match.group(1)):
+    text += "\""
+
+  return text
+
 def capitalize(x: str):
-  return x[:1].upper() + x[1:]
+  word = map(lambda part: regex.sub(r"(\")?([\p{Lu}|\p{L}]+)(\")?", handle_capitalize, part), x.split("-"))
+  return "-".join(list(word))
 
 def capitalize_every_word(x: str):
-  return regex.sub(r"(\s+|^)(\p{L})(\S?)", lambda match: f"{match.group(1)}{capitalize(match.group(2)) if match.group(2) != "i" or match.group(3) else match.group(2)}{match.group(3)}", x)
+  sentence = map(lambda word: capitalize(word) if word != "i" and word != "RP" and word != "PCK" and not re.match(r"^[IVXLCDM]+$", word) else word, re.split(r"\s+", x))
+  return " ".join(list(sentence))
 
 def load_replacements():
   with open("const/street_replacements.csv") as replacements_file:
