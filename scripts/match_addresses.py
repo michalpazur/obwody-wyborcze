@@ -12,6 +12,7 @@ pandas.options.mode.copy_on_write = True
 place_type = re.compile(r"^(miasto|miasta|wieś|wsie|sołectwo|sołectwa|osada|osady|przysiółek|przysiółki|miejscowość|miejscowości)(:\s*|\s+)", flags=re.IGNORECASE)
 streets_regex = re.compile(r"(\s+|,\s*|^)(ul\.|ulic[aey]):?\s*", flags=re.IGNORECASE)
 street_name_regex = regex.compile(r"^(\p{Lu}\p{L}+\s?)+$", flags=re.IGNORECASE)
+except_regex = r"bez|oprócz"
 
 DEBUG = True
 
@@ -97,6 +98,7 @@ def get_parsed_number(num: BuildingNumber | None):
     return -1
   
 def get_addresses_for_token(token: BaseParsedToken, token_addresses: geo.GeoDataFrame):
+  token_addresses = token_addresses[token_addresses["street"] == token["street"]]
   is_even = token["is_even"]
   is_odd = token["is_odd"]
 
@@ -261,12 +263,17 @@ def process_powiat(
         split_line = re.split(r"\s+", token)
         idx = 0
         towns_in_token: List[FoundTown | None] = []
+        is_except_token = False
+
         while (idx < len(split_line)):
           end_idx = idx
           found_town: FoundTown | None = None
           for word in split_line[idx:]:
             end_idx += 1
             town_tmp = " ".join(split_line[idx:end_idx])
+            if (idx == 0 and re.match(except_regex, word)):
+              is_except_token = True
+
             ends_with_dot = town_tmp.endswith(".")
             town_tmp = re.sub(r"\.$", "", town_tmp)
             town_tmp_replaced = re.sub(place_type, "", town_tmp + " ").strip()
@@ -361,7 +368,7 @@ def process_powiat(
           prev_token = parsed_tokens[-1] if len(parsed_tokens) > 0 else None
           restored_prev_token = False
 
-          if ((town is not None or restored_town != parsed_token["town"]) and prev_token and prev_token["town"] == parsed_token["town"] and prev_token["is_town"]):
+          if (not is_except_token and (town is not None or restored_town != parsed_token["town"]) and prev_token and prev_token["town"] == parsed_token["town"] and prev_token["is_town"]):
             restored_prev_token = True
             restored_town = parsed_token["town"]
             if (restored_town not in parsed_token["token"]):
@@ -402,7 +409,7 @@ def process_powiat(
                 start_of_token = utils.remove_street_type(start_of_token) + " "
                 start_of_token = utils.remove_replacements(start_of_token)
                 # Street was found later in the token, but the first part of the token was not included
-                if (not skipped_token and len(start_of_token) > 0 and idx != 0 and len(streets_in_token) == 0):
+                if (not skipped_token and len(start_of_token) > 0 and idx != 0 and len(streets_in_token) == 0 and not re.match(except_regex, start_of_token)):
                   try:
                     prev_token = parsed_tokens[-1]
                     prev_found_street: FoundStreet = {
@@ -436,6 +443,8 @@ def process_powiat(
 
           for street in streets_in_token:
             tmp_token = parsed_token.copy()
+            prev_token = parsed_tokens[-1] if len(parsed_tokens) > 0 else None
+
             if (street is not None):
               token = " ".join(split_line[street["start_index"]:prev_end])
               rest_of_token = " ".join(split_line[street["end_index"]:prev_end])
@@ -443,7 +452,7 @@ def process_powiat(
               prev_end = street["start_index"]
               parsed_token["street"] = street["street"]
               parsed_token["token"] = token
-              is_except = False
+              is_except = is_except_token
 
               if ("prev_token" in street):
                 prev_token = street["prev_token"]
@@ -455,7 +464,10 @@ def process_powiat(
 
               if (len(rest_of_token) == 0):
                 parsed_token["is_street"] = True
-                parsed_tokens.append(parsed_token)
+                if (is_except_token and prev_token):
+                  prev_token["except_addresses"].append(parsed_token)
+                elif (not is_except_token):
+                  parsed_tokens.append(parsed_token)
                 parsed_token = tmp_token.copy()
                 continue
             else:
@@ -476,7 +488,6 @@ def process_powiat(
             word_idx = -1
             skip_token = False
             set_parity = False
-            prev_token = parsed_tokens[-1] if len(parsed_tokens) > 0 else None
             
             if (prev_token and prev_token["street"] == parsed_token["street"] and prev_token["is_street"]):
               if (not restored_prev_token):
@@ -693,13 +704,14 @@ def process_powiat(
           # Ignore duplicate addresses
           token_addresses = token_addresses[~(token_addresses["f_address"].isin(district_addresses.f_address))]
 
-        if (token["is_town"]):
-          district_addresses = concat(district_addresses, token_addresses)
-          continue
-
         except_addresses = []
         for except_token in token["except_addresses"]:
           except_addresses.extend(get_addresses_for_token(except_token, token_addresses)["f_address"].to_list())
+
+        if (token["is_town"]):
+          token_addresses = token_addresses[~(token_addresses["f_address"].isin(except_addresses))]
+          district_addresses = concat(district_addresses, token_addresses)
+          continue
 
         token_addresses = token_addresses[token_addresses["street"] == token["street"]]
         is_even = token["is_even"]
