@@ -321,7 +321,7 @@ def process_powiat(
           if (found_town is None):
             idx += 1
 
-        prev_end = len(split_line)
+        prev_town_end = len(split_line)
         towns_in_token.reverse()
         if (len(towns_in_token) == 0):
           towns_in_token = [None]
@@ -339,10 +339,11 @@ def process_powiat(
           }
 
           if (town is not None):
-            token = " ".join(split_line[town["start_index"]:prev_end])
-            rest_of_token = " ".join(split_line[town["end_index"]:prev_end])
-            rest_of_token = re.sub(r"(^|\s+)i$", "", rest_of_token)
-            prev_end = town["start_index"]
+            token = " ".join(split_line[town["start_index"]:prev_town_end])
+            rest_of_token = " ".join(split_line[town["end_index"]:prev_town_end])
+            rest_of_token = re.sub(r"(^|\s+)(i|oraz)$", "", rest_of_token)
+            rest_of_token = rest_of_token.replace(town["town"], "").strip()
+            prev_town_end = town["start_index"]
             parsed_token["town"] = town["town"]
             parsed_token["street"] = town["town"]
             last_street = town["town"]
@@ -351,7 +352,9 @@ def process_powiat(
 
             if (len(rest_of_token) == 0):
               parsed_token["is_town"] = True
-              parsed_tokens.append(parsed_token)
+              prev_token = parsed_tokens[-1] if len(parsed_tokens) > 0 else None
+              if (not prev_token or prev_token["town"] != town["town"] or not prev_token["is_town"]):
+                parsed_tokens.append(parsed_token)
               continue
           else:
             parsed_token["town"] = last_town
