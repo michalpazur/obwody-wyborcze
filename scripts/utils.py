@@ -4,7 +4,7 @@ from geopandas import GeoDataFrame
 import os
 import re, regex
 from regex import Match
-from const import first_name_letter_regex, holy_name_regex, prince_queen_regex, char_order, ordinal_regex, quotation_regex, apostrophe_regex, dash_regex, building_types_regex
+from const import first_name_letter_regex, holy_name_regex, prince_queen_regex, char_order, ordinal_regex, year_regex, quotation_regex, apostrophe_regex, dash_regex, building_types_regex
 import typing
 from typing import Dict
 
@@ -134,6 +134,7 @@ class Utils:
       street = self.remove_first_name(street)
     street = self.remove_first_letter(street)
     street = re.sub(ordinal_regex, "", street)
+    street = re.sub(year_regex, r"\1 roku", street, flags=re.IGNORECASE)
     street = re.sub(quotation_regex, r'"\1"', street)
     street = re.sub(apostrophe_regex, "'", street)
     street = re.sub(dash_regex, "-", street)

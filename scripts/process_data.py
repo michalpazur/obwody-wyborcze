@@ -2,7 +2,7 @@ import pandas as pd
 import geopandas as geo
 import numpy as np
 from utils import load_replacements, load_replacements_exceptions, load_street_prefixes, capitalize_every_word, save_zip, concat, Utils, get_building_order
-from const import districts_columns, addresses_columns, streets_columns, towns_columns, building_num_regex, building_letter_regex, ordinal_regex, quotation_regex, multiple_number_regex, dash_regex, apostrophe_regex
+from const import districts_columns, addresses_columns, streets_columns, towns_columns, building_num_regex, building_letter_regex, ordinal_regex, year_regex, quotation_regex, multiple_number_regex, dash_regex, apostrophe_regex
 from typing import TypeVar, cast
 import os
 import os.path as path
@@ -70,6 +70,8 @@ def process_addresses(df: T, column_names: dict[str, str], is_addresses: bool = 
   # Normalize quotes in street names
   df["street"] = df["street"].str.replace(quotation_regex, r'"\1"', regex=True)
   df["street"] = df["street"].str.replace(apostrophe_regex, "'", regex=True)
+  # Normalize years in street names
+  df["street"] = df["street"].str.replace(year_regex, r"\1 roku", regex=True, flags=re.IGNORECASE)
   # Normalize hyphens in street names
   df["street"] = df["street"].str.replace(dash_regex, "-", regex=True)
   df["street"] = df["street"].str.replace(r"\s+-\s+", "-", regex=True)
