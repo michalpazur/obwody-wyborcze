@@ -342,20 +342,25 @@ def process_powiat(
             token = " ".join(split_line[town["start_index"]:prev_town_end])
             rest_of_token = " ".join(split_line[town["end_index"]:prev_town_end])
             rest_of_token = re.sub(r"(^|\s+)(i|oraz)$", "", rest_of_token)
+            rest_of_token = re.sub(place_type, "", rest_of_token)
             rest_of_token = rest_of_token.replace(town["town"], "").strip()
             prev_town_end = town["start_index"]
             parsed_token["town"] = town["town"]
             parsed_token["street"] = town["town"]
+            last_town = town["town"]
             last_street = town["town"]
             parsed_token["token"] = token
             is_except = False
+            is_except_token = bool(re.match(r"^(bez|oprócz)\s+", rest_of_token))
 
-            if (len(rest_of_token) == 0):
+            if (len(rest_of_token) == 0 or is_except_token):
               parsed_token["is_town"] = True
               prev_token = parsed_tokens[-1] if len(parsed_tokens) > 0 else None
               if (not prev_token or prev_token["town"] != town["town"] or not prev_token["is_town"]):
                 parsed_tokens.append(parsed_token)
-              continue
+                parsed_token = parsed_token.copy()
+              if (not is_except_token):
+                continue
           else:
             parsed_token["town"] = last_town
             parsed_token["street"] = last_street
@@ -410,7 +415,8 @@ def process_powiat(
                 start_of_token = " ".join(split_line[0:idx]) + " "
                 start_of_token = utils.transform_street_name(start_of_token, teryt) + " "
                 start_of_token = utils.remove_street_type(start_of_token) + " "
-                start_of_token = utils.remove_replacements(start_of_token)
+                start_of_token = utils.remove_replacements(start_of_token).strip()
+                start_of_token = re.sub(except_regex, "", start_of_token, flags=re.IGNORECASE)
                 # Street was found later in the token, but the first part of the token was not included
                 if (not skipped_token and len(start_of_token) > 0 and idx != 0 and len(streets_in_token) == 0 and not re.match(except_regex, start_of_token)):
                   try:
@@ -454,7 +460,9 @@ def process_powiat(
               rest_of_token = re.sub(r"(^|\s+)i$", "", rest_of_token)
               prev_end = street["start_index"]
               parsed_token["street"] = street["street"]
+              parsed_token["is_town"] = False
               parsed_token["token"] = token
+              parsed_token["except_addresses"] = []
               is_except = is_except_token
 
               if ("prev_token" in street):
@@ -469,6 +477,9 @@ def process_powiat(
                 parsed_token["is_street"] = True
                 if (is_except_token and prev_token):
                   prev_token["except_addresses"].append(parsed_token)
+                elif (prev_token and prev_token["street"] == parsed_token["street"] and prev_token["is_street"]):
+                  # No need to duplicate tokens
+                  continue
                 elif (not is_except_token):
                   parsed_tokens.append(parsed_token)
                 parsed_token = tmp_token.copy()
