@@ -51,6 +51,17 @@ def load_street_prefixes():
     prefixes = dict(zip([f"{x[0]}(\\.\\s*|\\s+)" for x in lines], [x[1] if x == "" else f"{x[1]} " for x in lines]))
   return prefixes
 
+def load_town_replacements() -> Dict[str, Dict[str, str]]:
+  with open("const/town_replacements.csv") as replacements_file:
+    replacements: Dict[str, Dict[str, str]] = {}
+    lines = [line.strip().split(";") for line in replacements_file.readlines()]
+    for line in lines:
+      [teryt, town, replacement] = line
+      teryt_replacements = replacements.get(teryt, {})
+      teryt_replacements[town] = replacement
+      replacements[teryt] = teryt_replacements
+  return replacements
+
 def get_street_types(prefixes: Dict[str, str]):
   types = prefixes.values()
   types = filter(lambda x: x != "" and x != " ", types)
@@ -83,6 +94,7 @@ class Utils:
     self.replacements_exceptions = load_replacements_exceptions()
     self.street_prefixes = load_street_prefixes()
     self.street_types = get_street_types(self.street_prefixes)
+    self.town_replacements = load_town_replacements()
 
   def remove_first_name(self, street: str):
     if (re.search(self.names_exceptions, street)):
@@ -141,11 +153,25 @@ class Utils:
     street = re.sub(building_types_regex, "", street)
     street = re.sub(r"-$", "", street)
     street = re.sub(r"\s*-\s*", "-", street)
+    street = re.sub(r"-$", "", street)
     street = re.sub(r"\.$", "", street)
     street = re.sub(ordinal_regex, "", street)
     street = capitalize_every_word(street)
 
     return street
+  
+  def replace_town_name(self, row: pandas.Series):
+    try:
+      teryt_replacements = self.town_replacements[row.teryt]
+    except:
+      return row.town
+    
+    try:
+      replacement = teryt_replacements[row.town]
+    except:
+      return row.town
+    
+    return replacement
 
 max_letters = 3
 def get_building_order(building_n: int | str, building_l: str):

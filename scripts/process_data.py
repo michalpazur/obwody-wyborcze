@@ -40,8 +40,7 @@ def add_street_type(row: pd.Series):
   
   return row.street
 
-def process_addresses(df: T, column_names: dict[str, str], is_addresses: bool = False) -> T:
-  utils = Utils()
+def process_addresses(df: T, column_names: dict[str, str], utils: Utils, is_addresses: bool = False) -> T:
   # Fill empty street names
   print("Filling empty street names...")
   df["street"] = np.where(df["street"].isna(), df["town"], df["street"])
@@ -87,11 +86,14 @@ def process_addresses(df: T, column_names: dict[str, str], is_addresses: bool = 
   # Remove custom replacements e.g. Aleja Generała Maczka -> Aleja Maczka
   df["no_repl"] = df["street"].apply(utils.remove_replacements)
   # Remove street type as well e.g. Aleja Generała Maczka -> Maczka
-  df["no_rep_typ"] = df["no_repl"].apply(utils.remove_street_type)
+  df["no_rep_typ"] = df["no_repl"].apply(utils.remove_street_type).apply(utils.remove_first_letter)
 
   # Remove redundant spaces
   print("Removing redundant spaces...")
   df["street"] = df["street"].str.strip().replace(r"\s+", " ", regex=True)
+
+  print("Normalizing town names...")
+  df["town"] = df.apply(utils.replace_town_name, axis=1)
 
   has_building_numbers = "building" in df
   if (has_building_numbers):
@@ -137,12 +139,14 @@ def process_addresses(df: T, column_names: dict[str, str], is_addresses: bool = 
   return df
 
 def process_data():
+  print("Loading utils...")
+  utils = Utils()
   print("Loading voting districts...")
   districts = pd.read_excel("data_in/districts.xlsx", converters={ "TERYT gminy": str })
   districts = districts[[key for key in districts_columns]].rename(columns=districts_columns)
   districts = districts[~districts["teryt"].isna()]
   print("Processing districts...")
-  districts = process_addresses(districts, districts_columns)
+  districts = process_addresses(districts, districts_columns, utils)
   districts.to_csv("data_processed/districts.csv", index=False, sep="|", encoding="utf-8")
   print("Address points saved!")
 
@@ -163,7 +167,7 @@ def process_data():
     streets = concat(streets, squares)
     streets = streets[[key for key in streets_columns]].rename(columns=streets_columns)
     print(f"Processing streets for voivodeship {teryt}...")
-    streets = process_addresses(streets, streets_columns, False)
+    streets = process_addresses(streets, streets_columns, utils, False)
     save_zip(f"{streets_path}/{teryt}", streets)
 
     print(f"Loading data for voivodeship {teryt}...")
@@ -174,7 +178,7 @@ def process_data():
     del addresses_columns["Cecha"]
     addresses = addresses[[*[key for key in addresses_columns], "str_type"]].rename(columns=addresses_columns)
     print(f"Processing data for voivodeship {teryt}...")
-    addresses = process_addresses(addresses, addresses_columns, True)
+    addresses = process_addresses(addresses, addresses_columns, utils, True)
     save_zip(f"{addresses_path}/{teryt}", addresses)
 
   print("Processing town names...")
