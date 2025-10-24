@@ -40,6 +40,7 @@ export const theme = createTheme({
             border: "none",
             backgroundColor: alpha(theme.palette.background.paper, 0.8),
             backdropFilter: "blur(10px)",
+            boxShadow: `0 4px 12px 0 ${alpha(theme.palette.text.primary, 0.1)}`,
           }),
         }),
       },

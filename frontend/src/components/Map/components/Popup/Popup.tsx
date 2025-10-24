@@ -20,7 +20,7 @@ const Popup: React.FC<PopupProps> = ({ district, position }) => {
     results = results.slice(0, 3);
 
     return (
-      <Card sx={{ p: 2, borderRadius: "4px" }}>
+      <Card variant="outlined" sx={{ p: 2 }}>
         <Typography sx={{ fontFamily: "'Bree Serif', sans-serif" }}>
           {district.gmina}{" "}
           <Typography
