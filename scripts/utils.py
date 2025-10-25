@@ -147,7 +147,7 @@ class Utils:
     street = self.remove_first_letter(street)
     street = re.sub(ordinal_regex, "", street)
     street = re.sub(year_regex, r"\1 roku", street, flags=re.IGNORECASE)
-    street = re.sub(quotation_regex, r'"\1"', street)
+    street = re.sub(quotation_regex, r'"\2"', street)
     street = re.sub(apostrophe_regex, "'", street)
     street = re.sub(dash_regex, "-", street)
     street = re.sub(building_types_regex, "", street)

@@ -67,7 +67,7 @@ def process_addresses(df: T, column_names: dict[str, str], utils: Utils, is_addr
   # Remove duplicate tokens
   df["street"] = df["street"].str.replace(r"(^|\s+)(.+)\s+((\S+\s+)*)\2(\s+(.+)|$)", r"\3 \2 \5", regex=True)
   # Normalize quotes in street names
-  df["street"] = df["street"].str.replace(quotation_regex, r'"\1"', regex=True)
+  df["street"] = df["street"].str.replace(quotation_regex, r'"\2"', regex=True)
   df["street"] = df["street"].str.replace(apostrophe_regex, "'", regex=True)
   # Normalize years in street names
   df["street"] = df["street"].str.replace(year_regex, r"\1 roku", regex=True, flags=re.IGNORECASE)

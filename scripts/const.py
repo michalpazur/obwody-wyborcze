@@ -96,6 +96,6 @@ prince_queen_regex = r"(księcia|księżnej)\s+"
 ordinal_regex = r"\s*-\s*(go|ej)"
 year_regex = r"(\d{3,4})\s+(r\.?|roku)"
 multiple_number_regex = r"(\d+\w*|\w+)\s?([-,/._]|s\.)\s?(\d*\w*\s?([-,/._]|s\.)?\s?)+"
-quotation_regex = r'[„"]\s*(\S+)\s*[”"]'
+quotation_regex = r'([„"”]|\'\')\s*(\S+)\s*([”"”]|\'\')'
 apostrophe_regex = r"[`'´]"
 dash_regex = r"[-–—―−]" # I hate it here.
