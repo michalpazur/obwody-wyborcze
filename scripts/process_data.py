@@ -36,7 +36,10 @@ def add_street_type(row: pd.Series):
     return row.street
 
   if (row.str_type == "Plac" and not row.street.lower().startswith("plac")):
-    return "plac " + row.street
+    return "Plac " + row.street
+  
+  if (row.str_type == "Osiedle" and not row.street.lower().startswith("osiedle")):
+    return "Osiedle " + row.street
   
   return row.street
 
