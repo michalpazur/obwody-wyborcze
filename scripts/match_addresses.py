@@ -4,7 +4,7 @@ import os
 import re
 import regex
 from typing import List, NotRequired, TypedDict, cast
-from utils import concat, Utils, get_building_order, save_zip
+from utils import concat, Utils, get_building_order, save_zip, capitalize_every_word
 from const import all_regex, odd_regex, even_regex, building_num_regex, building_letter_regex, district_types, dash_regex, multiple_number_regex, districts as town_districts, building_types_regex
 
 pandas.options.mode.copy_on_write = True
@@ -279,7 +279,11 @@ def process_powiat(
             town_tmp_replaced = re.sub(place_type, "", town_tmp + " ").strip()
             if (len(town_tmp_replaced) != 0):
               town_tmp = town_tmp_replaced
-            
+
+            town_capitalized = capitalize_every_word(town_tmp)
+            if (is_town(town_list, town_capitalized)):
+              town_tmp = town_capitalized
+
             town_split = town_tmp.split("-")[0]
             found_token_split = found_town["town"].split("-")[0] if found_town else ""
             if (town_split != found_token_split and is_town(town_list, town_split) and not is_town(town_list, town_tmp)):
