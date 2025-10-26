@@ -457,7 +457,7 @@ def process_powiat(
             if (street is not None):
               token = " ".join(split_line[street["start_index"]:prev_end])
               rest_of_token = " ".join(split_line[street["end_index"]:prev_end])
-              rest_of_token = re.sub(r"(^|\s+)i$", "", rest_of_token)
+              rest_of_token = re.sub(r"(^|\s+)(i|oraz)$", "", rest_of_token)
               prev_end = street["start_index"]
               parsed_token["street"] = street["street"]
               parsed_token["is_town"] = False
