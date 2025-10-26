@@ -485,7 +485,7 @@ def process_powiat(
                 parsed_token = tmp_token.copy()
                 continue
             else:
-              parsed_token["street"] = last_street
+              parsed_token["street"] = last_street if last_street != "" else last_town
               parsed_token["is_even"] = last_is_even
               parsed_token["is_odd"] = last_is_odd
               rest_of_token = " ".join(split_line)
