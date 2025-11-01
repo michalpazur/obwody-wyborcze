@@ -192,7 +192,6 @@ def process_powiat(
     teryt_addresses = addresses[addresses["teryt"] == teryt]
     teryt_towns = towns[towns["teryt"] == teryt]
     town_list = [ *teryt_towns["town"].to_list(), *teryt_addresses["town"].to_list() ]
-    tokens_to_skip = tokens_to_skip_df[tokens_to_skip_df["teryt"] == teryt]["token"].tolist()
     tokens_to_replace = tokens_to_replace_df[tokens_to_replace_df["teryt"] == teryt]
     addresses_to_skip = addresses_to_skip_df[addresses_to_skip_df["teryt"] == teryt]["f_address"].tolist()
     # Extra streets have to be parsed but will be discarded anyway
@@ -202,6 +201,7 @@ def process_powiat(
     teryt_streets = streets[streets["teryt"] == ("146501" if teryt.startswith("1465") else teryt)]
     teryt_streets = concat(teryt_streets, extra_streets)
     teryt_streets = concat(teryt_streets, teryt_addresses)
+    teryt_streets = teryt_streets.reset_index()
     teryt_streets = teryt_streets.drop_duplicates(["town", "street"])
     addresses_out: geo.GeoDataFrame | None = None
     processed_rows = 0
@@ -212,6 +212,7 @@ def process_powiat(
 
       district_id = f"{teryt}_{district.number}"
       district_addresses: geo.GeoDataFrame | None = None
+      tokens_to_skip = tokens_to_skip_df[(tokens_to_skip_df["teryt"] == teryt) & ((tokens_to_skip_df["district"].isna()) | (tokens_to_skip_df["district"] == district.number))]["token"].tolist()
       if (district.type != "stały"):
         district_addresses = teryt_addresses[teryt_addresses["f_address"] == district.f_address]
         special_addresses.append(district.f_address)
