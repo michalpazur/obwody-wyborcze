@@ -260,17 +260,22 @@ def process_powiat(
         token = re.sub(r"\.$", "", token)
 
         town_tmp = ""
-        split_line = re.split(r"\s+", token)
+        split_town_line = re.split(r"\s+", token)
         idx = 0
         towns_in_token: List[FoundTown | None] = []
         is_except_token = False
 
-        while (idx < len(split_line)):
+        while (idx < len(split_town_line)):
           end_idx = idx
           found_town: FoundTown | None = None
-          for word in split_line[idx:]:
+          for word in split_town_line[idx:]:
             end_idx += 1
-            town_tmp = " ".join(split_line[idx:end_idx])
+            town_tmp = " ".join(split_town_line[idx:end_idx])
+            # Here we only skip parts of token that we don't want to be parsed (e.g. old town names as street names)
+            if (town_tmp in tokens_to_skip):
+              print(f"Skipping part of town {town_tmp}...")
+              continue
+
             if (idx == 0 and re.match(except_regex, word)):
               is_except_token = True
 
@@ -310,14 +315,14 @@ def process_powiat(
                     }
                     towns_in_token.append(prev_found_town)
                   except:
-                    print(f"No previous token found for string \"{" ".join(split_line[0:idx])}\"!")
+                    print(f"No previous token found for string \"{" ".join(split_town_line[0:idx])}\"!")
               # End of line was reached
-              if (end_idx == len(split_line) or ends_with_dot):
+              if (end_idx == len(split_town_line) or ends_with_dot):
                 towns_in_token.append(found_town)
                 idx = end_idx
 
             # Handle cases such as Grabów nad Pilicą
-            elif (found_town is not None and (end_idx == found_town["end_index"] + 2 or end_idx == len(split_line))):
+            elif (found_town is not None and (end_idx == found_town["end_index"] + 2 or end_idx == len(split_town_line))):
               towns_in_token.append(found_town)
               idx = found_town["end_index"]
               break
@@ -325,7 +330,7 @@ def process_powiat(
           if (found_town is None):
             idx += 1
 
-        prev_town_end = len(split_line)
+        prev_town_end = len(split_town_line)
         towns_in_token.reverse()
         if (len(towns_in_token) == 0):
           towns_in_token = [None]
@@ -343,11 +348,15 @@ def process_powiat(
           }
 
           if (town is not None):
-            token = " ".join(split_line[town["start_index"]:prev_town_end])
-            rest_of_token = " ".join(split_line[town["end_index"]:prev_town_end])
+            token = " ".join(split_town_line[town["start_index"]:prev_town_end])
+            
+            if (token == "i" or token == "oraz"):
+              continue
+
+            rest_of_token = " ".join(split_town_line[town["end_index"]:prev_town_end])
             rest_of_token = re.sub(r"(^|\s+)(i|oraz)$", "", rest_of_token)
-            rest_of_token = re.sub(place_type, "", rest_of_token)
-            rest_of_token = rest_of_token.replace(town["town"], "").strip()
+            rest_of_token = re.sub(place_type, "", rest_of_token + " ")
+            rest_of_token = re.sub(f"^{town["town"]}(\\s+|$)", "", rest_of_token).strip()
             prev_town_end = town["start_index"]
             parsed_token["town"] = town["town"]
             parsed_token["street"] = town["town"]
@@ -368,14 +377,16 @@ def process_powiat(
           else:
             parsed_token["town"] = last_town
             parsed_token["street"] = last_street
-            rest_of_token = " ".join(split_line)
+            rest_of_token = " ".join(split_town_line)
 
           token = place_type.sub("", rest_of_token).strip()
           
           if (parsed_token["town"] == ""):
             parsed_token["town"] = district.town
+            last_town = district.town
           
-          token = streets_regex.sub("", token).strip()
+          token = streets_regex.sub(" ", token).strip()
+          token = re.sub(r"\s+", " ", token)
           token = re.sub(f"^{dash_regex}\\s*", "", token)
           prev_token = parsed_tokens[-1] if len(parsed_tokens) > 0 else None
           restored_prev_token = False
@@ -490,8 +501,9 @@ def process_powiat(
                 continue
             else:
               parsed_token["street"] = last_street if last_street != "" else last_town
-              parsed_token["is_even"] = last_is_even
-              parsed_token["is_odd"] = last_is_odd
+              if (not prev_token or prev_token["town"] == parsed_token["town"]):
+                parsed_token["is_even"] = last_is_even
+                parsed_token["is_odd"] = last_is_odd
               rest_of_token = " ".join(split_line)
 
             if (parsed_token["street"] in extra_streets_list):
