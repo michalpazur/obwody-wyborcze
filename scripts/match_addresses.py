@@ -639,6 +639,10 @@ def process_powiat(
               if (is_end and "num_from" in parsed_token and parsed_token["num_from"]["building_n"] == 1):
                   parsed_token["is_street"] = True
 
+              if (is_end and set_parity and ((parsed_token["is_even"] and re.match(odd_regex, next_word)) or (parsed_token["is_odd"] and re.match(even_regex, next_word)))):
+                parsed_tokens.append(parsed_token)
+                parsed_token = parsed_token.copy()
+
               if (is_start or is_end):
                 prev_word = word
                 continue
@@ -692,6 +696,10 @@ def process_powiat(
                 prev_word = word
               else:
                 prev_word = "-"
+
+              if (set_parity and ((parsed_token["is_even"] and re.match(odd_regex, next_word)) or (parsed_token["is_odd"] and re.match(even_regex, next_word)))):
+                parsed_tokens.append(parsed_token)
+                parsed_token = parsed_token.copy()
 
             num_from = parsed_token.get("num_from")
             num_to = parsed_token.get("num_to")
