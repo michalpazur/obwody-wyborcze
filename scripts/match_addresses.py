@@ -469,6 +469,7 @@ def process_powiat(
           for street in streets_in_token:
             tmp_token = parsed_token.copy()
             prev_token = parsed_tokens[-1] if len(parsed_tokens) > 0 else None
+            except_with_street_name = False
 
             if (street is not None):
               token = " ".join(split_line[street["start_index"]:prev_end])
@@ -500,6 +501,9 @@ def process_powiat(
                   parsed_tokens.append(parsed_token)
                 parsed_token = tmp_token.copy()
                 continue
+              if (re.match(r"bez|oprócz", rest_of_token)):
+                parsed_token["is_street"] = True
+                except_with_street_name = True
             else:
               parsed_token["street"] = last_street if last_street != "" else last_town
               if (not prev_token or prev_token["town"] == parsed_token["town"]):
@@ -642,12 +646,14 @@ def process_powiat(
               if (word == "bez" or word == "oprócz" or (is_except and restored_prev_token)):
                 if (restored_prev_token):
                   parsed_token["is_street"] = True
-                if (restored_prev_token or word_idx > 0):
+                if (restored_prev_token or except_with_street_name or word_idx > 0):
                   parsed_tokens.append(parsed_token)
                   parsed_token = parsed_token.copy()
                   parsed_token["is_street"] = False
                   parsed_token["except_addresses"] = []
                   parsed_token.pop("number", None)
+                  parsed_token.pop("num_to", None)
+                  parsed_token.pop("num_from", None)
                   restored_prev_token = False
                 if (word == "bez" or word == "oprócz"):
                   prev_word = word
