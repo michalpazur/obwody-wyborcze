@@ -742,6 +742,13 @@ def process_powiat(
             parsed_token = tmp_token.copy()
       
       for token in parsed_tokens:
+        if (token["token"] == ""):
+          continue
+
+        if (token["street"] == token["town"] and not token["is_town"] and not token["is_street"] and "number" not in token and "num_from" not in token and "num_to" not in token):
+          print(f"No street found for token {token}...")
+          continue
+
         token_addresses = teryt_addresses[teryt_addresses["town"] == token["town"]]
         token_addresses = token_addresses[~(token_addresses["f_address"].isin(special_addresses))]
         token_addresses = token_addresses[~(token_addresses["f_address"].isin(addresses_to_skip))]
