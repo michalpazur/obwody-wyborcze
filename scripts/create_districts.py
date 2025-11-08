@@ -48,8 +48,8 @@ def process_teryt(teryt: str, addresses: geo.GeoDataFrame, districts_df: geo.Geo
     if (len(district_addresses) == 0):
       unused_ids.append(row.OBWOD)
       continue
-    vornoroi = district_addresses.voronoi_polygons(extend_to=geom).clip(geom)
-    district_addresses = geo.GeoDataFrame(geometry=vornoroi, crs=district_addresses.crs).sjoin(district_addresses, predicate="covers")
+    voronoi = district_addresses.voronoi_polygons(extend_to=geom).clip(geom)
+    district_addresses = geo.GeoDataFrame(geometry=voronoi, crs=district_addresses.crs).sjoin(district_addresses, predicate="covers")
     districts_df = concat(district_addresses, districts_df)
     processed_districts += 1
 
