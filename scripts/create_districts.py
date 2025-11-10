@@ -4,6 +4,7 @@ from utils import concat
 from const import results_columns, candidates
 import uuid
 import os
+from os import path
 
 pd.options.mode.copy_on_write = True
 
@@ -126,7 +127,14 @@ def main():
 
   print("Winners:", districts_df["winner"].drop_duplicates().to_list())
   print("Saving data...")
-  districts_df.to_file(f"districts/{elections}.json", driver="GeoJSON")
+  districts_path = f"districts/{elections}"
+  if (not path.exists(districts_path)):
+    os.mkdir(districts_path)
+
+  for i in range(16):
+    woj_teryt = str((i + 1) * 2).rjust(2, "0")
+    woj_districts = districts_df[districts_df["teryt"].str.startswith(woj_teryt)]
+    woj_districts.to_file(f"{districts_path}/{woj_teryt}.json", driver="GeoJSON")
 
 if (__name__ == "__main__"):
   main()
