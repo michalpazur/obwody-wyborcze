@@ -144,4 +144,4 @@ export const tieGradient = chroma
   .scale(["#E0E0E0", "#212121"])
   .colors(GRADIENT_COLORS);
 
-export const mapOpacity = 0.75;
+export const mapOpacity = 1;

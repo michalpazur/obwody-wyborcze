@@ -1,3 +1,4 @@
+import { useTheme } from "@mui/material";
 import {
   ExpressionSpecification,
   GeoJSONFeature,
@@ -5,7 +6,13 @@ import {
   MapLayerMouseEvent,
 } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   Layer,
   Map as MapComponent,
@@ -22,22 +29,34 @@ import { useElectionsStore } from "../../redux/electionsSlice";
 import { DistrictInfo } from "../../types";
 import { generateFillColors } from "../../utils/generateFillColors";
 import DistrictInfoComponent from "./components/DistrictInfo";
+import { ElectionsDataSource } from "./components/Layers/ElectionDataSource";
+import { PlaceNameLayer } from "./components/Layers/PlaceNameLayer";
+import { TransportationLayer } from "./components/Layers/TransportationLayer";
 import Legend from "./components/Legend";
 import Popup from "./components/Popup";
+import { selectedFeatureOutline } from "./styles";
 
 let hoveredId: GeoJSONFeature["id"];
 
 const Map = () => {
+  const theme = useTheme();
   const mapRef = useRef<MapRef>(null);
   const [hovered, setHovered] = useState<DistrictInfo>();
   const [clicked, setClicked] = useState<DistrictInfo>();
   const [hoverPosition, setHoverPosition] = useState<LngLat>();
   const { elections, candidate } = useElectionsStore();
+  const selectedElections = electionsConfig[elections];
 
   useEffect(() => {
     setHovered(undefined);
     setClicked(undefined);
   }, [elections]);
+
+  const onMouseEnter = () => {
+    if (mapRef.current) {
+      mapRef.current.getCanvas().style.cursor = "pointer";
+    }
+  };
 
   const onMouseMove = (event: MapLayerMouseEvent) => {
     setHoverPosition(event.lngLat);
@@ -73,6 +92,10 @@ const Map = () => {
   };
 
   const onMouseLeave = () => {
+    if (mapRef.current) {
+      mapRef.current.getCanvas().style.cursor = "";
+    }
+
     if (!hoveredId) {
       return;
     }
@@ -103,22 +126,8 @@ const Map = () => {
   );
 
   const mapLayers = useMemo(() => {
-    const selectedElections = electionsConfig[elections];
-
     return (
-      <Source
-        id={elections}
-        key={elections}
-        type="vector"
-        promoteId="district"
-        tiles={[
-          `https://api.mapbox.com/v4/${
-            selectedElections.tilesetId
-          }/{z}/{x}/{y}.vector.pbf?access_token=${
-            import.meta.env.VITE_MAPBOX_TOKEN
-          }`,
-        ]}
-      >
+      <ElectionsDataSource>
         {candidate === "all" ? (
           electionsConfig[elections].winners.map((winnerId) => {
             const fill = generateFillColors(
@@ -182,33 +191,61 @@ const Map = () => {
             }}
           />
         )}
-        <Layer
-          key={candidate + "_outline"}
-          id="outline"
-          type="line"
-          source-layer={selectedElections.sourceLayer}
-          paint={{
-            "line-width": [
-              "interpolate",
-              ["linear"],
-              ["zoom"],
-              12,
-              1,
-              14,
-              3,
-              17,
-              6,
-            ],
-            "line-color": "#171717",
-            "line-opacity": [
-              "case",
-              ["boolean", ["feature-state", "hovered"], false],
-              1,
-              0,
-            ],
-          }}
-        />
-      </Source>
+      </ElectionsDataSource>
+    );
+  }, [elections, candidate]);
+
+  const featuresMapLayers = useMemo(() => {
+    return (
+      <React.Fragment>
+        <Source
+          id="maptiler-source"
+          key={`${elections}_${candidate}`}
+          tiles={[
+            `https://api.maptiler.com/tiles/v3/{z}/{x}/{y}.pbf?key=${
+              import.meta.env.VITE_MAPTILER_TOKEN
+            }`,
+          ]}
+          type="vector"
+        >
+          <TransportationLayer transportationClass="road" />
+          <TransportationLayer transportationClass="road-secondary" />
+          <TransportationLayer transportationClass="rail" color="#757575" />
+          <Layer
+            type="fill"
+            source-layer="building"
+            id="building"
+            minzoom={14}
+            paint={{
+              "fill-color": theme.palette.background.default,
+              "fill-opacity": 0.25,
+              "fill-outline-color": theme.palette.background.paper,
+            }}
+          />
+          <PlaceNameLayer placeClass="city" />
+          <PlaceNameLayer placeClass="town" />
+          <PlaceNameLayer placeClass="village" />
+          <PlaceNameLayer placeClass="suburb" />
+        </Source>
+        <ElectionsDataSource>
+          <Layer
+            key={candidate + "_outline"}
+            id="outline"
+            type="line"
+            source-layer={selectedElections.sourceLayer}
+            paint={{
+              "line-width": selectedFeatureOutline,
+              "line-color": theme.palette.text.primary,
+              "line-opacity": [
+                "case",
+                ["boolean", ["feature-state", "hovered"], false],
+                1,
+                0,
+              ],
+            }}
+          />
+        </ElectionsDataSource>
+      </React.Fragment>
     );
   }, [elections, candidate]);
 
@@ -218,12 +255,14 @@ const Map = () => {
       initialViewState={{
         latitude: 52.2319581,
         longitude: 21.0067249,
-        zoom: 13,
+        zoom: 14,
       }}
+      onMouseEnter={onMouseEnter}
       onMouseMove={onMouseMove}
       onMouseLeave={onMouseLeave}
       onMouseOut={onMouseLeave}
       onClick={onClick}
+      maxPitch={0}
       interactiveLayerIds={
         candidate === "all"
           ? [...electionsConfig[elections].winners, "tie"]
@@ -235,6 +274,7 @@ const Map = () => {
       }`}
     >
       {mapLayers}
+      {featuresMapLayers}
       {hovered && hoverPosition ? (
         <Popup district={hovered} position={hoverPosition} />
       ) : null}

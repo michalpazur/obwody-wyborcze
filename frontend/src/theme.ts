@@ -20,6 +20,9 @@ export const theme = createTheme({
     secondary: {
       main: "#424242",
     },
+    background: {
+      default: "#E0E0E0",
+    },
   },
   spacing: 4,
   shape: {
@@ -94,6 +97,13 @@ export const theme = createTheme({
       styleOverrides: {
         paper: ({ theme }) => ({
           marginTop: theme.spacing(2),
+        }),
+      },
+    },
+    MuiAvatar: {
+      styleOverrides: {
+        root: ({ theme }) => ({
+          color: theme.palette.background.paper,
         }),
       },
     },
