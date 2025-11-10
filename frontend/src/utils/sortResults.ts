@@ -9,8 +9,8 @@ export const sortResults = (district: DistrictInfo, elections: ElectionId) => {
     if (electionsConfig[elections]?.candidates.includes(candidate)) {
       results.push({
         candidate,
-        result: district[key],
-        resultProc: district[`${key}_proc`],
+        result: district[candidate],
+        resultProc: district[`${candidate}_proc`],
       });
     }
   });
