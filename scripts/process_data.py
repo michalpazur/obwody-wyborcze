@@ -26,6 +26,7 @@ def handle_replacements(row: pd.Series, replacements: dict[str, str]):
   street = row.street
   for search in replacements:
     street = re.sub(search, replacements[search], street, flags=re.IGNORECASE)
+    street = re.sub(r"\s+", " ", street)
   return street
 
 def handle_name_replacements(row: pd.Series, utils: Utils):
@@ -44,6 +45,8 @@ def add_street_type(row: pd.Series):
   return row.street
 
 def process_addresses(df: T, column_names: dict[str, str], utils: Utils, is_addresses: bool = False) -> T:
+  print("Normalizing town names...")
+  df["town"] = df["town"].map(capitalize_every_word)
   # Fill empty street names
   print("Filling empty street names...")
   df["street"] = np.where(df["street"].isna(), df["town"], df["street"])
