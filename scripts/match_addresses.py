@@ -102,6 +102,9 @@ def get_addresses_for_token(token: BaseParsedToken, token_addresses: geo.GeoData
   is_even = token["is_even"]
   is_odd = token["is_odd"]
 
+  if (is_even or is_odd):
+    token_addresses = token_addresses[token_addresses["building_n"] >= 0]
+
   if (is_even):
     token_addresses = token_addresses[token_addresses["building_n"] % 2 == 0]
   elif (is_odd):
