@@ -34,7 +34,7 @@ import { PlaceNameLayer } from "./components/Layers/PlaceNameLayer";
 import { TransportationLayer } from "./components/Layers/TransportationLayer";
 import Legend from "./components/Legend";
 import Popup from "./components/Popup";
-import { selectedFeatureOutline } from "./styles";
+import { selectedFeatureOutline, stateClicked, stateHovered } from "./styles";
 
 let hoveredId: GeoJSONFeature["id"];
 
@@ -116,10 +116,30 @@ const Map = () => {
   const onClick = useCallback(
     (event: MapLayerMouseEvent) => {
       const feature = event.features?.[0];
+
+      if (clicked) {
+        mapRef.current?.setFeatureState(
+          {
+            source: elections,
+            sourceLayer: electionsConfig[elections].sourceLayer,
+            id: clicked.id,
+          },
+          { clicked: false }
+        );
+      }
+
       if (clicked?.id === feature?.id) {
         setClicked(undefined);
       } else if (feature) {
         setClicked({ ...feature.properties, id: feature.id } as DistrictInfo);
+        mapRef.current?.setFeatureState(
+          {
+            source: elections,
+            sourceLayer: electionsConfig[elections].sourceLayer,
+            id: feature.id,
+          },
+          { clicked: true }
+        );
       }
     },
     [clicked]
@@ -238,7 +258,7 @@ const Map = () => {
               "line-color": theme.palette.text.primary,
               "line-opacity": [
                 "case",
-                ["boolean", ["feature-state", "hovered"], false],
+                ["any", stateHovered, stateClicked],
                 1,
                 0,
               ],

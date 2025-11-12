@@ -1,9 +1,22 @@
 import {
   DataDrivenPropertyValueSpecification,
+  ExpressionSpecification,
   SymbolLayerSpecification,
 } from "maplibre-gl";
 
 export const exponentialBase = 1.3;
+
+export const stateHovered: ExpressionSpecification = [
+  "boolean",
+  ["feature-state", "hovered"],
+  false,
+];
+
+export const stateClicked: ExpressionSpecification = [
+  "boolean",
+  ["feature-state", "clicked"],
+  false,
+];
 
 export const selectedFeatureOutline: DataDrivenPropertyValueSpecification<number> =
   [
@@ -13,7 +26,7 @@ export const selectedFeatureOutline: DataDrivenPropertyValueSpecification<number
     10,
     1,
     13,
-    3,
+    2,
     19,
     6,
   ];
