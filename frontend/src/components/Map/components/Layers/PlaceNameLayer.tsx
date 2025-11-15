@@ -6,6 +6,13 @@ type PlaceNameLayerProps = {
   placeClass: "city" | "town" | "village" | "suburb";
 };
 
+export const placeClasses: PlaceNameLayerProps["placeClass"][] = [
+  "city",
+  "town",
+  "village",
+  "suburb",
+];
+
 export const PlaceNameLayer: React.FC<PlaceNameLayerProps> = ({
   placeClass,
 }) => {

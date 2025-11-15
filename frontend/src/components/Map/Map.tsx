@@ -13,12 +13,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import {
-  Layer,
-  Map as MapComponent,
-  MapRef,
-  Source,
-} from "react-map-gl/maplibre";
+import { Layer, Map as MapComponent, MapRef } from "react-map-gl/maplibre";
 import {
   candidatesConfig,
   electionsConfig,
@@ -30,7 +25,11 @@ import { DistrictInfo } from "../../types";
 import { generateFillColors } from "../../utils/generateFillColors";
 import DistrictInfoComponent from "./components/DistrictInfo";
 import { ElectionsDataSource } from "./components/Layers/ElectionDataSource";
-import { PlaceNameLayer } from "./components/Layers/PlaceNameLayer";
+import FeaturesSource from "./components/Layers/FeaturesSource";
+import {
+  placeClasses,
+  PlaceNameLayer,
+} from "./components/Layers/PlaceNameLayer";
 import { TransportationLayer } from "./components/Layers/TransportationLayer";
 import Legend from "./components/Legend";
 import Popup from "./components/Popup";
@@ -218,16 +217,7 @@ const Map = () => {
   const featuresMapLayers = useMemo(() => {
     return (
       <React.Fragment>
-        <Source
-          id="maptiler-source"
-          key={`${elections}_${candidate}`}
-          tiles={[
-            `https://api.maptiler.com/tiles/v3/{z}/{x}/{y}.pbf?key=${
-              import.meta.env.VITE_MAPTILER_TOKEN
-            }`,
-          ]}
-          type="vector"
-        >
+        <FeaturesSource key={`${elections}_${candidate}`}>
           <TransportationLayer transportationClass="road" />
           <TransportationLayer transportationClass="road-secondary" />
           <TransportationLayer transportationClass="rail" color="#757575" />
@@ -242,12 +232,8 @@ const Map = () => {
               "fill-outline-color": theme.palette.background.paper,
             }}
           />
-          <PlaceNameLayer placeClass="city" />
-          <PlaceNameLayer placeClass="town" />
-          <PlaceNameLayer placeClass="village" />
-          <PlaceNameLayer placeClass="suburb" />
-        </Source>
-        <ElectionsDataSource>
+        </FeaturesSource>
+        <ElectionsDataSource key={`${elections}_${candidate}`}>
           <Layer
             key={candidate + "_outline"}
             id="outline"
@@ -265,6 +251,11 @@ const Map = () => {
             }}
           />
         </ElectionsDataSource>
+        <FeaturesSource key={`${elections}_${candidate}`}>
+          {placeClasses.map((placeClass) => (
+            <PlaceNameLayer key={placeClass} placeClass={placeClass} />
+          ))}
+        </FeaturesSource>
       </React.Fragment>
     );
   }, [elections, candidate]);
