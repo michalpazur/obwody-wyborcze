@@ -1,4 +1,4 @@
-teryt;token;is_whole_token
+teryt;token;district;entire_token
 126101;Kraków-Krowodrza: Józefa Chełmońskiego-Deptak
 106101;dr. Henryka Trenknera
 106101;Tenisowa
@@ -46,3 +46,6 @@ teryt;token;is_whole_token
 247501;Dziewanny
 247501;Leśny Zakątek.
 247701;rondo ks. Leona Szkatuły
+241003;Górnicza;;True
+241003;Szkolna;9;True
+241004;Polna;;True

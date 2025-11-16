@@ -215,7 +215,8 @@ def process_powiat(
 
       district_id = f"{teryt}_{district.number}"
       district_addresses: geo.GeoDataFrame | None = None
-      tokens_to_skip = tokens_to_skip_df[(tokens_to_skip_df["teryt"] == teryt) & ((tokens_to_skip_df["district"].isna()) | (tokens_to_skip_df["district"] == district.number))]["token"].tolist()
+      district_tokens_to_skip = tokens_to_skip_df[(tokens_to_skip_df["teryt"] == teryt) & ((tokens_to_skip_df["district"].isna()) | (tokens_to_skip_df["district"] == district.number))]
+      tokens_to_skip = district_tokens_to_skip["token"].tolist()
       if (district.type != "stały"):
         district_addresses = teryt_addresses[teryt_addresses["f_address"] == district.f_address]
         special_addresses.append(district.f_address)
@@ -245,10 +246,12 @@ def process_powiat(
       check_after_parity = False
       restored_token: ParsedToken | None = None
       restored_town = ""
+      all_tokens_to_skip = tokens_to_skip.copy()
       for token in split_borders:
         token = token.strip()
-        if (len(token) == 0 or token in tokens_to_skip):
-          print(f"Skipping {token}...")
+        tokens_to_skip = all_tokens_to_skip
+        if (len(token) == 0 or token == "." or token in tokens_to_skip):
+          print(f"Skipping token {token}...")
           continue
 
         token_replacement = tokens_to_replace[tokens_to_replace["token"] == token]
@@ -263,6 +266,8 @@ def process_powiat(
         token = re.sub(r"\s*:", "", token)
         token = re.sub(r"\.$", "", token)
 
+        partial_tokens_to_skip = district_tokens_to_skip[(district_tokens_to_skip["entire_token"].isna()) | (district_tokens_to_skip["entire_token"] == False)]
+        tokens_to_skip = partial_tokens_to_skip["token"].tolist()
         town_tmp = ""
         split_town_line = re.split(r"\s+", token)
         idx = 0
@@ -417,7 +422,7 @@ def process_powiat(
               street_tmp = " ".join(split_line[idx:end_idx])
               ends_with_dot = street_tmp.endswith(".")
               if (street_tmp in tokens_to_skip):
-                print(f"Skipping {street_tmp}...")
+                print(f"Skipping part of street {street_tmp}...")
                 skipped_token = True
                 idx = end_idx - 1
                 break
