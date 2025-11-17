@@ -489,6 +489,7 @@ def process_powiat(
               parsed_token["token"] = token
               parsed_token["except_addresses"] = []
               is_except = is_except_token
+              restored_token = None
 
               if ("prev_token" in street):
                 prev_token = street["prev_token"]
