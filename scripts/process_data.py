@@ -55,6 +55,7 @@ def process_addresses(df: T, column_names: dict[str, str], utils: Utils, is_addr
   street_prefixes = load_street_prefixes()
   for search in street_prefixes:
     df["street"] = df["street"].str.replace(search, street_prefixes[search], regex=True, flags=re.IGNORECASE)
+  df["street"] = df["street"].str.replace(utils.duplicate_prefixes_regex, r"\1", regex=True, flags=re.IGNORECASE)
   print("Removed prefixes!")
 
   # Normalize street names

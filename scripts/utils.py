@@ -94,6 +94,9 @@ class Utils:
     self.replacements_exceptions = load_replacements_exceptions()
     self.street_prefixes = load_street_prefixes()
     self.street_types = get_street_types(self.street_prefixes)
+    prefixes_regex = "(" + "|".join(map(lambda street_type: street_type.strip(), self.street_types)) + ")"
+    duplicate_prefixes_regex = f"{prefixes_regex}\\s+\\1"
+    self.duplicate_prefixes_regex = duplicate_prefixes_regex
     self.town_replacements = load_town_replacements()
 
   def remove_first_name(self, street: str):
