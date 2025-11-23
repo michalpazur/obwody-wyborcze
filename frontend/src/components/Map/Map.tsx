@@ -162,7 +162,6 @@ const Map = () => {
                 source-layer={selectedElections.sourceLayer}
                 paint={{
                   "fill-color": fill,
-                  "fill-outline-color": fill,
                   "fill-opacity": mapOpacity,
                 }}
               />
@@ -176,11 +175,6 @@ const Map = () => {
             source-layer={selectedElections.sourceLayer}
             paint={{
               "fill-color": generateFillColors(
-                `${candidate}_proc`,
-                candidatesConfig[candidate].gradient,
-                candidatesConfig[candidate].maxGradient
-              ),
-              "fill-outline-color": generateFillColors(
                 `${candidate}_proc`,
                 candidatesConfig[candidate].gradient,
                 candidatesConfig[candidate].maxGradient
@@ -202,10 +196,6 @@ const Map = () => {
             source-layer={selectedElections.sourceLayer}
             paint={{
               "fill-color": generateFillColors("winner_proc", tieGradient),
-              "fill-outline-color": generateFillColors(
-                "winner_proc",
-                tieGradient
-              ),
               "fill-opacity": mapOpacity,
             }}
           />
@@ -215,9 +205,22 @@ const Map = () => {
   }, [elections, candidate]);
 
   const featuresMapLayers = useMemo(() => {
+    const transparentFillPaint = {
+      "fill-color": theme.palette.background.default,
+      "fill-opacity": 0.25,
+      "fill-outline-color": theme.palette.background.paper,
+    };
+
     return (
       <React.Fragment>
         <FeaturesSource key={`${elections}_${candidate}`}>
+          <Layer
+            type="fill"
+            source-layer="water"
+            filter={["in", "class", "river", "lake"]}
+            id="water"
+            paint={transparentFillPaint}
+          />
           <TransportationLayer transportationClass="road" />
           <TransportationLayer transportationClass="road-secondary" />
           <TransportationLayer transportationClass="rail" color="#757575" />
@@ -226,11 +229,7 @@ const Map = () => {
             source-layer="building"
             id="building"
             minzoom={14}
-            paint={{
-              "fill-color": theme.palette.background.default,
-              "fill-opacity": 0.25,
-              "fill-outline-color": theme.palette.background.paper,
-            }}
+            paint={transparentFillPaint}
           />
         </FeaturesSource>
         <ElectionsDataSource key={`${elections}_${candidate}`}>

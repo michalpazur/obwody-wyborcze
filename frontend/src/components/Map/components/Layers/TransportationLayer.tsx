@@ -15,7 +15,12 @@ export const TransportationLayer: React.FC<TransportationLayerProps> = ({
   opacity = 0.4,
 }) => {
   const theme = useTheme();
-  const widthMultiplier = transportationClass === "road" ? 2 : 1;
+  const widthMultiplier =
+    transportationClass === "road"
+      ? 2
+      : transportationClass === "rail"
+      ? 0.75
+      : 1;
 
   return (
     <Layer
@@ -31,7 +36,7 @@ export const TransportationLayer: React.FC<TransportationLayerProps> = ({
           : ["==", "class", transportationClass]
       }
       paint={{
-        "line-color": color || theme.palette.background.default,
+        "line-color": color || theme.palette.background.paper,
         "line-width": transportationLineWidth(widthMultiplier),
         "line-opacity": opacity,
       }}
