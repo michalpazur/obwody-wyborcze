@@ -194,7 +194,12 @@ def process_powiat(
     teryt_districts = districts[districts["teryt"] == teryt]
     teryt_addresses = addresses[addresses["teryt"] == teryt]
     teryt_towns = towns[towns["teryt"] == teryt]
-    town_list = [ *teryt_towns["town"].to_list(), *teryt_addresses["town"].to_list() ]
+    all_towns = [ *teryt_towns["town"].to_list(), *teryt_addresses["town"].to_list() ]
+    town_list = []
+    for town in all_towns:
+      if (not town in town_list):
+        town_list.append(town)
+
     tokens_to_replace = tokens_to_replace_df[tokens_to_replace_df["teryt"] == teryt]
     addresses_to_skip = addresses_to_skip_df[addresses_to_skip_df["teryt"] == teryt]["f_address"].tolist()
     # Extra streets have to be parsed but will be discarded anyway
