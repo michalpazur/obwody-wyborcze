@@ -26,7 +26,6 @@ def get_winner(row: pd.Series):
 
 def process_teryt(teryt: str, addresses: geo.GeoDataFrame, districts_df: geo.GeoDataFrame):
   print(f"Processing districts for TERYT {teryt}...")
-  addresses = addresses[addresses["teryt"] == teryt]
   has_extra_teryts = False
   for town in towns_with_districts:
     if (teryt.startswith(town)):
@@ -79,15 +78,18 @@ elections = "pres_2025_1"
 def main():
   districts_df: geo.GeoDataFrame | None = geo.GeoDataFrame()
   districts = geo.read_file(f"data_in/statistical_districts.zip")
+  addresses_to_skip = pd.read_csv("const/addresses_to_skip.csv", sep=";", converters={ "teryt": str })
   districts["TERYT"] = districts["TERYT"].str[:-1]
   districts["OBWOD"] = districts["OBWOD"].apply(lambda x: str(uuid.uuid4()))
-  file_names = list(filter(lambda x: x.endswith(".zip"), os.listdir("matched_addresses")))
+  file_names = list(sorted(filter(lambda x: x.endswith(".zip"), os.listdir("matched_addresses"))))
 
   for file_name in file_names:
     addresses = geo.read_file(f"matched_addresses/{file_name}")
     teryts = addresses["teryt"].drop_duplicates()
     for teryt in teryts:
-      processed_districts = process_teryt(teryt, addresses, districts)
+      teryt_addresses_to_skip = addresses_to_skip[addresses_to_skip["teryt"] == teryt]["f_address"].to_list()
+      teryt_addresses = addresses[~addresses["f_address"].isin(teryt_addresses_to_skip)]
+      processed_districts = process_teryt(teryt, teryt_addresses, districts)
       districts_df = concat(districts_df, processed_districts)
 
   print("Loading voting results...")
