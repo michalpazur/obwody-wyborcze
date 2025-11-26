@@ -20,5 +20,10 @@ done
 
 echo "Processed all files!"
 echo "Merging files..."
-mapshaper -i $file_list combine-files -merge-layers -clean -simplify 4% dp keep-shapes -o districts/$1.json
+mapshaper -i $file_list combine-files \
+  -merge-layers \
+  -clean \
+  -simplify 4% dp keep-shapes \
+  -filter-slivers min-area=100 keep-shapes \
+  -o districts/$1.json
 echo "Done!"
