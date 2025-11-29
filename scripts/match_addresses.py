@@ -76,12 +76,12 @@ def process_token_word(word: str):
   return word
 
 def get_building_number(address: str) -> BuildingNumber:
-  match = re.match(building_num_regex, address)
+  match = re.search(building_num_regex, address)
   building_n = ""
   building_l = ""
   if (match is not None and match.group(2)):
     building_n = int(match.group(2))
-  match = re.match(building_letter_regex, address)
+  match = re.search(building_letter_regex, address)
   if (match is not None and match.group(1)):
     building_l = match.group(1)
 

@@ -210,7 +210,6 @@ const Map = () => {
       "fill-opacity": 0.25,
       "fill-outline-color": theme.palette.background.paper,
     };
-
     return (
       <React.Fragment>
         <FeaturesSource key={`${elections}_${candidate}`}>

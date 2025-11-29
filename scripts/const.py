@@ -85,7 +85,7 @@ districts = [
   "Poznań-Wilda"
 ]
 
-building_num_regex = r"((\d+)\w*|\w{1,2})$"
+building_num_regex = r"([a-zA-Z]?(\d+)\w*|\w{1,2})$"
 building_letter_regex = r"\d*(\w*)$"
 all_regex = r"cał[ae]"
 odd_regex = r"nieparz[yv]st[ae]"
