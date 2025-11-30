@@ -5,6 +5,7 @@ from const import results_columns, candidates
 import uuid
 import os
 from os import path
+import re
 
 pd.options.mode.copy_on_write = True
 
@@ -110,7 +111,7 @@ def main():
 
   results = results[merged_columns]
   results = results[results["teryt"] != "000000"]
-  results["gmina"] = results.apply(lambda row: row.gmina if row.gmina.startswith(r"g?m\.") else "m. " + row.powiat, axis=1)
+  results["gmina"] = results.apply(lambda row: re.sub(r"^m\.\s+", "", row.gmina) if re.match(r"^g?m\.", row.gmina) else row.powiat, axis=1)
   results["district"] = results.apply(lambda row: f"{row.teryt}_{row.number}", axis=1)
   # pd.DataFrame.idxmax doesn't show ties
   results["winner"] = results[candidates_columns].apply(get_winner, axis=1)
