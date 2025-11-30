@@ -3,6 +3,7 @@ import geopandas as geo
 import os
 import re
 import regex
+import json
 from typing import List, NotRequired, TypedDict, cast
 from utils import concat, Utils, get_building_order, save_zip, capitalize_every_word
 from const import all_regex, odd_regex, even_regex, building_num_regex, building_letter_regex, district_types, dash_regex, multiple_number_regex, districts as town_districts, building_types_regex
@@ -766,6 +767,7 @@ def process_powiat(
         token_addresses = teryt_addresses[teryt_addresses["town"] == token["town"]]
         token_addresses = token_addresses[~(token_addresses["f_address"].isin(special_addresses))]
         token_addresses = token_addresses[~(token_addresses["f_address"].isin(addresses_to_skip))]
+        token_addresses["token"] = json.dumps(token)
         if (district_addresses is not None):
           # Ignore duplicate addresses
           token_addresses = token_addresses[~(token_addresses["f_address"].isin(district_addresses.f_address))]
