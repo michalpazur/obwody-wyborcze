@@ -212,7 +212,7 @@ const Map = () => {
     };
     return (
       <React.Fragment>
-        <FeaturesSource key={`${elections}_${candidate}`}>
+        <FeaturesSource key={`features_${elections}_${candidate}`}>
           <Layer
             type="fill"
             source-layer="water"
@@ -231,7 +231,7 @@ const Map = () => {
             paint={transparentFillPaint}
           />
         </FeaturesSource>
-        <ElectionsDataSource key={`${elections}_${candidate}`}>
+        <ElectionsDataSource key={`outline_${elections}_${candidate}`}>
           <Layer
             key={candidate + "_outline"}
             id="outline"
@@ -249,7 +249,7 @@ const Map = () => {
             }}
           />
         </ElectionsDataSource>
-        <FeaturesSource key={`${elections}_${candidate}`}>
+        <FeaturesSource key={`place_names_${elections}_${candidate}`}>
           {placeClasses.map((placeClass) => (
             <PlaceNameLayer key={placeClass} placeClass={placeClass} />
           ))}
