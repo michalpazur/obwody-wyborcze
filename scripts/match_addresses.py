@@ -754,6 +754,7 @@ def process_powiat(
                 parsed_tokens.append(prev_token)
               else:
                 parsed_tokens.append(parsed_token)
+            restored_token = None
             parsed_token = tmp_token.copy()
       
       for token in parsed_tokens:
