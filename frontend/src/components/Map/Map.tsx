@@ -217,7 +217,7 @@ const Map = () => {
             type="fill"
             source-layer="water"
             filter={["in", "class", "river", "lake"]}
-            id="water"
+            id="water-layer"
             paint={transparentFillPaint}
           />
           <TransportationLayer transportationClass="road" />
@@ -278,9 +278,7 @@ const Map = () => {
           : [candidate]
       }
       style={{ width: "100%", height: "100%" }}
-      mapStyle={`https://api.maptiler.com/maps/dataviz-light/style.json?key=${
-        import.meta.env.VITE_MAPTILER_TOKEN
-      }`}
+      mapStyle="/obwody-wyborcze/map-style.json"
     >
       {mapLayers}
       {featuresMapLayers}

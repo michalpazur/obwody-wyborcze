@@ -1,6 +1,7 @@
 import { useTheme } from "@mui/material";
 import { Layer } from "react-map-gl/maplibre";
 import { exponentialBase, textLayout } from "../../styles";
+import { featuresSourceId } from "./FeaturesSource";
 
 type PlaceNameLayerProps = {
   placeClass: "city" | "town" | "village" | "suburb";
@@ -23,9 +24,9 @@ export const PlaceNameLayer: React.FC<PlaceNameLayerProps> = ({
   return (
     <Layer
       type="symbol"
-      source="maptiler-source"
+      source={featuresSourceId}
       source-layer="place"
-      id={placeClass}
+      id={`label_${placeClass}`}
       filter={["==", "class", placeClass]}
       minzoom={minZoom}
       maxzoom={15}

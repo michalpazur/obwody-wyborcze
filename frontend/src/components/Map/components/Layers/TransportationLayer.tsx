@@ -2,6 +2,7 @@ import { useTheme } from "@mui/material";
 import React from "react";
 import { Layer } from "react-map-gl/maplibre";
 import { transportationLineWidth } from "../../styles";
+import { featuresSourceId } from "./FeaturesSource";
 
 type TransportationLayerProps = {
   transportationClass: "road" | "road-secondary" | "rail";
@@ -25,7 +26,7 @@ export const TransportationLayer: React.FC<TransportationLayerProps> = ({
   return (
     <Layer
       type="line"
-      source="maptiler-source"
+      source={featuresSourceId}
       source-layer="transportation"
       id={transportationClass}
       filter={

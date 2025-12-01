@@ -48,6 +48,7 @@ export const transportationLineWidth = (
 export const textLayout = (
   baseFontSize: number = 12
 ): SymbolLayerSpecification["layout"] => ({
+  "text-font": ["Noto Sans Regular"],
   "text-field": "{name}",
   "text-size": [
     "interpolate",
