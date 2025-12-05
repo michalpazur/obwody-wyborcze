@@ -103,7 +103,6 @@ type ElectionConfig = {
   name: string;
   candidates: CandidateId[];
   winners: CandidateId[];
-  tilesetId: string;
   sourceLayer: string;
 };
 
@@ -127,16 +126,14 @@ export const electionsConfig: Record<ElectionId, ElectionConfig> = {
       "woch",
     ],
     winners: ["trzaskowski", "nawrocki", "mentzen", "braun", "zandberg"],
-    tilesetId: "michalpazur.0nra5ryd",
-    sourceLayer: "pres_2025_1-1v7a05",
+    sourceLayer: "pres_2025_1",
   },
   pres_2025_2: {
     id: "pres_2025_2",
     name: "Prezydent 2025 (II tura)",
     candidates: ["nawrocki", "trzaskowski"],
     winners: ["nawrocki", "trzaskowski"],
-    tilesetId: "michalpazur.17bbkxiq",
-    sourceLayer: "pres_2025_2-bqufar",
+    sourceLayer: "pres_2025_2",
   },
 };
 

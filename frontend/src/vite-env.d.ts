@@ -5,7 +5,7 @@ interface ViteTypeOptions {
 }
 
 interface ImportMetaEnv {
-  readonly VITE_MAPBOX_TOKEN: string;
+  readonly VITE_TILE_SERVER_URL: string;
 }
 
 interface ImportMeta {

@@ -1,0 +1,5 @@
+.env
+# Ignore created map tiles
+martin/mbtiles
+# Ignore PSQL files form Docker container
+postgres/pg_data
