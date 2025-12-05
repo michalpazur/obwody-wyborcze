@@ -41,8 +41,8 @@ jobs:
       - run: yarn build
         working-directory: ./frontend
         env:
-          VITE_MAPTILER_TOKEN: ${{ secrets.VITE_MAPTILER_TOKEN }}
-          VITE_MAPBOX_TOKEN: ${{ secrets.VITE_MAPBOX_TOKEN }}
+          VITE_TILE_SERVER_URL: ${{ secrets.VITE_TILE_SERVER_URL }}
+          VITE_G_TAG: ${{ secrets.VITE_G_TAG }}
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact
