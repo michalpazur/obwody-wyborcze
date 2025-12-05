@@ -116,7 +116,9 @@ def main():
   results["winner"] = results[candidates_columns].apply(get_winner, axis=1)
   for name in candidates_columns:
     results[name + "_proc"] = results[name] * 100 / results["total"]
+    results[name + "_proc"] = results[name + "_proc"].fillna(0)
   results["winner_proc"] = results[candidates_columns].max(axis=1) * 100 / results["total"]
+  results["winner_proc"] = results["winner_proc"].fillna(0)
   results["turnout"] = results["all_votes"] * 100 / results["voters"]
 
   print("Merging results with districts...")
