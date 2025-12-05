@@ -41,7 +41,7 @@ const ElectionsSelects: React.FC = () => {
         label="Wybory"
         value={elections}
       >
-        {Object.keys(electionsConfig).map((key) => (
+        {(Object.keys(electionsConfig) as ElectionId[]).map((key) => (
           <MenuItem key={key} value={key}>
             {electionsConfig[key].name}
           </MenuItem>

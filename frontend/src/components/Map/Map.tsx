@@ -286,10 +286,7 @@ const Map = () => {
         <Popup district={hovered} position={hoverPosition} />
       ) : null}
       <Legend />
-      <DistrictInfoComponent
-        districtInfo={clicked}
-        setDistrictInfo={setClicked}
-      />
+      <DistrictInfoComponent districtInfo={clicked} />
     </MapComponent>
   );
 };

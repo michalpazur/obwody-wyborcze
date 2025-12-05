@@ -1,9 +1,7 @@
-import CloseIcon from "@mui/icons-material/CloseRounded";
 import {
   Box,
   Card,
-  IconButton,
-  Slide,
+  Collapse,
   Stack,
   SxProps,
   Theme,
@@ -15,35 +13,36 @@ import { DistrictInfo } from "../../../../types";
 import { sortResults } from "../../../../utils/sortResults";
 import ResultsTable from "../ResultsTable";
 import ElectionsSelects from "./components/ElectionsSelects";
+import SideButtons from "./components/SideButtons";
+import { stackSpacing } from "./components/styles";
 
-const root: SxProps<Theme> = (theme) => ({
-  width: "100%",
+const stackSx: SxProps<Theme> = (theme) => ({
   position: "absolute",
-  top: (theme) => theme.spacing(6),
-  left: (theme) => theme.spacing(6),
-  p: 5,
   zIndex: 6,
-  maxWidth: "360px",
-  maxHeight: "calc(100% - 156px)",
-  overflowY: "auto",
+  top: theme.spacing(6),
+  left: theme.spacing(6),
+  right: theme.spacing(6),
+  height: "calc(100% - 156px)",
+  pointerEvents: "none",
+  "> *": {
+    pointerEvents: "auto",
+  },
   [theme.breakpoints.down("sm")]: {
-    maxWidth: `calc(100% - ${theme.spacing(6)})`,
-    top: (theme) => theme.spacing(3),
-    left: (theme) => theme.spacing(3),
-    maxHeight: "calc(100% - 140px)",
+    top: theme.spacing(3),
+    left: theme.spacing(3),
+    right: theme.spacing(3),
+    height: "calc(100% - 140px)",
   },
 });
 
-const closeButton: SxProps = {
-  position: "absolute",
-  right: "0px",
-  top: "0px",
-  display: { xs: "block", sm: "none" },
-};
-
-const header: SxProps<Theme> = (theme) => ({
+const rootSx: SxProps<Theme> = (theme) => ({
+  p: { xs: 4, sm: 5 },
+  pointerEvents: "auto",
+  width: "360px",
+  maxHeight: "100%",
+  overflowY: "auto",
   [theme.breakpoints.down("sm")]: {
-    marginRight: theme.spacing(5),
+    width: `calc(100vw - ${theme.spacing(6)} - ${theme.spacing(1)} - 40px)`,
   },
 });
 
@@ -59,21 +58,33 @@ const text: SxProps<Theme> = {
 const CardWithSlide: React.FC<{
   children: React.ReactNode;
   open: boolean;
-  onExited: () => void;
-}> = ({ open, children, onExited }) => {
+  onClose: () => void;
+}> = ({ open, onClose, children }) => {
   return (
-    <Slide in={open} direction="right" appear={false} onExited={onExited}>
-      <Card variant="outlined" sx={root}>
-        {children}
-      </Card>
-    </Slide>
+    <Stack
+      direction="row"
+      alignItems="flex-start"
+      spacing={stackSpacing}
+      sx={stackSx}
+    >
+      <Collapse
+        in={open}
+        orientation="horizontal"
+        appear={false}
+        sx={{ height: "100% !important", pointerEvents: "none" }}
+      >
+        <Card variant="outlined" sx={rootSx}>
+          {children}
+        </Card>
+      </Collapse>
+      <SideButtons open={open} onClose={onClose} />
+    </Stack>
   );
 };
 
 const DistrictInfoComponent: React.FC<{
   districtInfo?: DistrictInfo;
-  setDistrictInfo: (districtInfo: DistrictInfo | undefined) => void;
-}> = ({ districtInfo, setDistrictInfo }) => {
+}> = ({ districtInfo }) => {
   const [open, setOpen] = useState(true);
   const { elections } = useElectionsStore();
 
@@ -84,11 +95,7 @@ const DistrictInfoComponent: React.FC<{
   }, [districtInfo]);
 
   const onCloseClick = () => {
-    setOpen(false);
-  };
-
-  const onExited = () => {
-    setDistrictInfo(undefined);
+    setOpen((open) => !open);
   };
 
   const results = useMemo(() => {
@@ -100,19 +107,9 @@ const DistrictInfoComponent: React.FC<{
   }, [districtInfo, elections]);
 
   return (
-    <CardWithSlide open={open} onExited={onExited}>
-      <IconButton
-        aria-label="Zamknij szczegóły"
-        sx={closeButton}
-        onClick={onCloseClick}
-        color="secondary"
-      >
-        <CloseIcon />
-      </IconButton>
+    <CardWithSlide open={open} onClose={onCloseClick}>
       <Stack spacing={4}>
-        <Typography variant="h2" sx={header}>
-          Szczegółowe wyniki
-        </Typography>
+        <Typography variant="h2">Szczegółowe wyniki</Typography>
         <ElectionsSelects />
         {districtInfo ? (
           <Box>

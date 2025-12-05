@@ -1,0 +1,20 @@
+diff --git a/node_modules/@mui/material/esm/IconButton/IconButton.d.ts b/node_modules/@mui/material/esm/IconButton/IconButton.d.ts
+index f3229c4..b7e5ac8 100644
+--- a/node_modules/@mui/material/esm/IconButton/IconButton.d.ts
++++ b/node_modules/@mui/material/esm/IconButton/IconButton.d.ts
+@@ -5,6 +5,7 @@ import { Theme } from "../styles/index.js";
+ import { ExtendButtonBase, ExtendButtonBaseTypeMap } from "../ButtonBase/index.js";
+ import { OverrideProps } from "../OverridableComponent/index.js";
+ import { IconButtonClasses } from "./iconButtonClasses.js";
++import { ButtonProps } from '../Button/Button.js';
+ export interface IconButtonPropsColorOverrides {}
+ export interface IconButtonPropsSizeOverrides {}
+ export interface IconButtonOwnProps {
+@@ -64,6 +65,7 @@ export interface IconButtonOwnProps {
+    * The system prop that allows defining system overrides as well as additional CSS styles.
+    */
+   sx?: SxProps<Theme>;
++  variant?: ButtonProps["variant"];
+ }
+ export type IconButtonTypeMap<AdditionalProps = {}, RootComponent extends React.ElementType = 'button'> = ExtendButtonBaseTypeMap<{
+   props: AdditionalProps & IconButtonOwnProps;

@@ -48,6 +48,33 @@ export const theme = createTheme({
         }),
       },
     },
+    MuiIconButton: {
+      styleOverrides: {
+        root: ({ theme }) => ({
+          variants: [
+            {
+              props: { color: "default" },
+              style: { color: theme.palette.text.primary },
+            },
+            {
+              props: { variant: "outlined" },
+              style: {
+                borderRadius: theme.shape.borderRadius,
+                backgroundColor: alpha(theme.palette.background.paper, 0.8),
+                backdropFilter: "blur(10px)",
+                boxShadow: `0 4px 12px 0 ${alpha(
+                  theme.palette.text.primary,
+                  0.1
+                )}`,
+                "&:hover": {
+                  backgroundColor: alpha(theme.palette.background.default, 0.8),
+                },
+              },
+            },
+          ],
+        }),
+      },
+    },
     MuiTableCell: {
       styleOverrides: {
         root: ({ theme }) => ({
@@ -82,6 +109,13 @@ export const theme = createTheme({
             duration: theme.transitions.duration.shortest,
           }),
         }),
+      },
+    },
+    MuiMenuItem: {
+      styleOverrides: {
+        root: {
+          minHeight: "unset !important",
+        },
       },
     },
     MuiSelect: {
