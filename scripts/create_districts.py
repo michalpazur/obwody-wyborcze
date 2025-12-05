@@ -70,7 +70,6 @@ def process_teryt(teryt: str, addresses: geo.GeoDataFrame, districts_df: geo.Geo
 
   districts_df.geometry = districts_df.geometry.buffer(1, cap_style="flat", join_style="bevel")
   districts_df = districts_df.dissolve(by="district")
-  districts_df.geometry = districts_df.geometry.buffer(-1, cap_style="flat", join_style="bevel")
   districts_df.geometry = districts_df.geometry.make_valid(method="structure")
   return districts_df
 
