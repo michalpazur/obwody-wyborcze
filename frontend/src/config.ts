@@ -142,3 +142,12 @@ export const tieGradient = chroma
   .colors(GRADIENT_COLORS);
 
 export const mapOpacity = 1;
+
+export const layerIds = {
+  elections: "elections",
+  water: "water-layer",
+  road: "road",
+  building: "building-layer",
+  outline: "outline",
+  city: "city",
+};

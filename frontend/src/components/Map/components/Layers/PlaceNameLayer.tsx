@@ -26,7 +26,7 @@ export const PlaceNameLayer: React.FC<PlaceNameLayerProps> = ({
       type="symbol"
       source={featuresSourceId}
       source-layer="place"
-      id={`label_${placeClass}`}
+      id={placeClass}
       filter={["==", "class", placeClass]}
       minzoom={minZoom}
       maxzoom={15}

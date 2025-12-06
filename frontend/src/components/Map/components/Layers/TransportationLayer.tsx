@@ -1,6 +1,7 @@
 import { useTheme } from "@mui/material";
 import React from "react";
 import { Layer } from "react-map-gl/maplibre";
+import { layerIds } from "../../../../config";
 import { transportationLineWidth } from "../../styles";
 import { featuresSourceId } from "./FeaturesSource";
 
@@ -29,6 +30,7 @@ export const TransportationLayer: React.FC<TransportationLayerProps> = ({
       source={featuresSourceId}
       source-layer="transportation"
       id={transportationClass}
+      beforeId={layerIds.building}
       filter={
         transportationClass === "road"
           ? ["in", "class", "primary", "secondary", "motorway", "trunk"]

@@ -17,6 +17,7 @@ import { Layer, Map as MapComponent, MapRef } from "react-map-gl/maplibre";
 import {
   candidatesConfig,
   electionsConfig,
+  layerIds,
   mapOpacity,
   tieGradient,
 } from "../../config";
@@ -46,6 +47,14 @@ const Map = () => {
   const { elections, candidate } = useElectionsStore();
   const selectedElections = electionsConfig[elections];
 
+  const featureSelector = useMemo(
+    () => ({
+      source: elections,
+      sourceLayer: electionsConfig[elections].sourceLayer,
+    }),
+    [elections]
+  );
+
   useEffect(() => {
     setHovered(undefined);
     setClicked(undefined);
@@ -64,11 +73,6 @@ const Map = () => {
     if (feature?.id === hoveredId) {
       return;
     }
-
-    const featureSelector = {
-      source: elections,
-      sourceLayer: electionsConfig[elections].sourceLayer,
-    };
 
     if (hoveredId) {
       mapRef.current?.setFeatureState(
@@ -100,11 +104,7 @@ const Map = () => {
     }
 
     mapRef.current?.setFeatureState(
-      {
-        source: elections,
-        sourceLayer: electionsConfig[elections].sourceLayer,
-        id: hoveredId,
-      },
+      { ...featureSelector, id: hoveredId },
       { hovered: false }
     );
     hoveredId = undefined;
@@ -118,11 +118,7 @@ const Map = () => {
 
       if (clicked) {
         mapRef.current?.setFeatureState(
-          {
-            source: elections,
-            sourceLayer: electionsConfig[elections].sourceLayer,
-            id: clicked.id,
-          },
+          { ...featureSelector, id: clicked.id },
           { clicked: false }
         );
       }
@@ -132,11 +128,7 @@ const Map = () => {
       } else if (feature) {
         setClicked({ ...feature.properties, id: feature.id } as DistrictInfo);
         mapRef.current?.setFeatureState(
-          {
-            source: elections,
-            sourceLayer: electionsConfig[elections].sourceLayer,
-            id: feature.id,
-          },
+          { ...featureSelector, id: feature.id },
           { clicked: true }
         );
       }
@@ -158,6 +150,7 @@ const Map = () => {
                 key={winnerId}
                 filter={["==", "winner", winnerId]}
                 id={winnerId}
+                beforeId={layerIds.water}
                 type="fill"
                 source-layer={selectedElections.sourceLayer}
                 paint={{
@@ -171,6 +164,7 @@ const Map = () => {
           <Layer
             key={candidate}
             id={candidate}
+            beforeId={layerIds.water}
             type="fill"
             source-layer={selectedElections.sourceLayer}
             paint={{
@@ -192,6 +186,7 @@ const Map = () => {
               ),
             ]}
             id="tie"
+            beforeId={layerIds.water}
             type="fill"
             source-layer={selectedElections.sourceLayer}
             paint={{
@@ -212,29 +207,15 @@ const Map = () => {
     };
     return (
       <React.Fragment>
-        <FeaturesSource key={`features_${elections}_${candidate}`}>
-          <Layer
-            type="fill"
-            source-layer="water"
-            filter={["in", "class", "river", "lake"]}
-            id="water-layer"
-            paint={transparentFillPaint}
-          />
-          <TransportationLayer transportationClass="road" />
-          <TransportationLayer transportationClass="road-secondary" />
-          <TransportationLayer transportationClass="rail" color="#757575" />
-          <Layer
-            type="fill"
-            source-layer="building"
-            id="building"
-            minzoom={14}
-            paint={transparentFillPaint}
-          />
+        <FeaturesSource>
+          {placeClasses.map((placeClass) => (
+            <PlaceNameLayer key={placeClass} placeClass={placeClass} />
+          ))}
         </FeaturesSource>
-        <ElectionsDataSource key={`outline_${elections}_${candidate}`}>
+        <ElectionsDataSource>
           <Layer
-            key={candidate + "_outline"}
-            id="outline"
+            id={layerIds.outline}
+            beforeId={layerIds.city}
             type="line"
             source-layer={selectedElections.sourceLayer}
             paint={{
@@ -249,14 +230,29 @@ const Map = () => {
             }}
           />
         </ElectionsDataSource>
-        <FeaturesSource key={`place_names_${elections}_${candidate}`}>
-          {placeClasses.map((placeClass) => (
-            <PlaceNameLayer key={placeClass} placeClass={placeClass} />
-          ))}
+        <FeaturesSource>
+          <Layer
+            type="fill"
+            source-layer="building"
+            id={layerIds.building}
+            beforeId={layerIds.outline}
+            paint={transparentFillPaint}
+          />
+          <TransportationLayer transportationClass="road" />
+          <TransportationLayer transportationClass="road-secondary" />
+          <TransportationLayer transportationClass="rail" color="#757575" />
+          <Layer
+            type="fill"
+            source-layer="water"
+            filter={["in", "class", "river", "lake"]}
+            id={layerIds.water}
+            beforeId={layerIds.road}
+            paint={transparentFillPaint}
+          />
         </FeaturesSource>
       </React.Fragment>
     );
-  }, [elections, candidate]);
+  }, [selectedElections]);
 
   return (
     <MapComponent
@@ -280,8 +276,8 @@ const Map = () => {
       style={{ width: "100%", height: "100%" }}
       mapStyle="/obwody-wyborcze/map-style.json"
     >
-      {mapLayers}
       {featuresMapLayers}
+      {mapLayers}
       {hovered && hoverPosition ? (
         <Popup district={hovered} position={hoverPosition} />
       ) : null}

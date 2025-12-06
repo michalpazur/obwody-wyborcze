@@ -43,7 +43,7 @@
       ],
       "paint": {
         "fill-antialias": true,
-        "fill-color": "rgba(228, 246, 255, 1)",
+        "fill-color": "rgba(155, 201, 234, 1)",
         "fill-translate-anchor": "map"
       }
     },
@@ -1329,7 +1329,8 @@
           10,
           11,
           12
-        ]
+        ],
+        "visibility": "none"
       },
       "paint": {
         "text-color": "#000",
@@ -1367,7 +1368,8 @@
           12,
           11,
           14
-        ]
+        ],
+        "visibility": "none"
       },
       "paint": {
         "text-color": "#000",
@@ -1437,7 +1439,8 @@
           13,
           11,
           18
-        ]
+        ],
+        "visibility": "none"
       },
       "paint": {
         "text-color": "#000",
@@ -1483,7 +1486,7 @@
           11,
           20
         ],
-        "visibility": "visible"
+        "visibility": "none"
       },
       "paint": {
         "text-color": "#000",
