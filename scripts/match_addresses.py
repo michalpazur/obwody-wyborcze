@@ -320,11 +320,17 @@ def process_powiat(
             if (town_split != found_token_split and is_town(town_list, town_split) and not is_town(town_list, town_tmp)):
               town_tmp = town_split
 
-            town_with_dash = "-".join(town_tmp.split(" "))
+            town_with_dash = "-".join(town_tmp.split(" ")).replace("---", "-")
             if (is_town(town_list, town_with_dash)):
               town_tmp = town_with_dash
 
-            if (is_town(town_list, town_tmp) and not is_street(teryt_streets, last_town, town_tmp) and (not found_town or found_town["town"] != town_tmp)):
+            street_name = is_street(teryt_streets, last_town, town_tmp)
+            town_found = is_town(town_list, town_tmp)
+            if (end_idx > 1 and street_name != "" and not town_found):
+              idx = end_idx
+              continue
+
+            if (town_found and street_name == "" and (not found_town or found_town["town"] != town_tmp)):
               last_town = town_tmp
               found_town = {
                 "town": town_tmp,
@@ -380,7 +386,7 @@ def process_powiat(
               continue
 
             rest_of_token = " ".join(split_town_line[town["end_index"]:prev_town_end])
-            rest_of_token = re.sub(r"(^|\s+)(i|oraz)$", "", rest_of_token)
+            rest_of_token = re.sub(r"(^|\s+)(i|oraz|z miejscowością|z miejscowościami)$", "", rest_of_token)
             rest_of_token = re.sub(place_type, "", rest_of_token + " ")
             rest_of_token = re.sub(f"^{town["town"]}(\\s+|$)", "", rest_of_token).strip()
             prev_town_end = town["start_index"]
@@ -395,7 +401,7 @@ def process_powiat(
             if (len(rest_of_token) == 0 or is_except_token):
               parsed_token["is_town"] = True
               prev_token = parsed_tokens[-1] if len(parsed_tokens) > 0 else None
-              if (not prev_token or prev_token["town"] != town["town"] or not prev_token["is_town"]):
+              if (not prev_token or prev_token["town"] != town["town"] or is_except_token):
                 parsed_tokens.append(parsed_token)
                 parsed_token = parsed_token.copy()
               if (not is_except_token):
@@ -404,6 +410,8 @@ def process_powiat(
             parsed_token["town"] = last_town
             parsed_token["street"] = last_street
             rest_of_token = " ".join(split_town_line)
+            # Handle cases where town name is repeated multiple times
+            rest_of_token = re.sub(f"{last_town}\\s+", " ", rest_of_token, 1)
 
           token = place_type.sub("", rest_of_token).strip()
           
@@ -543,6 +551,7 @@ def process_powiat(
             rest_of_token = re.sub(dash_regex, "-", rest_of_token)
             rest_of_token = re.sub(r"^/", "", rest_of_token) # See: Olsztyn
             rest_of_token = re.sub(building_types_regex, "", rest_of_token)
+            rest_of_token = re.sub(r"(\w+)\s+\1", r"\1", rest_of_token)
             split_token = re.split(r"\s+", rest_of_token.strip())
             prev_word = ""
             next_word = ""
@@ -592,6 +601,11 @@ def process_powiat(
                 if (not set_parity):
                   parsed_token["is_odd"] = False
                   parsed_token["is_even"] = False
+                prev_word = word
+                continue
+
+              if (word == "strona"):
+                prev_word = word
                 continue
 
               split_by_dash = re.split(dash_regex, word)
@@ -605,8 +619,10 @@ def process_powiat(
 
               if (ends_with_dash):
                 word = word[:-1]
+                word_idx += 1
               if (ends_with_to):
                 word = word[:-2]
+                word_idx += 1
 
               if (starts_with_dash):
                 word = word[1:]
@@ -662,12 +678,14 @@ def process_powiat(
                 parsed_token["num_from"] = get_building_number(parsed_token["number"])
                 del parsed_token["number"]
 
-              if (is_end and "num_from" in parsed_token and parsed_token["num_from"]["building_n"] == 1):
+              if (is_end and "num_from" in parsed_token and parsed_token["num_from"]["building_n"] == 1 and next_word == "" and not parsed_token["is_even"] and not parsed_token["is_odd"]):
                   parsed_token["is_street"] = True
 
               if (is_end and set_parity and ((parsed_token["is_even"] and re.match(odd_regex, next_word)) or (parsed_token["is_odd"] and re.match(even_regex, next_word)))):
                 parsed_tokens.append(parsed_token)
                 parsed_token = parsed_token.copy()
+                parsed_token.pop("num_from", None)
+                parsed_token.pop("num_to", None)
 
               if (is_start or is_end):
                 prev_word = word
@@ -715,8 +733,10 @@ def process_powiat(
                   parsed_token["num_from"] = get_building_number(num_from)
               elif (word != "od" and word != "-" and word != "do" and next_word != "-" and re.match(building_num_regex, word)):
                 parsed_token["number"] = word
-                parsed_token["is_even"] = False
-                parsed_token["is_odd"] = False
+                if (not set_parity):
+                  parsed_token["is_even"] = False
+                  parsed_token["is_odd"] = False
+                parsed_token["is_street"] = False
               
               if (not ends_with_dash and not ends_with_to):
                 prev_word = word
@@ -726,6 +746,8 @@ def process_powiat(
               if (set_parity and ((parsed_token["is_even"] and re.match(odd_regex, next_word)) or (parsed_token["is_odd"] and re.match(even_regex, next_word)))):
                 parsed_tokens.append(parsed_token)
                 parsed_token = parsed_token.copy()
+                parsed_token.pop("num_from", None)
+                parsed_token.pop("num_to", None)
 
             num_from = parsed_token.get("num_from")
             num_to = parsed_token.get("num_to")
