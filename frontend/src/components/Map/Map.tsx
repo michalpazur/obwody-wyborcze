@@ -258,9 +258,9 @@ const Map = () => {
     <MapComponent
       ref={mapRef}
       initialViewState={{
-        latitude: 52.2319581,
-        longitude: 21.0067249,
-        zoom: 14,
+        latitude: 52.1911,
+        longitude: 19.3554,
+        zoom: 6,
       }}
       onMouseEnter={onMouseEnter}
       onMouseMove={onMouseMove}
