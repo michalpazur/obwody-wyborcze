@@ -230,16 +230,19 @@ def process_powiat(
           # TODO: Attempt geocoding address using API
           pass
         if (district_addresses is not None):
-          special_addresses.count(district.f_address)
           district_addresses["district"] = district_id
           addresses_out = concat(addresses_out, district_addresses)
         processed_rows += 1
         continue
       
       borders = district.borders
-      borders = re.sub(r"(nr\.?|numer(u|y|ów)?)\s+(posesji\s+)?", "", borders, flags=re.IGNORECASE)
+      borders = re.sub(dash_regex, "-", borders)
+      borders = re.sub(r"((^|\s+)o\s+)?(nr\.?|n-?ry|numer(u|y|ów)?):?\s+(posesji|blok(u|ów)\s+)?", " ", borders, flags=re.IGNORECASE)
       borders = re.sub(r"[()]", "", borders)
-      borders = re.sub(r"(,\s*|\s+)(bez|oprócz|z wyłączeniem)(\s+(numer|nr\.?)(u|ów))?(\s+(blok|bl\.?)(u|ów))?", ", bez", borders, flags=re.IGNORECASE)
+      borders = re.sub(r"(,\s*|\s+)(bez|oprócz|z wyłączeniem|za? wyjątkiem)(\s+(numer|nr\.?)(u|ów))?(\s+(blok|bl\.?)(u|ów))?(\s+ulicy?)?", ", bez", borders, flags=re.IGNORECASE)
+      borders = re.sub(r"część\s+(gminy|sołectwa|miasta)\s+(\w+|w skład której wchodzą miejscowości|obejmując[ae])", "", borders, flags=re.IGNORECASE)
+      borders = re.sub(r"sołectwo\s+((\S+)(\s+\S+){0,2})\s+((obejmujące\s+(wieś|przysiółek|miejscowość|miejscowości):?)|z (wsią|miejscowością|miejscowościami):?)\s+\1", r"\1", borders, flags=re.IGNORECASE)
+      borders = re.sub(r"\s+", " ", borders)
       split_borders: List[str] = re.split(r",\s*", borders.replace(";", ","))
 
       parsed_tokens: List[ParsedToken] = []
@@ -267,10 +270,18 @@ def process_powiat(
           token = token_replacement
 
         token = re.sub(r"(\s*-\s*|\s+)oficyn[ay]", "", token, flags=re.IGNORECASE)
-        token = re.sub(r"(\s*-\s*|\s+)bloki?", "", token, flags=re.IGNORECASE)
+        token = re.sub(r"(\s*-\s*|\s+)(bloki?|budynki|budynek|dom[uy]?|posesji)\s+", " ", token, flags=re.IGNORECASE)
+        token = re.sub(r"(gmina|sołectwo|miasto)\s+(\S+(\s+\S+){0,3})\s*-część", "", token, flags=re.IGNORECASE)
+        token = re.sub(r"\s*-\s*((nie)?parz[yv]ste)", r" \1", token, flags=re.IGNORECASE)
+        token = re.sub("obie strony", "wszystkie", token, flags=re.IGNORECASE)
+        token = re.sub("do końca numeracji", "do końca", token, flags=re.IGNORECASE)
+        token = re.sub("-do końca", " do końca", token, flags=re.IGNORECASE)
         token = re.sub(r"\s*/\.?$", "", token) # See: Olsztyn
         token = re.sub(r"\s*:", "", token)
         token = re.sub(r"\.$", "", token)
+
+        if (token == ""):
+          continue
 
         partial_tokens_to_skip = district_tokens_to_skip[(district_tokens_to_skip["entire_token"].isna()) | (district_tokens_to_skip["entire_token"] == False)]
         tokens_to_skip = partial_tokens_to_skip["token"].tolist()
