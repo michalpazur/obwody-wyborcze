@@ -6,14 +6,23 @@ teryt;token;replacement
 226201;Osada Rybacka;ul. Osada Rybacka
 226201;Osada Kolejowa od 2 do 10 parzyste i od 1 do 13 nieparzyste;ul. Osada Kolejowa od 2 do 10 parzyste i od 1 do 13 nieparzyste
 226201;Osada Kolejowa od 12 do końca parzyste i od 15 do końca nieparzyste;ul. Osada Kolejowa od 12 do końca parzyste i od 15 do końca nieparzyste
+226201;Warszawska 1 - 3;Warszawska 1 i 3
+226201;Eugeniusza Kwiatkowskiego;Kwiatkowskiego od 92
+226201;Abrahama od 48 do 60 parzyste;Antoniego Abrahama od 48 do 60 parzyste
+226201;Antoniego Abrahama od 36 do 46 i od 62 do końca parzyste i od 45 do końca nieparzyste;Antoniego Abrahama od 36 do 46 parzyste i od 62 parzyste i od 45 nieparzyste
 046401;Osada Rybnica;ul. Osada Rybnica
+046401;Kruszyńska od 2 do 24 - strona parzysta;Kruszyńska do 24 parzyste
 306101;Gen. Stefana Roweckiego „GROTA”;Gen. Stefana Roweckiego "Grota"
+306201;Stanisława Ignacego Witkiewicza /Witkacego/;Witkacego
 146201;nieparzyste od 65 do 69;65 i 69
 146201;bez 67/1 oraz nieparzyste od 71 do 103;nieparzyste od 71 do 103
 146301;Sycyńska od 1 do 29A;Sycyńska od 1 do 29A nieparzyste
-146301;nieparzysta i od 2 do końca parzysta;od 2 parzyste
-146301;Czarna od 21 i od 59 nieparzysta;Czarna od 21 do 59 nieparzyste
-146301;Kielecka od 44 do 82 parzysta i od 37 do 81A i 81K nieparzysta;Kielecka od 44 do 82 parzyste i od 37 do 81A nieparzyste i 81K
+146301;strona nieparzysta i od 2 do końca strona parzysta;od 2 parzyste
+146301;Czarna od 21 i od 59 strona nieparzysta;Czarna od 21 do 59 nieparzyste
+146301;Kielecka od 44 do 82 strona parzysta i od 37 do 81A i 81K strona nieparzysta;Kielecka od 44 do 82 parzyste i od 37 do 81A nieparzyste i 81K
+146505;ul. Augustówka cała nieparzyste;Augustówka nieparzyste
+146513;ul. Chłapowskiego: cała;Dezyderego Chłapowskiego
+146513;ul. św. M. Kolbego: cała;Św. Maksymiliana Kolbego
 026201;Batalionu"Parasol";Batalionu "Parasol"
 026501;place: Magistracki;plac Magistracki
 246201;Orląt Lwowskich od 1 od 10;Orląt Lwowskich od 1 do 10
@@ -36,3 +45,515 @@ teryt;token;replacement
 247901;Osiedle Pawlikowskiego bloki od 1 do 11L oraz blok od 21A do 22D i 42;Osiedle Pawlikowskiego bloki od 1 do 11L oraz od 21 do 22D i 42
 247901;Pszczyńska;bez 54
 186101;Kazmierza Pużaka;Pużaka
+140201;Osada Fabryczna;ul. Osada Fabryczna
+140305;Sołectwo: Górzno Kolonia Górzno ulice: Al. Kasztanowa;Górzno Aleja Kasztanowa
+140504;Piaskowa;Piaskowa do 17
+140504;Planty Książnickie;Planty Książenickie
+140505;Stare Budy od 1 do 99A oraz ulice: Agrestowa;Stare Budy ul. Stare Budy od 1 do 99A i Agrestowa
+140505;Stare Budy od 134 do 195;Stare Budy ul. Stare Budy od 134 do 195
+140601;Sadków Kolonia;Sadków-Kolonia
+140605;Częstoniew Kolonia;Częstoniew-Kolonia
+140701;ppłk. Wł. Molendy "Graba";Graba
+141101;od 49;od 48
+141104;sołectwa: Krasnosielc Krasnosielc;Krasnosielc
+141205;od 22 do końca;od 22 do końca wszystkie
+141206;Sołectwa Dobre I i Dobre III Dobre ulice: Armii Krajowej;Dobre Armii Krajowej
+141206;Sołectwa Dobre II i Dobre III Dobre ulice: Kopernika;Dobre Kopernika
+141211;sołectwo Kolonia Karolina Karolina ulice: Brzozowa;Karolina Brzozowa
+141211;sołectwo Cielechowizna Cielechowizna;Cielechowizna
+141213;Sołectwa Siennica I i Siennica II Siennica ulice: Agawy;Siennica Agawy
+141213;Siennica III (Siennica ulice: Czarnockiego;Siennica Czarnockiego
+141305;część miejscowości Aleksandrowo;Aleksandrowo K. Pokrytek
+141406;BWTZ Byłych Więźniów Twierdzy Zakroczym cała;BWTZ (Byłych Więźniów Twierdzy Zakroczym)
+141508;Myszyniec – Koryta;Myszyniec-Koryta
+141508;sołectwa: Wolkowe I;Wolkowe
+141605;część sołectwa Małkinia Górna I ulice: Brokowska;Małkinia Górna Brokowska
+141605;część sołectwa Małkinia Górna II ulice: Biegańskiego;Małkinia Górna Biegańskiego
+141605;część sołectwa Małkinia Górna III ulice: Cicha;Małkinia Górna Cicha
+141605;część sołectwa Małkinia Górna III i sołectwo Małkinia Górna IV: ulica Leśna;Małkinia Górna Leśna
+141605;część sołectwa Małkinia Górna V ulice: Chopina;Małkinia Górna Chopina
+141601;25- 63;od 25 do 63
+141601;26- 46 Parzyste;od 26 do 46 parzyste
+141604;sołectwo Brzostowa: Akacjowa;Brok Akacjowa
+141604;sołectwo Czuraj: ulica Czuraj;Czuraj
+141604;sołectwo Stare Miasto ulice: Małkińska;Małkińska
+141702;Danuty;Otwock Danuty
+141802;Konstancin-Jeziorna ulice: Bielawska parzyste 2 do 56;Konstancin-Jeziorna Bielawska parzyste do 56
+141802;Parcela-Obory;Parcela
+141907;Warszawska parzyste od 4 do 16 oraz od 18 do końca;Warszawska parzyste od 4 do 16 i od 18 wszystkie
+142001;Warszawska-strona nieparzysta 25 - 61;Warszawska nieparzyste od 25 do 61
+142105;Złotego Runa Stara Wieś ulice: Aleja Katowicka;Złotego Runa i Aleja Katowicka
+142105;Żwirowa Rusiec ulice: Aleja Katowicka od 123 do 211 nieparzyste;Żwirowa i Aleja Katowicka od 123 do 211 nieparzyste
+142106;Sołectwa: Jaworowa I;Jaworowa
+142106;Sołectwo Rybie I ulice: Bratkowa;Rybie Bratkowa
+142106;Sołectwo Rybie II ulice: Akacjowa;Rybie Akacjowa
+142106;Sołectwo Rybie III ulice: Aksamitna;Rybie Aksamitna
+142302;Sołtysy;Sołtysy i Gościniec
+142302;Sołectwa: Rozwady;Rozwady i Bochenka i Bród i Góźdź
+142302;Wywóz;Wywóz i Wywóz (kolonia)
+142503;Sołectwa: Krzyżanowice wraz z Domem Pomocy Społecznej;Krzyżanowice
+142503;Wójtowski Młyn ulice: Armii Krajowej;Wójtowski Młyn i Armii Krajowej
+142503;8 i 11 ulice: Bodzentyńska od 59 do 117;8 i 11 i Bodzentyńska od 59 do 117
+142613;Sołectwa: Zbuczyn Południowy;Zbuczyn
+143205;ulice we wsi Łomianki Dolne: Fabryczna;Łomianki Dolne Fabryczna
+143401;Obwód głosowania obejmuje rejon Sosnówki i stronę parzystą ulicy Nadarzyńskiej oraz fragment ulicy Gen. Franciszka Żymirskiego: Ceglana;Ceglana
+143401;nieparzyste od 2 do 88;parzyste do 88
+143409;Zbigniewa Cybulskiego;Cybulskiego i Łąki
+143411;Kury;Kury i Ołdaki i Balcery i Zapole
+143411;Pólko;Pólko i Wilczeniec
+143411;Sołectwo: Postoliska;Postoliska i Fiukały
+143412;Batalionu Zośka;Batalionu "Zośka"
+143412;Batalionu Parasol;Batalionu "Parasol"
+143501;sołectwa: Białebłoto – Kobyla;Białebłoto-Kobyla
+143504;Huta Podgórna miejscowości: Huta Podgórna;Huta Podgórna
+143603;Grabów nad Wisłą;Grabów Nad Wisłą
+143605;Wojska Polskiego-od 57 do 180;Wojska Polskiego od 57 do 180
+143605;Sycyna – Kolonia;Sycyna-Kolonia
+200204;Waliły-Stacja-ulice: Białostocka;Waliły-Stacja Białostocka
+200509;Sołectwa: Siemianówka;Siemianówka Siemieniakowszczyzna Babia Góra
+200509;Lewkowo Stare;Lewkowo Stare Nowiny i Łozowe
+200509;Michnówka;Michnówka Cieremki i Dąbrowa
+200509;Olchówka;Olchówka i Zabrody
+200509;Guszczewina;Guszczewina i Gruszki
+200509;Nowa Łuka;Nowa Łuka i Słobódka
+200509;Podlewkowie;Podlewkowie i Suszczy Borek
+200509;Eliaszuki;Eliaszuki i Porosłe
+200509;Zabłotczyzna;Zabłotczyzna i Minkówka
+200601;Ks. J. L. Grajewskiego;L Grajewskiego
+200602;ul. Wincentego Witosa;im. Witosa
+200602;ul. Tadeusza Kościuszki;im. Kościuszki
+200706;Wilamowo I;Wilamowo
+201401;ulice: Białostocka-budynki o numerach parzystych od 2 do 58;Białostocka parzyste od 2 do 58
+201401;33 i 39;33 i 39 i od 7 do 67 nieparzyste bez od 19 do 25
+280106;ulice: Długa;Sępopol ulica Długa
+280502;Sołectwo Nowa Wieś Ełcka Lipinka;Lipinka
+280504;Osiedle Leśne Prostki;Prostki Osiedle Leśne
+281002;Sołectwa: Kolonia Mikołajki Kolonia Mikołajki;Kolonia Mikołajki
+281004;Piecki Czaszkowo;Czaszkowo
+281103;Sołectwo: Kozłowo Kozłówko;Kozłówko
+281303;Kowale Oleckie Kowale Oleckie;Kowale Oleckie
+281404;Kieźliny 4;Kieźliny Kieźliny 4
+281409;37 i 39;35a i 37 i 39
+281411;Olsztyńska nieparzyste od 17 do 200;Olsztyńska nieparzyste od 17 do 201
+281411;Stawiguda 1;Stawiguda Stawiguda 1
+281411;Stawiguda 161;Stawiguda Stawiguda 161
+281411;Jaroty Jaroty ulica Bartąska;Jaroty Bartąska
+281411;Stawiguda 185 i 187;Stawiguda Stawiguda 185 i 187
+281902;Kolonia Pozezdrze Kolonia Pozezdrze;Kolonia Pozezdrze
+040102;B. M. Raczyńskich;D.M. Raczyńskich
+040104;kolonia Poczałkowo;Poczałkowo-Kolonia
+040104;Przybranowo;Przybranowo i Kolonia Przybranowska
+040201;K. Szymanowskiego;K.Szymanowskiego
+040201;mjr H. Sucharskiego;H.Sucharskiego
+040302;sołectwa: Otowice i Dąbrowa Chełmińska-część;Otowice
+040302;Czarże-część: miejscowość Czarże;Czarże
+040302;sołectwa: Czarże-część: miejscowości Czarże;Czarże
+040304;bez przy ul. Pomianowskiego nr: 2;bez Pomianowskiego 2
+040305;Bydgoska- nieparzyste od 1 do końca i parzyste od 2 do 54 tj. od ul. Komunalnej do przejazdu kolejowego;Bydgoska nieparzyste od 1 i parzyste od 2 do 54
+040305;Bydgoska- parzyste od 56 do końca tj. od przejazdu kolejowego do Januszkowa;Bydgoska parzyste od 56
+040308;Sołectwo Kujawska - ulice: Armii Krajowej;Armii Krajowej
+040801;os. Osiedle Generała Władysł. Sikorskiego;Osiedle Generała Władysł.Sikorskiego
+040903;Powstańców Wlkp.;Powstańców Wielkopolskich
+041302;sołectwa: Iłowo;Iłowo i Diabli Kąt
+041302;Radońsk;Radońsk i Kacze Doły
+041401;dr. Fl. Ceynowy;Doktora Ceynowy
+041402;sołectwa: Górna Grupa miejscowości: Górna Grupa;Górna Grupa
+041407;przysiółek Starnie;Osie-Starnie
+041507;Łążyn II;Łążyn
+041603;Kęsowo-część: miejscowość Sicinki;Sicinki
+041604;sołectwo Bysław-część: miejscowość Bysław od 26 do 81 oraz ulice: Krótka;Krótka i Bysław od 26 do 81
+041604;miejscowość Bysław od 1 do 25 oraz od 82 do końca oraz ulice: Brzozowa;Brzozowa i Bysław od 1 do 25 i od 82
+041604;sołectwo Lubiewo-część: miejscowość Lubiewo od 18 do 62 oraz ulice: ks. Czarnowskiego;Czarnowskiego i Lubiewo od 18 do 62
+041801;bł. Dominika Jędrzejowskiego;Dominika Jędrzejowskiego
+041806;Kubłowo;Kubłowo i Kretki
+041806;Zbijewo;Zbijewo Zbijewskie Parcele i Zbijewo-Parcele
+041901;sołectwo Barcin-Wieś wsie: Barcin-Wieś i Julianowo;Barcin-Wieś i Julianowo
+041904;Nowe Dąbie-część: miejscowość Obórznia;Obórznia
+041906;Sulinowo Bekanówka miejscowość Sulinowo od 1 do 9A;Sulinowo od 1 do 9A
+100101;osiedle Okrzei: 1;osiedle Okrzei od 1 do 4e
+100107;ul. M. Konopnickiej;M.Konopnickiej
+100201;ks. A. Kordeckiego;Ks.A. Kordeckiego
+100302;Warszawska od 18 do końca i od 53 do końca;Warszawska od 18 parzyste i od 53
+100507;Zielkowice;Zielkowice Stara Wieś Zielkowice Drugie Zielkowice-Góry Kępy Czajki i Za Rzeką
+100607;Koluszki ul.: Aleja ZHP;Aleje ZHP
+100704;ul. św. Maksymiliana Marii Kolbe;św. Maksymiliana Marii Kolbego
+100802;Warszawska od 1 do 69A i od 103 do końca - nieparzyste oraz od 50 do końca - parzyste;Warszawska do 69A nieparzyste i od 103 nieparzyste i od 50 parzyste
+100802;Myśliwska od 2 do 14 i od 56 do końca - parzyste oraz od 1 do 3D i od 37 do końca - nieparzyste;Myśliwska od 2 do 14 parzyste i od 56 parzyste i do 3d nieparzyste i od 37 nieparzyste
+100802;Bugaj od 77 do 107 - nieparzyste oraz od 78 do 88A i od 96B do 108 - parzyste;Bugaj od 77 do 107 nieparzyste i od 78 do 88a parzyste i od 96b do 108 parzyste
+100802;Bugaj od 56 do 76 i od 90 do 96A - parzyste oraz od 69 do 75A - nieparzyste;Bugaj od 56 do 76 parzyste i od 90 do 96a parzyste i od 69 do 75a nieparzyste
+100901;Sadowiec-Wieś;Sadowiec
+100901;Kiedosy;Kiedosy i Bugaj
+101301;ul. Solidarności od 1 do 6;Solidarności od 1 do 3 i od 4 do 6
+101403;Czartoryja;Czartoria
+101409;kolonia Zaspy;Zaspy Kolonia
+101409;Rynek im. Wł. St. Reymonta;Im.Wł.St.Reymonta
+101601;ul. P. O. W.;Polskiej Organizacji Wojskowej
+101601;ul. P. C. K.;Polskiego Czerwonego Krzyża
+101610;Niewiadów-Kolonia;Niewiadów-Kolonia i Niewiadów
+101704;Mokrsko;Mokrsko i Mokrsko Rządowe
+101704;Ożarów;Ożarów Kocilew Sikornik Dobijacz Słoniny Banasie-Słoniny Lasek i Ożarów Towarzystwo
+101901;al. Tadeusza Kościuszki;Aleje Kościuszki
+102003;Andrzeja Frycza-Modrzewskiego;Modrzewskiego
+102003;Henryka Dąbrowskiego od 1 do 13 nieparzyste;Generała Henryka Dąbrowskiego od 1 do 13 nieparzyste
+102003;Henryka Dąbrowskiego od 23 do 39 nieparzyste;Generała Henryka Dąbrowskiego od 23 do 39 nieparzyste
+102003;Henryka Dąbrowskiego od 2 do 22 parzyste i od 15 do 21 nieparzyste;Generała Henryka Dąbrowskiego od 2 do 22 parzyste i od 15 do 21 nieparzyste
+260303;Stolarska;Stolarska i Stolarska A i Stolarska B i Stolarska C
+260401;Sołectwa: Górki Napękowskie oraz Bieliny Kapitulne w tym miejscowość Bieliny;Górki Napękowskie
+260401;ulice: Działkowa;Bieliny Działkowa
+260401;Sołectwa: Czaplów-Zofiówka w tym miejscowości: Czaplów i Zofiówka oraz Bieliny Poduchowne w tym miejscowość Bieliny;Czaplów i Zofiówka
+260401;ulice: Cicha;Bieliny Cicha
+260405;Sołectwo Słopiec;Słopiec Rządowy i Słopiec Szlachecki i Słopiec
+260405;Sołectwo Niwy;Niwy i Niwki Daleszyckie
+260405;Sołectwo Szczecno;Szczecno i Murawin
+260410;Góra ulice: Bugajska;Miedziana Góra Bugajska
+260416;ulice: Górki 1 - 6;Raków Górki od 1 do 6
+260417;części miejscowości Trzcianki i osada Trzcianki;Trzcianki (cz. Sitkówka) i Trzcianki (cz. Wola Murowana)
+260503;: ulice: Akacjowa nieparzyste od 53 do końca i parzyste od 96 do końca;Końskie Akacjowa nieparzyste od 53 i parzyste od 96
+260701;Bugaja Leszka;Leszka Bugaja
+260701;od 48 do 72 i od 74 do 90- parzyste;od 48 do 72 wszystkie i od 74 do 90 parzyste
+260702;Okół II;Okół
+260704;od 128 do końca;od 128 wszystkie
+260804;Marszałka J. Piłsudskiego;Marszałka J Piłsudskiego
+260901;Igancego Maciejowskiego;Maciejowskiego
+261201;Moszyny;Moszyny Góry Moszyńskie Barabaszówka i Rogoźno
+261201;Sołectwa: Kiełczyna;Kolonia Kiełczyna Kiełczyna i Gościniec
+261201;Miłoszowice;Miłoszowice Brzeziny i Kolonia Miłoszowice
+261201;Przyborowice;Przyborowice i Brzegi
+261201;Grzybów;Grzybów Kolonia Grzybów i Brzezionki
+261201;Sołectwa: Domardzice;Kolonia Domardzice i Domardzice
+261201;Szczeglice;Kolonia Szczeglice i Szczeglice
+261201;Sołectwa: Jurkowice;Jurkowice i Samotnia
+261206;Tuklęcz;Tuklęcz i Gaj Święcicki
+060105;Adama Naruszewicza;Janów Podlaski Mickiewicza i Naruszewicza
+060106;osada Kostomłoty;Kostomłoty (osada)
+060202;Aleksandrów: ul. Cicha;Cicha
+060202;Aleksandrów: ul. Wesoła;Wesoła
+060203;Dąbrowica;Dąbrowica i Zagrody Dąbrowickie i Zagumnie
+060203;Dyle;Dyle i Cyncynopol
+060203;Stary Bidaczów;Stary Bidaczów i Jachosze
+060207;Czarny Las;Czarny Las-Kolonia
+060301;Marii Skłodowskiej-Curie;Skłodowskiej- Curie
+060506;ul. 11-Listopada;11 Listopada
+060605;Białka;Białka i Białka POHZ i Białka PSO
+060705;Wyżnica-Kolonia;Wyżnica-Kolonia i Ośrodek-Wyżnica
+060801;ul. Słowackiego 1 - 18 parzyste;Słowackiego od 1 do 3 i od 4 do 18 parzyste
+060804;Przytoczno;Przytoczno I i Przytoczno
+060805;Samoklęski;Samoklęski i Samoklęski-Kolonia Pierwsza
+060805;ul. Litewska;Kamionka Litewska
+060805;kolonia Kokosz;Kokosz
+060805;ul. Cicha;Kamionka Cicha
+060903;wieś Marysin;Marysin
+060911;Jakubowice Konińskie - Kolonia;Jakubowice Konińskie-Kolonia
+061107;wieś Sarnów;Sarnów i Sarnów Osiedle
+061107;Jedlanka;Jedlanka i Jedlanka Osada
+061206;wieś Poniatowa .;Poniatowa-Wieś
+061404;Kazimierz Dolny: inne Wylągi;Wylągi i Góry
+061602;Wola Zadybska - Kolonia;Wola Zadybska-Kolonia
+061804;wieś Podhajce i Łaszczów ulice: Aleksandra Łaszcza od 1 do 16;Podhajce
+061805;Siedliska;Siedliska i Jelinka
+061805;Hrebenne;Hrebenne i Bukowinka
+061805;Huta Lubycka;Huta Lubycka i Pawliszcze i Rudki
+061806;Boczna;Łaszczów Łaszcza od 1 do 16 i Boczna
+061806;Kościuszki parzyste od 74 do 78 i od 80;Kościuszki parzyste od 74 do 78 i od 80 wszystkie
+062004;Majdan Wielki;Majdan Wielki bez Borki i Tomaszowska
+220102;1 - Go Maja;1 Maja
+220106;Wiązowa;Wiązowa i Pasieka
+220201;ks. Antoniego Wolszlegera;Ks.Wolszlegera
+220606;Ks. Z. J. Trzebiatowskiego;Ks.Z.J. Trzebiatowskiego
+220606;Ks. P. Dunajskiego;Ks.P.Dunajskiego
+220705;Jarzębina w skład sołectwa Jarzębina wchodzą miejscowości: Jarzębina;Jarzębina
+220705;Sołectwo Benowo w skład sołectwa Benowo wchodzą miejscowości: Benowo;Benowo
+220705;Mątowskie Pastwiska w skład sołectwa Mątowskie Pastwiska wchodzą miejscowości: Mątowskie Pastwiska;Mątowskie Pastwiska
+220705;Watkowice w skład sołectwa Watkowice wchodzą miejscowości: Watkowice;Watkowice
+220802;Tadeusza Kościuszki od 1 do 10;Kościuszki od 1 do 10e
+220901;K. C. Norwida;K.C. Norwida
+221002;19- 54;od 19 do 54 wszystkie
+221105;I. K. Chodkiewicza;I.K. Chodkiewicza
+221204;14 - 17A;Klęcinko 14 - 17a
+221204;6A - 13B;Klęcinko 6a - 13b
+221207;Potęgowo ulice: 9 Maja;9-Maja
+221308;ulice: Wyzwolenia;Osiek Wyzwolenia
+221312;Kwitnącej Wiśni;Kwitnącej Wiśni i Jana Pawła II
+221401;Gen. Bema;Gen.Bema
+221401;Ks. Ściegiennego;Ks.Ściegiennego
+221401;Ks. J. St. Pasierba;Ks.J.St. Pasierba
+221509;Bojano ulice: A. Abrahama;Bojano Abrahama
+221510;Piaskowa;Bolszewo Piaskowa
+221601;osada Jasna;Jasna (Osada)
+221601;osada Żuławka Sztumska;Żuławka Sztumska (Osada)
+221605;wieś Sztumska Wieś od 16 do końca i ul. Kwidzyńska;Sztumska Wieś Kwidzyńska i Sztumska Wieś od 16
+300208;Mjr. Hubala;Mjr.Hubala
+300504;osada leśna Rakoniewice;Rakoniewice - osada leśna
+300504;wieś Rakoniewice ulice: Akacjowa;Rakoniewice-Wieś Akacjowa
+300504;wieś Rakoniewice: os. Osiedle Parkowe.;Rakoniewice-Wieś Osiedle Parkowe
+300602;Miasto Jarocin Osiedle 10-Glinki Jarocin ulice: Akacjowa;Akacjowa
+300602;Miasto Jarocin Osiedle 16-Zatorze Jarocin ulice: Jabłoniowa;Jabłoniowa
+300702;sołectwa: Piegonisko-Pustkowie Piegonisko-Kolonia;Piegonisko-Kolonia
+300704;Godziesze Małe II;Godziesze Małe
+300706;Budy Liskowskie II;Budy Liskowskie
+300706;Lisków-Rzgów Lisków ulice: ks. Wacława Blizińskiego 83;Księdza Blizińskiego 83
+300706;Rzgowska;Lisków-Rzgów i Lisków
+300803;sołectwo Krążkowy Mianowice;Mianowice
+300803;Ks. Mariana Magnuszewskiego;Ks.Magnuszewskiego
+300901;32 - 44 oraz 62 - 78;od 32 do 44 wszystkie i od 62 do 78
+300903;Sołectwo Kaleń Mała: osada Dzierzbice;Dzierzbice Osada
+301003;osada Nieświastów;Nieświastów (osada)
+301204;Łąbędzia;Łabędzia
+301701;Płk. Fr. Nullo;Fr.Nullo
+301701;Ks. Mjr Franciszka Dymarskiego;Ks.Majora Dymarskiego
+301701;M. Pawlikowskiej-Jasnorzewskiej;M.Pawlikowskiej-Jasnorzewskiej
+301703;Krotoszyńska 79 - 89 nieparzyste i od 91 do końca;Krotoszyńska od 79 do 89 nieparzyste i od 91 wszystkie
+301801;Sołectwo Salamony II;Salamony
+301804;Kobyla Góra: Onufry;Onufry
+301807;sołectwa: Pustkowie Południe Ostrzeszów-Pustkowie ulice: Brylantowa;Ostrzeszów-Pustkowie Brylantowa
+301807;Pustkowie Północ Ostrzeszów-Pustkowie od 1 do 37 oraz 38;Ostrzeszów-Pustkowie od 1 do końca
+301901;Żeromskiego nieparzyste od 1A do 85 parzyste od 2 do 70.;Żeromskiego od 1A do 85 nieparzyste i od 2 do 70 parzyste
+302005;Kościelna Wieś I;Kościelna Wieś
+302005;sołectwo Gołuchów /Gołuchów;Gołuchów
+302006;Miasto Pleszew Pleszew ulica Mieszka I od 1 do 15;Mieszka I od 1 do 15d
+302006;sołectwo Nowa Wieś Nowa Wieś;Nowa Wieś
+302006;Plac Wolności im. Jana Pawła II;Plac Wolności
+302103;Dakowy Suche;Dobra i Dakowy Suche
+302109;Osiedle Piaskowe;Piaskowe
+302109;Osiedle Zielona Polana;Zielona Polana
+302109;Osiedle Azaliowe;Azaliowe
+302109;Osiedle Kresowe;Kresowe
+302109;Osiedle Stefana Białoboka;Białoboka
+302115;od 19 do końca;od 19 do końca wszystkie
+302115;od 45 do końca;od 45 do końca wszystkie
+302205;Ceglana;Rawicz Ceglana
+302301;Miasto Słupca-ulice: Jana Kilińskiego 1;Słupca Kilińskiego od 1 do 3b
+302306;sołectwo Kąty: część miejscowości Kąty-nr: od 26 do 56;Kąty od 26 do 56
+302307;Sołectwo Strzałkowo: Bielawy;Bielawy
+302307;Sołectwo Strzałkowo: Pospólno;Pospólno
+302307;Staw;Staw Pierwszy i Staw Drugi
+302702;Sołectwo Brudzew: miejscowość Brudzew ul. Piaski;Brudzew Piaski
+302707;pl. Powstańców Styczniowych 1863r.;Plac Powstańców Styczniowych 1863
+303005;Sołectwo Bierzglinek: osada leśna Dębina;Dębina
+303106;Tarnówka.;Tarnówka Wybudowanie i Tarnówka
+180305;Sołectwo Jodłowa Dolna: Jodłowa od 6 do 142;Jodłowa od 6 do 142
+180305;Sołectwo Jodłowa Dolna: Jodłowa od 143 do 239;Jodłowa od 143 do 239
+180305;Sołectwo Jodłowa Górna: Jodłowa od 328 do 440;Jodłowa od 328 do 440
+180305;Sołectwo Jodłowa Wisowa: Jodłowa od 753 do 849;Jodłowa od 753 do 849
+180805;Judaszówka Jelna od 310 do 340- parzyste;Jelna od 310 do 340 parzyste
+180805;Majdan Łętownia od 1 do 75 - nieparzyste;Łętownia od 1 do 75 nieparzyste
+180805;Gościniec Łętownia od 458 do 562 - parzyste;Łętownia od 458 do 562 parzyste
+181108;ks. Jana Curyłły;Księdza Curyły
+181109;Grochowe II;Grochowe
+181203;od 560B do 661A;Jeżowe od 560b do 661a
+181203;Sołectwo Jeżowe Kameralne: Jeżowe od 783 do końca;Jeżowe od 783
+181203;Sołectwo Jeżowe Zaborczyny: Jeżowe od 474 do 496;Jeżowe od 474 do 496
+181204;Koziarnia II;Koziarnia
+181204;od 11A do 13;Kamionka-Kolonia od 11a do 13
+181204;14A oraz od 17 do końca;Kamionka-Kolonia od 14 do 14a i od 17
+181206;ulice: Jana Kilińskiego;Kilinskiego
+181206;Powstańców Styczniowych;Powstanców Styczniowych
+181206;Sołectwo Chałupki;Kopki Wiśniowa i Kościelna i Mickiewicza i Ogrodowa i Wiklinowa i Świerkowa i Polna i Chałupki
+181206;Sołectwo Kopki;Kopki bez Wiśniowa i Kościelna i Mickiewicza i Ogrodowa i Wiklinowa i Świerkowa i Polna
+181302;Sielnica;Sielnia i Łączki
+181503;Króla Kazimierza Wielkiego-za wyjątkiem 2/4;Kazimierza Wielkiego bez 2
+181503;Leopolda Lisa-Kuli;Lisa Kuli
+181601;Ks. Józefa Ożoga od mostu do końca: domów 19;Ks. Ożoga 19
+181606;J. H. Dąbrowskiego;J.H.Dąbrowskiego
+181608;Nowy Kamień-wszystkie i wszystkie ulice;Nowy Kamień
+181608;Kamień: nieparzyste od 1 do 291 parzyste od 2 do 368 ul. Akacjowa;Kamień Akacjowa i Kamień od 1 do 291 nieparzyste i od 2 do 368 parzyste
+181608;Kamień: nieparzyste od 317 do 609 parzyste od 372 do 694;Kamień nieparzyste od 317 do 609 i parzyste od 372 do 694
+181701;Reymonta S.;Reymonta S...
+181801;M. Dąbrowskiej;M.Dąbrowskiej
+181801;Ppor. Tadeusza Sochy;Ppor.Sochy
+181801;Por. Józefa Sarny;Por.Sarny
+181801;St. Bełżyńskiego;St.Bełżyńskiego
+181802;Sołectwo Bojanów za Rzeką: Bojanów ul: Kolbuszowska i Rzeszowska;Bojanów Kolbuszowska i Rzeszowska
+181803;Sołectwo Olszowiec obejmujące część miejscowości Pysznica ulice: Jesionowa;Jesionowa
+181803;Sołectwo Sudoły obejmujące część miejscowości Pysznica ulice: Błonie;Pysznica Błonie
+181901;Sołectwo Pstrągowa Wola Pstrągowa od 519 do 652B;Pstrągowa od 519 do 652b
+182001;Osiedle Skopanie ulice: Al. Gen. Sikorskiego;Sikorskiego
+120202;Brzesko: Ogrodowa nieparzyste od 1 do 11 i parzyste od 2 do 12;Osiedle Ogrodowa do 12 i Ogrodowa do 12
+120202;Ogrodowa nieparzyste od 13 do końca i parzyste od 14 do końca;Osiedle Ogrodowa od 13 i Ogrodowa od 13
+120303;28K i od 30 do 122 oraz nieparzyste od 51 do 151;28k i od 30 do 122 parzyste i nieparzyste od 51 do 151
+120303;Sołectwo Okradziejówka: Ciężkowicka;Balin Ciężkowicka
+120501;Parkowa-od 1 do 2;Parkowa od 1 do 2
+120606;Osiedle Żbik ulice: Brzozowa;Brzozowa
+120606;Porąbki;Nowa Góra Porąbki
+120606;Zielona oraz budynków: 43;Nowa Góra Zielona i Nowa Góra 43
+120606;Filipowice 222;Filipowice Filipowice 222
+120606;Tenczynek 374;Tenczynek Tenczynek 222
+120606;Wola Filipowska budynków: 131;Wola Filipowska Wola Filipowska 131
+120611;ks. Jerzego Popiełuszki;ks. Jerzego Popiełuszki od 2 parzyste
+120701;Stanisława Mytki Ilmanowity;Mytki-Ilmanowity
+120711;Słopnice Dolne Królewskie: Słopnice budynków 1 - 12;Słopnice 1 - 12
+120711;Słopnice Mogielica: Słopnice budynków 30;Słopnice 30
+120711;Słopnice Górne: Słopnice budynków 13;Słopnice 13
+120711;Słopnice Granice: Słopnice budynków 421;Słopnice 421
+120711;Słopnice Dolne Szlacheckie: Słopnice budynków 411 - 418;Słopnice 411 - 418
+121001;Osiedle Śródmieście II ul. Czerwona Góra;Czerwona Góra
+121003;Bartkowa-Posadowa;Bartkowa Posadowa
+121003;Roztoka-Brzeziny;Roztoka Brzeziny
+121011;Żegiestów: w tym Łopata Polska;Żegiestów i Łopata Polska
+121012;Nawojowa II: ul. Krynicka;Krynicka
+121304;św. Maksymiliana Marii Kolbe;Św. Maksymilinana Marii Kolbe
+121304;św. Maksymiliana Kolbe;Św. Maksymilana Kolbe
+121507;Stryszawa Dolna: budynków od 1 do 312E;Stryszawa do 312e
+121507;Stryszawa Górna: budynków od 313 do 787A;Stryszawa od 313 do 787a
+121609;Wola Rzędzińska: od 1 do 199E oraz bloki: TZCB-I;Wola Rzędzińska do 199e
+121609;Wola Rzędzińska: od 405A do 612B oraz blok PKP-I;Wola Rzędzińska od 405a do 612b
+121610;Kozłówek: adresy Siedliska 1B;Siedliska 1b
+121611;695 - 700 nieparzyste;od 695 do 699 nieparzyste
+121702;Biały Dunajec przysiółek Leszczyny;Leszczyny
+121803;Kalwaria Zebrzydowska /II/: ul. Dworcowa;Dworcowa
+121803;Kalwaria Zebrzydowska /IV/: ul. Ogrodowa;Ogrodowa
+121806;Spytkowice ulice: Brzestowa;Lipowa
+121806;Gwarna;Spytkowice Brzestowa i Gwarna
+121809;ul. Marcina Wadowity;Osiedle Wadowity i Wadowity
+240101;Mariana Kantora Mirskiego;Kantora-Mirskiego
+240102;od 7 30;od 7 do 30
+240105;Targoszyce: ul.: Kościelna.;Kościelna
+240106;Dąbie Górne;Dąbie od 1 do 30 
+240106;Brzękowice Górne;Brzękowice Górne i Dąbie Górne
+240203;Sołectwo Kalna Kalna - cała miejscowość;Kalna
+240204;ul. Kazimierza Tetmajera-Przerwy;Przerwy-Tetmajera
+240204;: ul. Bory;Ligota Bory
+240206;Pelchrim;Pelchr
+240210;Maków;Wilkowice Maków
+240210;116 - 200;od 116 do 200 parzyste
+240301;rynek Górny Rynek;Górny Rynek
+240301;dr. Jana Michejdy;Dra Michejdy
+240302;Cieszyńska;Cieszyńska nieparzyste
+240304;Lachy Dolne;Brenna Lachy Dolne
+240307;Sołectwo Goleszów Dolny: 1 Maja;Goleszów 1 Maja
+240307;Sołectwo Goleszów Górny: Cieszyńska: nieparzyste od 1 do końca;Goleszów Cieszyńska nieparzyste
+240307;Sołectwo Goleszów Równia: Boczna;Goleszów Boczna
+240307;Sołectwo Kozakowice: Biała;Kozakowice Górne Biała i Kozakowice Dolne
+240308;Pogwizdów ulica Akacjowa;Pogwizdów Akacjowa
+240308;Pogwizdów ulica Brzozowa;Pogwizdów Brzozowa
+240310;ul. Zofii Kossak Szatkowskiej;Kossak-Szatkowskiej
+240415;Sołectwo Rędziny-Kolonia: Rędziny ulice: Krzysztofa Kamila Baczyńskiego;Rędziny Baczyńskiego
+240415;Sołectwo Rędziny-Okupniki: Rędziny ulice: Cicha;Rędziny Cicha
+240415;Sołectwo Rędziny-Wyrazów: Rędziny ulice: Mstowska od 2 do 160 parzyste;Rędziny Mstowska do 160 parzyste
+240415;Sołectwo Rędziny-Osiedle: Rędziny ulice: Władysława Broniewskiego 1;Broniewskiego 1
+240503;ul.: Kolonia Beksza;Gierałtowice Kolonia Beksza
+240604;Sołectwo Dębiniec: Miedźno ulice: Dębowa;Miedźno Dębowa
+240802;os. Michalskie Doły;Michalskie Doły
+240805;Rybnicka-wszystkie od 241 do 999;Rybnicka od 241 do 999 wszystkie
+240901;Kościuszki od 18 do 40 parzyste i od 41 do 84 i od 85 do 129 nieparzyste;Kościuszki od 41 do 84 i od 18 do 40 parzyste i od 85 do 129 nieparzyste
+240902;Sołectwa: Stara Huta I;Stara Huta
+241004;ulice: Borki;Warszowice Borki
+241004;Sołectwo Krzyżowice-wszystkie ulice;Krzyżowice
+241004;Sołectwo Pniówek-wszystkie ulice.;Pniówek
+241004;Sołectwo Golasowice-wszystkie ulice.;Golasowice
+241004;Sołectwo Jarząbkowice-wszystkie ulice.;Jarząbkowice
+241005;ulice: Cieszyńska parzyste od 24 do końca i nieparzyste od 27 do końca;Pszczyna Cieszyńska od 24 parzyste i od 27 nieparzyste
+241005;Sznelowiec parzyste od 4 do końca;Łąka Sznelowiec parzyste od 4 do końca
+241005;Zdrojowa parzyste od 2 do końca;Pszczyna Zdrojowa parzyste od 2 do końca
+241005;Sznelowiec;Sznelowiec bez parzyste od 4 do końca
+241302;Metalowa: od 1 do 5/III;Metalowa od 1 do 5 nieparzyste
+241506;Wieś Gorzyce-ulice: Adama Mickiewicza nieparzyste od 1 do 12;Mickiewicza nieparzyste od 1 do 11
+241509;ulice: 1 Maja nieparzyste 1 - 129 i parzyste 2 - 164;Maja 1 nieparzyste do 129 i parzyste do 164
+241509;ulice: 1 Maja- nieparzyste od 129a do końca i parzyste od 164a-do końca;Maja 1 nieparzyste od 129a i parzyste od 164a
+241604;Kroczyce Okupne;Kroczyce
+241701;Browar-Kolonia;Browar Kolonia
+241701;1-Maja;1 Maja
+241704;Przyborów-niezabudowane Przysiółek Bystra ulice: Do Jałowca;Do Jałowca
+241704;od 1 do 121;Jana Kazimierza od 1 do 121 nieparzyste
+241713;Przyłęków wszystkie ulice;Przyłęków
+160105;Sołectwo: Czepielowice z osadami: Stawy;Czepielowice i Stawy
+160105;Roszkowice z przysiółkiem: Kopalina;Roszkowice i Kopalina
+160105;Sołectwo Mąkoszyce z osadą: Borek;Mąkoszyce i Borek
+160105;Rogalice z przysiółkami: Książkowice;Rogalice i Książkowice
+160105;Sołectwa: Borucice z przysiółkiem: Boruta;Borucice i Boruta
+160105;Sołectwo Błota z przysiółkami: Lednica;Błota
+160201;Sołectwo Tłustomosty wraz z przysiółkiem Rogów;Tłustomosty i Rogów
+160402;Ligota Górna i Zamecka;Ligota Górna i Ligota Zamecka
+160502;Osiedle Sady i Osiedle XXX-lecia od 1 do 7;Osiedle Sady i Osiedle XXX lecia od 1 do 7
+160502;Sołectwo Kórnica: z częściami wsi Wygon;Kórnica i Wygon
+160601;Sołectwo Gręboszów wraz z przysiółkami: Stary Gręboszów;Gręboszów i Stary Gręboszów
+160601;Sołectwo Siemysłów wraz z przysiółkami: Wielka Kolonia;Siemysłów i Wielka Kolonia
+160602;Władysława Stanisława Reymonta-numery parzyste: 10A - 10H;Reymonta od 10a do 10h
+160602;część Osiedla V - Osiedla Reymonta obejmująca ulice: Władysława Stanisława Reymonta 1;Reymonta 1
+160602;60 - 66;parzyste od 60 do 66
+160602;część Osiedla II - Osiedla za Widawą obejmująca ulice: Adama Asnyka;Asnyka
+160602;Sołectwo Żaba;Żaba Zielona i Brunatna i Wodna i Szuwarowa
+160605;kolonia Wojciechów;Wojciechów-Kolonia
+160705;Sudecka od 32 do końca;Sudecka parzyste od 32
+160705;Generała Augusta Emila Fieldorfa Pseudonim "Nil";Generała Fieldorfa-Pseudonim "Nil"
+160801;wraz ze wsią Turza i kolonią Dąbrowica;Turza i Dąbrowica
+160802;Osiedle Północ I ulice: Golska;Golska
+160804;Mickiewicza-z wyłączeniem 2;Mickiewicza bez 2
+160804;Listopadowa-z wyłączeniem 15 i 17;Listopadowa bez 15 i 17
+160806;w skład którego wchodzą miejscowości: Cieciułów;Cieciułów
+160807;Sołectwo Radawie;Radawie i Kosice
+160906;wraz z przysiółkiem Morcinek i kolonią Wojszyn;Morcinek i Wojszyn
+160906;Sołectwo Murów-część obejmująca ulice: Lipowa i Myśliwska;Murów Lipowa i Myśliwska
+160908;ulice: Brzeziny;Ozimek Brzeziny
+160910;os. Leśne;Leśne
+161002;Rafała Urbana.;Urbana Rafała
+161002;Kazimierz;Kazimierz i Anachów
+161002;Sołectwo: Zawada wraz z Przysiółkami: But;Zawada i But
+161105;sołectwo miejskie Mokre Łany obejmujące ulice: Brzezińska;Brzezińska
+161105;sołectwo miejskie Nowa Wieś obejmujące ulice: Deszczowa;Deszczowa
+161105;Floriana Dolińska;Floriana i Dolińska
+020101;Majora „Hubala”;Majora Hubala
+020207;Jasna;Niemcza Jasna
+020207;Kolejowa;Niemcza Kolejowa
+020207;Podgórze;Niemcza Podgórze
+020207;Stroma;Niemcza Stroma
+020301;Obrońców Pokoju od 13;Obrońców Pokoju 13
+020301;od 15;15
+020804;miasto Nowa Ruda: Osiedle XXX-lecia;Osiedle XXX Lecia
+020813;wieś Stronie-Wieś;Stronie Śląskie do 59
+021101;Ulice: Artura Grottgera;Lubin Grottgera
+021101;Stary Lubin od 13 do 26;Lubin Stary Lubin od 13 do 26
+021101;Stary Lubin od 1 do 11a;Lubin Stary Lubin od 1 do 11a
+021101;Stary Lubin od 27 do końca;od 27
+021406;Osada Leśna;Osada Osada Leśna
+021408;św. Jadwigi;Jadwigi
+021605;ul. Ceglana;bez Ceglana
+021804;Kopermika;Kopernika
+021901;od 42 do 52 parzyste od 3 do 5 nieparzyste;od 42 do 52 parzyste i od 3 do 5 nieparzyste
+022309;W. Jagiełły;Władysława Jagiełły
+022604;Nowy Kościół;Nowy Kościół i Dynowice
+022604;Sędziszowa;Sędziszowa i Różana
+022604;Lubiechowa;Lubiechowa i Janochów
+022604;Stara Kraśnica;Stara Kraśnica i Jurczyce
+026401;Kontradmirała Stefana Frankowskiego;K Frankowskiego
+026401;122 - 166;od 122 do 166 wszystkie
+026401;130 - 196;od 130 do 196 wszystkie
+080301;Templewo;Templewo i Templewo Pgr
+080301;Bledzew;Bledzew i Elektrownia
+080406;Nowe Miasteczko ulice: 22-lipca;Gołaszyn Poniatowskiego i Nowe Miasteczko 22 Lipca
+080406;Akacjowa;Nowe Miasteczko Akacjowa
+080406;Nowe Miasteczko ulice: 3-maja;3 Maja
+080406;Plac 1-maja;Plac 1 Maja
+080505;ks. Piotra Wawrzyniaka;Ksiedza Wawrzyniaka
+080602;Osiedla Leśnego;Osiedle Leśne
+080604;P. C. K.;Polskiego Czerwonego Krzyża
+080701;Krzeszyce;Krzeszyce i Krzeszyce (Osada)
+080705;Kolonia Drzewce;Drzewce Kolonia
+080802;Troszki gajówka: Zamęt;Troszki i Zamęt
+081007;Podgórna od 11-do 28;Podgórna od 11 do 28
+081007;Wiechlice od 1 do końca i ulice: Akacjowa;Wiechlice Akacjowa i Wiechlice
+081203;Wschowa ulice : Arcybiskupa Stablewskiego;Abiskupa Stablewskiego
+320407;część miejscowości Stepnica obejmująca ulice: Anny Jagiellonki;Stepnica Anny Jagiellonki
+320407;część miejscowości Stepnica obejmująca ulice: Bolesława Krzywoustego od 24 do 75;Stepnica Bolesława Krzywoustego od 24 do 75
+320502;Sołectwo Brodniki obejmujące osadę Brodniki od nr 1 do końca;Brodniki Brodniki od 1
+320502;Zdrojowa oraz Sołectwo Brodniki obejmujące osadę Brodniki ulice: Osada Zdrój;Brodniki ul. Osada Zdrój i Ogrodowa i Gryfice Zdrojowa
+320603;obejmująca ulice: Barnkowo;Chojna Barnkowo
+320604;Sołectwo Pniewo obejmujące miejscowość: Pniewo;Pniewo
+320604;Sołectwo Żórawie obejmujące miejscowości: Szczawno;Szczawno
+320604;Sołectwo Żabnica obejmujące miejscowości: Dębce;Dębce
+320604;Sołectwo Sobiemyśl obejmujące miejscowości: Sobiemyśl;Sobiemyśl
+320604;Sołectwo Krzypnica obejmujące miejscowości: Krzypnica;Krzypnica
+320604;Sołectwo Steklinko obejmujące miejscowość: Steklinko;Steklinko
+320703;Płochowo;Połchowo
+321001;ulica Gorzowska znajdująca się w mieście oraz ulica Myśliborska znajdująca się w mieście;Gorzowska i Myśliborska
+321001;obejmująca: sołectwo Moczkowo: ulica Gorzowska znajdująca się w Moczkowie;Moczkowo Gorzowska
+321001;ulica Myśliborska znajdująca się w Moczkowie oraz ulice: Brukowa;Moczkowo Myśliborska i Brukowa
+321001;Ożar z miejscowością Ożar;Ożar
+321102;Warzymice od 71 do 150 oraz ulice: Brzeziny;Warzymice Brzeziny i Warzymice od 71 do 150
+321102;Przecław od 1 do 48A i ulice: Aleja Kasztanowa;Przecław Aleja Kasztanowa i Przecław od 1 do 48a
+321404;miejscowości: Ziemomyśl ''A";Ziemomyśl A
+321404;Ziemomyśl ''B";Ziemomyśl B
+321409;Sołectwo Parlino obejmujące miejscowość Parlino;Parlino
+321409;Sołectwo Chlebówko obejmujące miejscowości Chlebówko;Chlebówko
+321410;Sołectwo Żarowo obejmujące miejscowości: Mokrzyca;Mokrzyca
+321410;Sołectwo Witkowo Pierwsze obejmujące miejscowości: Radziszewo;Radziszewo

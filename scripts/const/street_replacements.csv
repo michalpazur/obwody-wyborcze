@@ -3,21 +3,38 @@
 św.;Św.
 Błogosławionego;Bł.
 Błogosławionej;Bł.
-bł.;Bł.
+błog.;Bł.
 Gen;Generała
 Marsz.;Marszałka
 Kard.;Kardynała
+Kmdr.;
+Ks. Kan.;Księdza
+Księdza Kan.;Księdza
+Ks. Prał.;Księdza
+Księdza Prał.;Księdza
+Ks. Kanonika;Księdza
 Ks.;Księdza
 X.;Księdza
+arcybiskupa;
+Bp;Biskupa
 Księdza Bpa;Biskupa
 Księdza Biskupa;Biskupa
+Księdza Prym;
+Księdza Prymasa;
+Ks. Prym;
+Ks. Prymasa;
+im;
 Dr;Doktora
 Inż;Inżyniera
 Prof;Profesora
 Bulw.;Bulwar
 Wyb.;Wybrzeże
 Pil.;Pilota
-Het.;Hetmana
+Het.;
+Hetm.;
+Hetmana;
+Kanc.;
+Kanclerza;
 Mjr;Majora
 kpt. ż.w.;Kapitana Żeglugi Wielkiej
 kpt. ż. w.;Kapitana Żeglugi Wielkiej
@@ -27,7 +44,9 @@ p. por.;
 p.por.;
 ppłk;
 płk;
+pułkownika;
 rtm;
+adm;
 kadm;
 kontradmirała;
 kmdr;
@@ -35,7 +54,8 @@ komandora;
 prez.;Prezydenta
 króla;
 abp;
-arcybiskupa;
+hr.;
+hrabiego;
 Sierpnia 1980;Sierpnia '80
 Sierpnia 80;Sierpnia '80
 Czerwca 1976;Czerwca '76
@@ -46,6 +66,7 @@ AWP;Armii Wojska Polskiego
 O. Beyzyma;Ojca Beyzyma
 O. Widucha;Ojca Widucha
 O. Justyna Widucha;Ojca Widucha
+N/;nad 
  - Deptak;-Deptak
 Rynek Ratusz;Ratusz
 Frycza Modrzewskiego;Frycza-Modrzewskiego
@@ -63,8 +84,7 @@ Kamieńskiego Huzar;Kamieńskiego "Huzar"
 im. Księdza Emila Szramka;plac Księdza Szramka
 M.C.Skłodowskiej;Skłodowskiej-Curie
 M. C. Skłodowskiej;Skłodowskiej-Curie
-Curie Skłodowskiej;Skłodowskiej-Curie
-Curie-Skłodowskiej;Skłodowskiej-Curie
+Curie Skłodowskiej;Curie-Skłodowskiej
 Skłodowskiej Curie;Skłodowskiej-Curie
 Bł. Edmunda Bojanowskiego;Edmunda Bojanowskiego
 Hubala Henryka Dobrzańskiego;Henryka "Hubala" Dobrzańskiego
@@ -75,12 +95,7 @@ K.I. Gałczyńskiego;Gałczyńskiego
 Księcia Janusza I-bloki;Księcia Janusza I
 55.Pułku Piechoty;55. Pułku Piechoty
 Boya Żeleńskiego;Boya-Żeleńskiego
-1905 r;1905 roku
-1905r;1905 roku
-1920 r;1920 roku
-1920r;1920 roku
-1939r;1939 roku
-1939 r;1939 roku
+Powstańców Wlkp;Powstańców Wielkopolskich
 o. Huberta Czumy;Ojca Huberta Czumy
 19-Lutego;19 Lutego
 Benjamina;Beniamina
@@ -88,7 +103,21 @@ Wktora;Wiktora
 Charles'a;Charlesa
 Alferda;Alfreda
 Rodolfa;Rudolfa
-30-Lecia;30-Lecia
-40-Lecia;40-lecia
+0 lecia;0-Lecia
+5 lecia;5-Lecia
 Herlinga Grudzińskiego;Herlinga-Grudzińskiego
 Berka-Joselewicza;Berka Joselewicza
+J.M.Waisenberga;Waisenberga
+Molendy "Graba";Graba
+Krzywdy Rzewuskiego;Krzywdy-Rzewuskiego
+Bojowników O Wolność i Demokr;Bojowników O Wolność i Demokrację
+P. O. W.;Polskiej Organizacji Wojskowej
+P. C. K.;Polskiego Czerwonego Krzyża
+P.C.K.;Polskiego Czerwonego Krzyża
+Przedm;Przedmieście
+M.Ledóchowskiego;M. Ledóchowskiego
+Plac Wolności Jana Pawła II;Plac Wolności
+Nędzy-Kubińca;Nędzy Kubińca
+Przerwy Tetmajera;Przerwy-Tetmajera
+Osiedla Leśnego;Osiedle Leśne
+Witkiewicza /Witkacego/;Witkacego

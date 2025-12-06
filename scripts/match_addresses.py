@@ -6,14 +6,14 @@ import regex
 import json
 from typing import List, NotRequired, TypedDict, cast
 from utils import concat, Utils, get_building_order, save_zip, capitalize_every_word
-from const import all_regex, odd_regex, even_regex, building_num_regex, building_letter_regex, district_types, dash_regex, multiple_number_regex, districts as town_districts, building_types_regex
+from const import all_regex, odd_regex, even_regex, building_num_regex, building_letter_regex, district_types, dash_regex, multiple_number_regex, building_types_regex
 
 pandas.options.mode.copy_on_write = True
 
-place_type = re.compile(r"^(miasto|miasta|wieś|wsie|sołectwo|sołectwa|osada|osady|przysiółek|przysiółki|miejscowość|miejscowości)(:\s*|\s+)", flags=re.IGNORECASE)
-streets_regex = re.compile(r"(\s+|,\s*|^)(ul\.|ulic[aey]):?\s*", flags=re.IGNORECASE)
+place_type = re.compile(r"^(miasto|miasta|wieś|wsie|sołectwo|sołectwa|osada|osady|przysiółek|przysiółki|miejscowość|miejscowości|kol.|os. leśna)(:\s*|\s+)", flags=re.IGNORECASE)
+streets_regex = re.compile(r"(\s+|,\s*|^)(ul\.|ulic[aey]|place|skwery|osiedla)(:\s*|\s+)", flags=re.IGNORECASE)
 street_name_regex = regex.compile(r"^(\p{Lu}\p{L}+\s?)+$", flags=re.IGNORECASE)
-except_regex = r"bez|oprócz"
+except_regex = r"^(bez|oprócz)$"
 
 DEBUG = True
 

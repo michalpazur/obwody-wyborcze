@@ -52,3 +52,18 @@ Szyb Bartosza
 [oO]siedle Księcia Władysława
 [gG]enerała Henryka Dąbrowskiego
 [gG]enerała Jarosława Dąbrowskiego
+Aleja Czesława Miłosza
+Aleja Nadziei
+Macieja z Błonia
+Mikołaja z Błonia
+Piotra [zZ] Goniądza
+Księdza Bogdana Gordona
+Prof(esora|\.) T. Seweryna
+Ks(iędza|\.) Marka
+[Bb](iskupa|p\.) Konstantyna Dominika
+A(ntoniego|\.) Abrahama
+[gG]en(erała|\.) Romana Abrahama
+profesora Kaliny
+[kK]s(iędza|\.) Antoniego Janusza
+[kK]s(iędza|\.) Brunona Aleksandra
+[bB](p\.|iskupa) Dominika
