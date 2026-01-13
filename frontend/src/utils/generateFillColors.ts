@@ -1,5 +1,6 @@
 import { ExpressionSpecification } from "maplibre-gl";
-import { GRADIENT_COLORS, tieGradient } from "../config";
+import { GRADIENT_COLORS } from "../colors";
+import { tieGradient } from "../config";
 import { ProcentKey } from "../types";
 
 export const generateFillColors = (

@@ -1,4 +1,5 @@
 import chroma from "chroma-js";
+import { colors, GRADIENT_COLORS } from "./colors";
 import { presidentialCandidates } from "./static";
 
 export type CandidateId =
@@ -25,8 +26,6 @@ type Candidate = {
   maxGradient?: number;
 };
 
-export const GRADIENT_COLORS = 5;
-
 export const candidatesConfig: Record<CandidateId, Candidate> = {
   bartosiewicz: {
     name: "Artur Bartoszewicz",
@@ -36,26 +35,23 @@ export const candidatesConfig: Record<CandidateId, Candidate> = {
   biejat: {
     name: "Magdalena Biejat",
     id: "biejat",
-    color: "#8ACE00",
-    gradient: chroma.scale(["#B4FF1C", "#689B00"]).colors(GRADIENT_COLORS),
     avatarUrl: presidentialCandidates.biejat,
     maxGradient: 15,
+    ...colors.brat,
   },
   braun: {
     name: "Grzegorz Braun",
     id: "braun",
-    color: "#5D4037",
-    gradient: chroma.scale(["#A1887F", "#3E2723"]).colors(GRADIENT_COLORS),
     avatarUrl: presidentialCandidates.braun,
     maxGradient: 20,
+    ...colors.brown,
   },
   holownia: {
     name: "Szymon Hołownia",
     id: "holownia",
-    color: "#FBC02D",
-    gradient: chroma.scale(["#FFF176", "#F57F17"]).colors(GRADIENT_COLORS),
     avatarUrl: presidentialCandidates.holownia,
     maxGradient: 20,
+    ...colors.yellow,
   },
   jakubiak: {
     name: "Marek Jakubiak",
@@ -70,17 +66,15 @@ export const candidatesConfig: Record<CandidateId, Candidate> = {
   mentzen: {
     name: "Sławomir Mentzen",
     id: "mentzen",
-    color: "#303F9F",
-    gradient: chroma.scale(["#7986CB", "#1A237E"]).colors(GRADIENT_COLORS),
     avatarUrl: presidentialCandidates.mentzen,
     maxGradient: 40,
+    ...colors.indigo,
   },
   nawrocki: {
     name: "Karol Nawrocki",
     id: "nawrocki",
-    color: "#1976D2",
-    gradient: chroma.scale(["#64B5F6", "#0D47A1"]).colors(GRADIENT_COLORS),
     avatarUrl: presidentialCandidates.nawrocki,
+    ...colors.blue,
   },
   senyszyn: {
     name: "Joanna Senyszyn",
@@ -95,9 +89,8 @@ export const candidatesConfig: Record<CandidateId, Candidate> = {
   trzaskowski: {
     name: "Rafał Trzaskowski",
     id: "trzaskowski",
-    color: "#E64A19",
-    gradient: chroma.scale(["#FF8A65", "#BF360C"]).colors(GRADIENT_COLORS),
     avatarUrl: presidentialCandidates.trzaskowski,
+    ...colors.orange,
   },
   woch: {
     name: "Marek Woch",
@@ -107,10 +100,9 @@ export const candidatesConfig: Record<CandidateId, Candidate> = {
   zandberg: {
     name: "Adrian Zandberg",
     id: "zandberg",
-    color: "#7B1FA2",
     avatarUrl: presidentialCandidates.zandberg,
-    gradient: chroma.scale(["#BA68C8", "#4A148C"]).colors(GRADIENT_COLORS),
     maxGradient: 20,
+    ...colors.purple,
   },
 };
 

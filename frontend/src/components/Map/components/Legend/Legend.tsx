@@ -1,9 +1,9 @@
 import { Box, Card, Stack, SxProps, Theme, Typography } from "@mui/material";
 import React from "react";
+import { GRADIENT_COLORS } from "../../../../colors";
 import {
   candidatesConfig,
   electionsConfig,
-  GRADIENT_COLORS,
   mapOpacity,
   tieGradient,
 } from "../../../../config";
