@@ -10,6 +10,7 @@ import {
 } from "../../../../config";
 import { useElectionsStore } from "../../../../redux/electionsSlice";
 import { getLastName } from "../../../../utils/getLastName";
+import { useIsParliamentaryElection } from "../../../../utils/useIsParliamentaryElection";
 
 const colors = Array(GRADIENT_COLORS).fill(0);
 const colorBoxWidth = 5;
@@ -60,6 +61,7 @@ const colorBox: SxProps<Theme> = {
 
 const Legend: React.FC = () => {
   const { elections, candidate } = useElectionsStore();
+  const isParliamentaryElection = useIsParliamentaryElection();
 
   const winners =
     candidate === "all"
@@ -75,13 +77,13 @@ const Legend: React.FC = () => {
     (winner: CandidateId) => {
       const candidateConfig = candidatesConfig[winner];
 
-      if (electionsConfig[elections].type === "parliament") {
+      if (isParliamentaryElection) {
         return candidateConfig.name;
       }
 
       return getLastName(candidateConfig.name);
     },
-    [elections, candidatesConfig, electionsConfig],
+    [isParliamentaryElection, candidatesConfig, electionsConfig],
   );
 
   return (

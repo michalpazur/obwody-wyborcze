@@ -1,8 +1,8 @@
 import { Box, Avatar as MuiAvatar, SxProps } from "@mui/material";
 import React from "react";
-import { Candidate, electionsConfig } from "../../../../../config";
-import { useElectionsStore } from "../../../../../redux/electionsSlice";
+import { Candidate } from "../../../../../config";
 import { getInitials } from "../../../../../utils/getInitials";
+import { useIsParliamentaryElection } from "../../../../../utils/useIsParliamentaryElection";
 
 const avatarSx: SxProps = {
   fontSize: "12px",
@@ -12,10 +12,9 @@ const avatarSx: SxProps = {
 };
 
 const Avatar: React.FC<{ candidate: Candidate }> = ({ candidate }) => {
-  const { elections } = useElectionsStore();
+  const isParliamentaryElection = useIsParliamentaryElection();
 
-  return electionsConfig[elections].type === "parliament" &&
-    candidate.avatarUrl ? (
+  return isParliamentaryElection && candidate.avatarUrl ? (
     <Box component="img" alt="" src={candidate.avatarUrl} sx={avatarSx} />
   ) : (
     <MuiAvatar src={candidate.avatarUrl} sx={avatarSx}>

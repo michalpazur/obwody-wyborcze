@@ -9,11 +9,13 @@ import {
   CandidatesKey,
   useElectionsStore,
 } from "../../../../../redux/electionsSlice";
+import { useIsParliamentaryElection } from "../../../../../utils/useIsParliamentaryElection";
 import TextField from "../../../../TextField";
 
 const ElectionsSelects: React.FC = () => {
   const { elections, setElections, candidate, setCandidate } =
     useElectionsStore();
+  const isParliamentaryElection = useIsParliamentaryElection();
 
   const onChangeElections = (e: React.ChangeEvent<HTMLInputElement>) => {
     const elections = e.target.value as ElectionId;
@@ -33,8 +35,6 @@ const ElectionsSelects: React.FC = () => {
     [elections],
   );
 
-  const isParliamentElection = electionsConfig[elections].type === "parliament";
-
   return (
     <Stack spacing={2}>
       <TextField
@@ -52,11 +52,11 @@ const ElectionsSelects: React.FC = () => {
       <TextField
         select
         onChange={onChangeCandidate}
-        label={isParliamentElection ? "Nazwa listy" : "Kandydat"}
+        label={isParliamentaryElection ? "Nazwa listy" : "Kandydat"}
         value={candidate}
       >
         <MenuItem value="all">
-          {isParliamentElection ? "Wszystkie listy" : "Wszyscy"}
+          {isParliamentaryElection ? "Wszystkie listy" : "Wszyscy"}
         </MenuItem>
         {candidates.map((candidate) => (
           <MenuItem key={candidate} value={candidate}>

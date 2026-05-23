@@ -12,6 +12,7 @@ import React from "react";
 import { candidatesConfig } from "../../../../config";
 import { Results } from "../../../../types";
 import Avatar from "./components/Avatar";
+import { useIsParliamentaryElection } from "../../../../utils/useIsParliamentaryElection";
 
 const colorIndicator: SxProps = {
   position: "absolute",
@@ -25,12 +26,14 @@ const ResultsTable: React.FC<{ results: Results[]; full?: boolean }> = ({
   results,
   full,
 }) => {
+  const isParliamentaryElection = useIsParliamentaryElection();
+
   return (
     <Table>
       <TableHead>
         <TableRow>
           <TableCell align="left" sx={{ pl: full ? 9 : 3 }}>
-            Kandydat
+            {isParliamentaryElection ? "Lista" : "Kandydat"}
           </TableCell>
           <TableCell align="right">Głosy</TableCell>
           <TableCell align="right">Proc.</TableCell>
