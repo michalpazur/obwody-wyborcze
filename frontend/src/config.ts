@@ -153,6 +153,7 @@ export type ElectionId = "parl_2023" | "pres_2025_1" | "pres_2025_2";
 type ElectionConfig = {
   id: ElectionId;
   name: string;
+  htmlTitle: string;
   type: "parliament" | "president";
   candidates: CandidateId[];
   winners: CandidateId[];
@@ -163,6 +164,7 @@ export const electionsConfig: Record<ElectionId, ElectionConfig> = {
   parl_2023: {
     id: "parl_2023",
     name: "Sejm 2023",
+    htmlTitle: "Wybory do Sejmu 2023",
     type: "parliament",
     candidates: [
       "pis",
@@ -184,6 +186,7 @@ export const electionsConfig: Record<ElectionId, ElectionConfig> = {
   pres_2025_1: {
     id: "pres_2025_1",
     name: "Prezydent 2025 (I tura)",
+    htmlTitle: "Wybory prezydenckie 2025",
     type: "president",
     candidates: [
       "trzaskowski",
@@ -206,6 +209,7 @@ export const electionsConfig: Record<ElectionId, ElectionConfig> = {
   pres_2025_2: {
     id: "pres_2025_2",
     name: "Prezydent 2025 (II tura)",
+    htmlTitle: "Wybory prezydenckie 2025",
     type: "president",
     candidates: ["nawrocki", "trzaskowski"],
     winners: ["nawrocki", "trzaskowski"],

@@ -6,7 +6,10 @@ import {
   Typography,
 } from "@mui/material";
 import { visuallyHidden } from "@mui/utils";
+import { useEffect } from "react";
 import Map from "./components/Map";
+import { electionsConfig } from "./config";
+import { useElectionsStore } from "./redux/electionsSlice";
 import { theme } from "./theme";
 
 const rootSx: SxProps = {
@@ -16,6 +19,12 @@ const rootSx: SxProps = {
 };
 
 const App = () => {
+  const { elections } = useElectionsStore();
+
+  useEffect(() => {
+    document.title = electionsConfig[elections].htmlTitle;
+  }, [elections]);
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
