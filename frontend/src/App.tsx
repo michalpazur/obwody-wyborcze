@@ -8,7 +8,7 @@ import {
 import { visuallyHidden } from "@mui/utils";
 import { useEffect } from "react";
 import Map from "./components/Map";
-import { electionsConfig } from "./config";
+import { ElectionId, electionsConfig } from "./config";
 import { useElectionsStore } from "./redux/electionsSlice";
 import { theme } from "./theme";
 
@@ -19,9 +19,19 @@ const rootSx: SxProps = {
 };
 
 const App = () => {
-  const { elections } = useElectionsStore();
+  const { elections, setElections } = useElectionsStore();
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const param = params.get("election");
+
+    if (param && param in electionsConfig) {
+      setElections(param as ElectionId);
+    }
+  }, []);
+
+  useEffect(() => {
+    history.replaceState(null, "", `?election=${elections}`);
     document.title = electionsConfig[elections].htmlTitle;
   }, [elections]);
 
