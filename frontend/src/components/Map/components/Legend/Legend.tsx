@@ -1,7 +1,8 @@
 import { Box, Card, Stack, SxProps, Theme, Typography } from "@mui/material";
-import React from "react";
+import React, { useCallback } from "react";
 import { GRADIENT_COLORS } from "../../../../colors";
 import {
+  CandidateId,
   candidatesConfig,
   electionsConfig,
   mapOpacity,
@@ -17,20 +18,29 @@ const colorBoxSpacing = 0.25;
 const root: SxProps<Theme> = (theme) => ({
   position: "absolute",
   bottom: (theme) => theme.spacing(3),
+  right: (theme) => theme.spacing(3),
   left: (theme) => theme.spacing(6),
   p: 2,
   zIndex: 5,
+  maxWidth: "fit-content",
   [theme.breakpoints.down("sm")]: {
     left: (theme) => theme.spacing(3),
+    right: (theme) => theme.spacing(3),
   },
 });
 
-const text: SxProps<Theme> = {
+const text: SxProps<Theme> = (theme) => ({
   fontSize: "12px",
   color: (theme) => theme.palette.secondary.light,
-  flexGrow: "1",
+  flex: "1",
   minWidth: (theme) => theme.spacing(20),
-};
+  whiteSpace: "nowrap",
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  [theme.breakpoints.down("sm")]: {
+    minWidth: "0px",
+  },
+});
 
 const legendText: SxProps<Theme> = {
   fontSize: "10px",
@@ -57,7 +67,22 @@ const Legend: React.FC = () => {
       : [candidate];
 
   const maxGradient =
-    candidate === "all" ? 100 : candidatesConfig[candidate].maxGradient ?? 100;
+    candidate === "all"
+      ? 100
+      : (candidatesConfig[candidate].maxGradient ?? 100);
+
+  const getLegendName = useCallback(
+    (winner: CandidateId) => {
+      const candidateConfig = candidatesConfig[winner];
+
+      if (electionsConfig[elections].type === "parliament") {
+        return candidateConfig.name;
+      }
+
+      return getLastName(candidateConfig.name);
+    },
+    [elections, candidatesConfig, electionsConfig],
+  );
 
   return (
     <Card variant="outlined" elevation={1} sx={root}>
@@ -65,9 +90,7 @@ const Legend: React.FC = () => {
       <Stack spacing={1}>
         {winners.map((winner) => (
           <Stack spacing={2} direction="row" alignItems="center" key={winner}>
-            <Typography sx={text}>
-              {getLastName(candidatesConfig[winner].name)}
-            </Typography>
+            <Typography sx={text}>{getLegendName(winner)}</Typography>
             <Stack direction="row" spacing={colorBoxSpacing}>
               {colors.map((_, idx) => (
                 <Box

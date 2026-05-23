@@ -28,10 +28,12 @@ const ElectionsSelects: React.FC = () => {
   const candidates = useMemo(
     () =>
       electionsConfig[elections].candidates.filter(
-        (candidate) => !!candidatesConfig[candidate].gradient
+        (candidate) => !!candidatesConfig[candidate].gradient,
       ),
-    [elections]
+    [elections],
   );
+
+  const isParliamentElection = electionsConfig[elections].type === "parliament";
 
   return (
     <Stack spacing={2}>
@@ -50,10 +52,12 @@ const ElectionsSelects: React.FC = () => {
       <TextField
         select
         onChange={onChangeCandidate}
-        label="Kandydat"
+        label={isParliamentElection ? "Nazwa listy" : "Kandydat"}
         value={candidate}
       >
-        <MenuItem value="all">Wszyscy</MenuItem>
+        <MenuItem value="all">
+          {isParliamentElection ? "Wszystkie listy" : "Wszyscy"}
+        </MenuItem>
         {candidates.map((candidate) => (
           <MenuItem key={candidate} value={candidate}>
             {candidatesConfig[candidate].name}

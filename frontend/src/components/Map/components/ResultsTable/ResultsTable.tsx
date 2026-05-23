@@ -1,5 +1,4 @@
 import {
-  Avatar,
   Box,
   SxProps,
   Table,
@@ -12,6 +11,7 @@ import {
 import React from "react";
 import { candidatesConfig } from "../../../../config";
 import { Results } from "../../../../types";
+import Avatar from "./components/Avatar";
 
 const colorIndicator: SxProps = {
   position: "absolute",
@@ -58,12 +58,7 @@ const ResultsTable: React.FC<{ results: Results[]; full?: boolean }> = ({
                       },
                     ]}
                   />
-                  {full && (
-                    <Avatar
-                      src={candidate.avatarUrl}
-                      sx={{ mr: 1, width: "24px", height: "24px" }}
-                    />
-                  )}
+                  {full && <Avatar candidate={candidate} />}
                   <span>{candidate.name}</span>
                 </Box>
               </TableCell>

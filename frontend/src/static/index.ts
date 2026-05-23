@@ -27,3 +27,21 @@ export const presidentialCandidates = {
   woch,
   zandberg,
 };
+
+import bs from "./bs.png";
+import ko from "./ko.png";
+import konfederacja from "./konfederacja.png";
+import nl from "./nl.png";
+import p2050_psl from "./p2050_psl.png";
+import pis from "./pis.png";
+import pjj from "./pjj.png";
+
+export const parties = {
+  bs,
+  ko,
+  konfederacja,
+  nl,
+  p2050_psl,
+  pis,
+  pjj,
+};

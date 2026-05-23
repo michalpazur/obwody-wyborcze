@@ -52,11 +52,14 @@ results_columns = {
   "Gmina": "gmina",
   "Powiat": "powiat",
   "Teryt Gminy": "teryt",
+  "TERYT Gminy": "teryt",
   "Nr komisji": "number",
   "Liczba głosów ważnych oddanych łącznie na wszystkich kandydatów (z kart ważnych)": "total",
   "Liczba głosów ważnych oddanych łącznie na obu kandydatów (z kart ważnych)": "total",
+  "Liczba głosów ważnych oddanych łącznie na wszystkie listy kandydatów": "total",
   "Liczba kart ważnych": "all_votes",
-  "Liczba wyborców uprawnionych do głosowania (umieszczonych w spisie, z uwzględnieniem dodatkowych formularzy) w chwili zakończenia głosowania": "voters"
+  "Liczba wyborców uprawnionych do głosowania (umieszczonych w spisie, z uwzględnieniem dodatkowych formularzy) w chwili zakończenia głosowania": "voters",
+  "Liczba wyborców uprawnionych do głosowania": "voters"
 }
 
 candidates = {
@@ -73,6 +76,18 @@ candidates = {
   "TRZASKOWSKI Rafał Kazimierz": "trzaskowski",
   "WOCH Marek Marian": "woch",
   "ZANDBERG Adrian Tadeusz": "zandberg",
+  "KOMITET WYBORCZY BEZPARTYJNI SAMORZĄDOWCY": "bs",
+  "KOALICYJNY KOMITET WYBORCZY TRZECIA DROGA POLSKA 2050 SZYMONA HOŁOWNI - POLSKIE STRONNICTWO LUDOWE": "p2050_psl",
+  "KOMITET WYBORCZY NOWA LEWICA": "nl",
+  "KOMITET WYBORCZY PRAWO I SPRAWIEDLIWOŚĆ": "pis",
+  "KOMITET WYBORCZY KONFEDERACJA WOLNOŚĆ I NIEPODLEGŁOŚĆ": "konfederacja",
+  "KOALICYJNY KOMITET WYBORCZY KOALICJA OBYWATELSKA PO .N IPL ZIELONI": "ko",
+  "KOMITET WYBORCZY POLSKA JEST JEDNA": "pjj",
+  "KOMITET WYBORCZY WYBORCÓW RUCHU DOBROBYTU I POKOJU": "rdip",
+  "KOMITET WYBORCZY NORMALNY KRAJ": "nk",
+  "KOMITET WYBORCZY ANTYPARTIA": "ap",
+  "KOMITET WYBORCZY RUCH NAPRAWY POLSKI": "rnp",
+  "KOMITET WYBORCZY WYBORCÓW MNIEJSZOŚĆ NIEMIECKA": "mn"
 }
 
 char_order = list("aąbcćdefghijklłmnńoópqrsśtuvwxyzżź0123456789")

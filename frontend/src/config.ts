@@ -1,6 +1,6 @@
 import chroma from "chroma-js";
 import { colors, GRADIENT_COLORS } from "./colors";
-import { presidentialCandidates } from "./static";
+import { parties, presidentialCandidates } from "./static";
 
 export type CandidateId =
   | "bartosiewicz"
@@ -15,11 +15,23 @@ export type CandidateId =
   | "stanowski"
   | "trzaskowski"
   | "woch"
-  | "zandberg";
+  | "zandberg"
+  | "ap"
+  | "bs"
+  | "ko"
+  | "konfederacja"
+  | "mn"
+  | "nk"
+  | "nl"
+  | "pis"
+  | "pjj"
+  | "p2050_psl"
+  | "rdip"
+  | "rnp";
 
-type Candidate = {
+export type Candidate = {
   name: string;
-  id: CandidateId;
+  short?: string;
   color?: string;
   gradient?: string[];
   avatarUrl?: string;
@@ -29,97 +41,150 @@ type Candidate = {
 export const candidatesConfig: Record<CandidateId, Candidate> = {
   bartosiewicz: {
     name: "Artur Bartoszewicz",
-    id: "bartosiewicz",
     avatarUrl: presidentialCandidates.bartoszewicz,
   },
   biejat: {
     name: "Magdalena Biejat",
-    id: "biejat",
     avatarUrl: presidentialCandidates.biejat,
     maxGradient: 15,
     ...colors.brat,
   },
   braun: {
     name: "Grzegorz Braun",
-    id: "braun",
     avatarUrl: presidentialCandidates.braun,
     maxGradient: 20,
     ...colors.brown,
   },
   holownia: {
     name: "Szymon Hołownia",
-    id: "holownia",
     avatarUrl: presidentialCandidates.holownia,
     maxGradient: 20,
     ...colors.yellow,
   },
   jakubiak: {
     name: "Marek Jakubiak",
-    id: "jakubiak",
     avatarUrl: presidentialCandidates.jakubiak,
   },
   maciak: {
     name: "Maciej Maciak",
-    id: "maciak",
     avatarUrl: presidentialCandidates.maciak,
   },
   mentzen: {
     name: "Sławomir Mentzen",
-    id: "mentzen",
     avatarUrl: presidentialCandidates.mentzen,
     maxGradient: 40,
     ...colors.indigo,
   },
   nawrocki: {
     name: "Karol Nawrocki",
-    id: "nawrocki",
     avatarUrl: presidentialCandidates.nawrocki,
     ...colors.blue,
   },
   senyszyn: {
     name: "Joanna Senyszyn",
-    id: "senyszyn",
     avatarUrl: presidentialCandidates.senyszyn,
   },
   stanowski: {
     name: "Krzysztof Stanowski",
-    id: "stanowski",
     avatarUrl: presidentialCandidates.stanowski,
   },
   trzaskowski: {
     name: "Rafał Trzaskowski",
-    id: "trzaskowski",
     avatarUrl: presidentialCandidates.trzaskowski,
     ...colors.orange,
   },
   woch: {
     name: "Marek Woch",
-    id: "woch",
     avatarUrl: presidentialCandidates.woch,
   },
   zandberg: {
     name: "Adrian Zandberg",
-    id: "zandberg",
     avatarUrl: presidentialCandidates.zandberg,
     maxGradient: 20,
     ...colors.purple,
   },
+  ap: { name: "Antypartia" },
+  bs: {
+    name: "Bezpartyjni Samorządowcy",
+    short: "BS",
+    avatarUrl: parties.bs,
+    maxGradient: 5,
+    ...colors.red,
+  },
+  ko: {
+    name: "Koalicja Obywatelska",
+    short: "KO",
+    avatarUrl: parties.ko,
+    ...colors.orange,
+  },
+  konfederacja: {
+    name: "Konfederacja",
+    avatarUrl: parties.konfederacja,
+    maxGradient: 20,
+    ...colors.indigo,
+  },
+  mn: { name: "Mniejszość Niemiecka", short: "MN" },
+  nk: { name: "Normalny Kraj" },
+  nl: {
+    name: "Nowa Lewica",
+    avatarUrl: parties.nl,
+    maxGradient: 20,
+    ...colors.pink,
+  },
+  pis: {
+    name: "Prawo i Sprawiedliwość",
+    short: "PiS",
+    avatarUrl: parties.pis,
+    ...colors.blue,
+  },
+  pjj: { name: "Polska Jest Jedna", short: "PJJ", avatarUrl: parties.pjj },
+  p2050_psl: {
+    name: "Trzecia Droga",
+    avatarUrl: parties.p2050_psl,
+    maxGradient: 25,
+    ...colors.lightGreen,
+  },
+  rdip: { name: "Ruch Dobrobytu i Pokoju", short: "RDiP" },
+  rnp: { name: "Ruch Naprawy Polski", short: "RNP" },
 };
 
-export type ElectionId = "pres_2025_1" | "pres_2025_2";
+export type ElectionId = "parl_2023" | "pres_2025_1" | "pres_2025_2";
 
 type ElectionConfig = {
   id: ElectionId;
   name: string;
+  type: "parliament" | "president";
   candidates: CandidateId[];
   winners: CandidateId[];
   sourceLayer: string;
 };
 
 export const electionsConfig: Record<ElectionId, ElectionConfig> = {
+  parl_2023: {
+    id: "parl_2023",
+    name: "Sejm 2023",
+    type: "parliament",
+    candidates: [
+      "pis",
+      "ko",
+      "p2050_psl",
+      "nl",
+      "konfederacja",
+      "bs",
+      "pjj",
+      "mn",
+      "rdip",
+      "nk",
+      "ap",
+      "rnp",
+    ],
+    winners: ["pis", "ko", "p2050_psl", "nl", "konfederacja"],
+    sourceLayer: "parl_2023",
+  },
   pres_2025_1: {
     id: "pres_2025_1",
     name: "Prezydent 2025 (I tura)",
+    type: "president",
     candidates: [
       "trzaskowski",
       "nawrocki",
@@ -141,6 +206,7 @@ export const electionsConfig: Record<ElectionId, ElectionConfig> = {
   pres_2025_2: {
     id: "pres_2025_2",
     name: "Prezydent 2025 (II tura)",
+    type: "president",
     candidates: ["nawrocki", "trzaskowski"],
     winners: ["nawrocki", "trzaskowski"],
     sourceLayer: "pres_2025_2",

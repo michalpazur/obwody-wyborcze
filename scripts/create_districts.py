@@ -93,7 +93,7 @@ def main():
       districts_df = concat(districts_df, processed_districts)
 
   print("Loading voting results...")
-  results = pd.read_csv(f"data_in/results_{elections}.csv", sep=";", converters={ "Teryt Gminy": lambda x: x.zfill(6) })
+  results = pd.read_csv(f"data_in/results_{elections}.csv", sep=";", converters={ "Teryt Gminy": lambda x: x.zfill(6), "TERYT Gminy": lambda x: x.zfill(6) })
   merged_columns = { **results_columns, **candidates }
   results = results.rename(columns=merged_columns)
 
