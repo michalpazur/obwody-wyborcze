@@ -508,7 +508,14 @@ def process_powiat(
               token = " ".join(split_line[street["start_index"]:prev_end])
               rest_of_token = " ".join(split_line[street["end_index"]:prev_end])
               rest_of_token = re.sub(r"(^|\s+)(i|oraz)$", "", rest_of_token)
+              overlapping_streets = prev_end < street["end_index"]
               prev_end = street["start_index"]
+            
+              if (overlapping_streets):
+                print(f"⚠️ Skipping overlapping street {street} in token {" ".join(split_line)}...")
+                print(f"Found streets: {streets_in_token}.")
+                continue
+
               parsed_token["street"] = street["street"]
               parsed_token["is_town"] = False
               parsed_token["token"] = token
