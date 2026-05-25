@@ -11,8 +11,9 @@ import {
 import React from "react";
 import { candidatesConfig } from "../../../../config";
 import { Results } from "../../../../types";
-import Avatar from "./components/Avatar";
 import { useIsParliamentaryElection } from "../../../../utils/useIsParliamentaryElection";
+import Avatar from "./components/Avatar";
+import WinnerInfo from "./components/WinnerInfo";
 
 const colorIndicator: SxProps = {
   position: "absolute",
@@ -27,12 +28,15 @@ const ResultsTable: React.FC<{ results: Results[]; full?: boolean }> = ({
   full,
 }) => {
   const isParliamentaryElection = useIsParliamentaryElection();
+  const nameCellSx = { pl: full ? 9 : 3 };
+
+  const truncatedResults = full ? results : results.slice(0, 3);
 
   return (
     <Table>
       <TableHead>
         <TableRow>
-          <TableCell align="left" sx={{ pl: full ? 9 : 3 }}>
+          <TableCell align="left" sx={nameCellSx}>
             {isParliamentaryElection ? "Lista" : "Kandydat"}
           </TableCell>
           <TableCell align="right">Głosy</TableCell>
@@ -40,7 +44,7 @@ const ResultsTable: React.FC<{ results: Results[]; full?: boolean }> = ({
         </TableRow>
       </TableHead>
       <TableBody>
-        {results.map((result) => {
+        {truncatedResults.map((result) => {
           const candidate = candidatesConfig[result.candidate];
 
           return (
@@ -73,17 +77,11 @@ const ResultsTable: React.FC<{ results: Results[]; full?: boolean }> = ({
           );
         })}
       </TableBody>
-      {full ? (
-        <TableFooter>
-          <TableRow>
-            <TableCell sx={{ pl: full ? 9 : 3 }}>Łącznie głosów</TableCell>
-            <TableCell align="right">
-              {results.reduce((sum, result) => sum + result.result, 0)}
-            </TableCell>
-            <TableCell />
-          </TableRow>
-        </TableFooter>
-      ) : null}
+      <TableFooter>
+        <TableRow>
+          <WinnerInfo results={results} rootSx={nameCellSx} />
+        </TableRow>
+      </TableFooter>
     </Table>
   );
 };

@@ -16,8 +16,7 @@ const Popup: React.FC<PopupProps> = ({ district, position }) => {
   const { elections } = useElectionsStore();
 
   const popupContent = useMemo(() => {
-    let results = sortResults(district, elections);
-    results = results.slice(0, 3);
+    const results = sortResults(district, elections);
 
     return (
       <Card variant="outlined" sx={{ p: 2 }}>

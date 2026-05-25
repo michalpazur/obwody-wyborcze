@@ -1,5 +1,4 @@
-import chroma from "chroma-js";
-import { colors, GRADIENT_COLORS } from "./colors";
+import { colors } from "./colors";
 import { parties, presidentialCandidates } from "./static";
 
 export type CandidateId =
@@ -217,9 +216,7 @@ export const electionsConfig: Record<ElectionId, ElectionConfig> = {
   },
 };
 
-export const tieGradient = chroma
-  .scale(["#E0E0E0", "#212121"])
-  .colors(GRADIENT_COLORS);
+export const tieGradient = colors.grey.gradient;
 
 export const mapOpacity = 1;
 
