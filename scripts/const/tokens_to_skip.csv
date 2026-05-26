@@ -1,5 +1,7 @@
-teryt;token;district;entire_token
+teryt;token;district;entire_token;elections
 126101;Kraków-Krowodrza: Józefa Chełmońskiego-Deptak
+126101;Wielkotyrnowska;103;True;parl_2023
+126101;bez 16 i 16a;103;True;parl_2023
 106101;dr. Henryka Trenknera
 106101;Tenisowa
 106101;Kartuska
@@ -44,6 +46,7 @@ teryt;token;district;entire_token
 246301;Planty imienia Jerzego Wyrobka
 246301;Rondo Niebieskich Mistrzów
 246301;Rondo Antoniego Sorichty
+246901;Południowa;1;True;parl_2023
 247501;Dziewanny
 247501;Leśny Zakątek.
 247701;rondo ks. Leona Szkatuły

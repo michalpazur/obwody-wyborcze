@@ -17,6 +17,8 @@ except_regex = r"^(bez|oprócz)$"
 
 DEBUG = True
 
+elections = "pres_2025"
+
 class BuildingNumber(TypedDict):
   building_n: int | str
   building_l: str
@@ -221,7 +223,11 @@ def process_powiat(
 
       district_id = f"{teryt}_{district.number}"
       district_addresses: geo.GeoDataFrame | None = None
-      district_tokens_to_skip = tokens_to_skip_df[(tokens_to_skip_df["teryt"] == teryt) & ((tokens_to_skip_df["district"].isna()) | (tokens_to_skip_df["district"] == district.number))]
+      district_tokens_to_skip = tokens_to_skip_df[
+        (tokens_to_skip_df["teryt"] == teryt) & 
+        ((tokens_to_skip_df["district"].isna()) | (tokens_to_skip_df["district"] == district.number)) & 
+        ((tokens_to_skip_df["elections"].isna()) | (tokens_to_skip_df["elections"] == elections))
+      ]
       tokens_to_skip = district_tokens_to_skip["token"].tolist()
       if (district.type != "stały"):
         district_addresses = teryt_addresses[teryt_addresses["f_address"] == district.f_address]
