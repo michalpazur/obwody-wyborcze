@@ -57,12 +57,18 @@ results_columns = {
   "Liczba głosów ważnych oddanych łącznie na wszystkich kandydatów (z kart ważnych)": "total",
   "Liczba głosów ważnych oddanych łącznie na obu kandydatów (z kart ważnych)": "total",
   "Liczba głosów ważnych oddanych łącznie na wszystkie listy kandydatów": "total",
+  "Liczba głosów ważnych": "total",
   "Liczba kart ważnych": "all_votes",
+  "Liczba kart ważnych (liczba osób, które wzięły udział w głosowaniu)": "all_votes",
   "Liczba wyborców uprawnionych do głosowania (umieszczonych w spisie, z uwzględnieniem dodatkowych formularzy) w chwili zakończenia głosowania": "voters",
   "Liczba wyborców uprawnionych do głosowania": "voters"
 }
 
 candidates = {
+  # Referendum
+  "Liczba głosów pozytywnych „Tak”": "yes",
+  "Liczba głosów negatywnych „Nie”": "no",
+  # Presidential candidates
   "BARTOSZEWICZ Artur": "bartosiewicz",
   "BIEJAT Magdalena Agnieszka": "biejat",
   "BRAUN Grzegorz Michał": "braun",
@@ -76,6 +82,7 @@ candidates = {
   "TRZASKOWSKI Rafał Kazimierz": "trzaskowski",
   "WOCH Marek Marian": "woch",
   "ZANDBERG Adrian Tadeusz": "zandberg",
+  # Parliamentary lists
   "KOMITET WYBORCZY BEZPARTYJNI SAMORZĄDOWCY": "bs",
   "KOALICYJNY KOMITET WYBORCZY TRZECIA DROGA POLSKA 2050 SZYMONA HOŁOWNI - POLSKIE STRONNICTWO LUDOWE": "p2050_psl",
   "KOMITET WYBORCZY NOWA LEWICA": "nl",

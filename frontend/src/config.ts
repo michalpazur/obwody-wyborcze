@@ -2,6 +2,8 @@ import { colors } from "./colors";
 import { parties, presidentialCandidates } from "./static";
 
 export type CandidateId =
+  | "yes"
+  | "no"
   | "bartosiewicz"
   | "biejat"
   | "braun"
@@ -38,6 +40,14 @@ export type Candidate = {
 };
 
 export const candidatesConfig: Record<CandidateId, Candidate> = {
+  yes: {
+    name: "Tak",
+    ...colors.green,
+  },
+  no: {
+    name: "Nie",
+    ...colors.red,
+  },
   bartosiewicz: {
     name: "Artur Bartoszewicz",
     avatarUrl: presidentialCandidates.bartoszewicz,
@@ -147,17 +157,24 @@ export const candidatesConfig: Record<CandidateId, Candidate> = {
   rnp: { name: "Ruch Naprawy Polski", short: "RNP" },
 };
 
-export type ElectionId = "parl_2023" | "pres_2025_1" | "pres_2025_2";
+export type ElectionId =
+  | "parl_2023"
+  | "pres_2025_1"
+  | "pres_2025_2"
+  | "ref_krk2026_1"
+  | "ref_krk2026_2";
 
 type ElectionConfig = {
   id: ElectionId;
   name: string;
   htmlTitle: string;
-  type: "parliament" | "president";
   candidates: CandidateId[];
   winners: CandidateId[];
   sourceLayer: string;
-};
+} & (
+  | { type: "parliament" | "president"; question?: never }
+  | { type: "referendum"; question: string }
+);
 
 export const electionsConfig: Record<ElectionId, ElectionConfig> = {
   parl_2023: {
@@ -213,6 +230,28 @@ export const electionsConfig: Record<ElectionId, ElectionConfig> = {
     candidates: ["nawrocki", "trzaskowski"],
     winners: ["nawrocki", "trzaskowski"],
     sourceLayer: "pres_2025_2",
+  },
+  ref_krk2026_1: {
+    id: "ref_krk2026_1",
+    name: "Referendum Kraków 2026 (Prezydent)",
+    htmlTitle: "Referendum w sprawie odwołania Prezydenta Krakowa",
+    type: "referendum",
+    question:
+      "Czy jest Pan/Pani za odwołaniem Pana Aleksandra Jana Miszalskiego z funkcji Prezydenta Miasta Krakowa przed upływem kadencji?",
+    candidates: ["yes", "no"],
+    winners: ["yes", "no"],
+    sourceLayer: "ref_krk2026_1",
+  },
+  ref_krk2026_2: {
+    id: "ref_krk2026_2",
+    name: "Referendum Kraków 2026 (Rada Miasta)",
+    htmlTitle: "Referendum w sprawie odwołania Rady Miasta Krakowa",
+    type: "referendum",
+    question:
+      "Czy jest Pan/Pani za odwołaniem Rady Miasta Krakowa przed upływem kadencji?",
+    candidates: ["yes", "no"],
+    winners: ["yes", "no"],
+    sourceLayer: "ref_krk2026_2",
   },
 };
 
