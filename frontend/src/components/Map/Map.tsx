@@ -1,4 +1,5 @@
 import { useTheme } from "@mui/material";
+import { grey } from "@mui/material/colors";
 import {
   ExpressionSpecification,
   GeoJSONFeature,
@@ -35,7 +36,13 @@ import {
 import { TransportationLayer } from "./components/Layers/TransportationLayer";
 import Legend from "./components/Legend";
 import Popup from "./components/Popup";
-import { selectedFeatureOutline, stateClicked, stateHovered } from "./styles";
+import {
+  featureOutline,
+  featureOutlineOpacity,
+  selectedFeatureOutline,
+  stateClicked,
+  stateHovered,
+} from "./styles";
 
 let hoveredId: GeoJSONFeature["id"];
 
@@ -223,7 +230,7 @@ const Map = () => {
         </FeaturesSource>
         <ElectionsDataSource>
           <Layer
-            id={layerIds.outline}
+            id={layerIds.hoverOutline}
             beforeId={layerIds.city}
             type="line"
             source-layer={selectedElections.sourceLayer}
@@ -244,7 +251,7 @@ const Map = () => {
             type="fill"
             source-layer="building"
             id={layerIds.building}
-            beforeId={layerIds.outline}
+            beforeId={layerIds.hoverOutline}
             paint={transparentFillPaint}
           />
           <TransportationLayer transportationClass="road" />
@@ -259,6 +266,19 @@ const Map = () => {
             paint={transparentFillPaint}
           />
         </FeaturesSource>
+        <ElectionsDataSource>
+          <Layer
+            id={layerIds.outline}
+            beforeId={layerIds.building}
+            type="line"
+            source-layer={selectedElections.sourceLayer}
+            paint={{
+              "line-color": grey[300],
+              "line-width": featureOutline,
+              "line-opacity": featureOutlineOpacity,
+            }}
+          />
+        </ElectionsDataSource>
       </React.Fragment>
     );
   }, [selectedElections]);

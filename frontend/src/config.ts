@@ -254,6 +254,7 @@ export const layerIds = {
   road: "road",
   building: "building-layer",
   outline: "outline",
+  hoverOutline: "hover-outline",
   city: "city",
 };
 

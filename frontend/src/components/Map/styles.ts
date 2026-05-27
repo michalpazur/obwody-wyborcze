@@ -18,21 +18,36 @@ export const stateClicked: ExpressionSpecification = [
   false,
 ];
 
+export const featureOutline: DataDrivenPropertyValueSpecification<number> = [
+  "interpolate",
+  ["exponential", exponentialBase],
+  ["zoom"],
+  10,
+  0.2,
+  16,
+  1,
+  19,
+  3,
+];
+
+export const featureOutlineOpacity: DataDrivenPropertyValueSpecification<number> =
+  ["interpolate", ["linear"], ["zoom"], 10, 0, 10.5, 1];
+
 export const selectedFeatureOutline: DataDrivenPropertyValueSpecification<number> =
   [
     "interpolate",
     ["exponential", exponentialBase],
     ["zoom"],
     10,
-    1,
-    13,
-    2,
+    1.5,
+    14,
+    3.5,
     19,
-    6,
+    7,
   ];
 
 export const transportationLineWidth = (
-  multiplier: number = 2
+  multiplier: number = 2,
 ): DataDrivenPropertyValueSpecification<number> => [
   "interpolate",
   ["exponential", exponentialBase],
@@ -46,7 +61,7 @@ export const transportationLineWidth = (
 ];
 
 export const textLayout = (
-  baseFontSize: number = 12
+  baseFontSize: number = 12,
 ): SymbolLayerSpecification["layout"] => ({
   "text-font": ["Noto Sans Regular"],
   "text-field": "{name}",
