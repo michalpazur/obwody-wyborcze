@@ -11,10 +11,12 @@ import { GradientOptions } from "./utils/generateFillColors";
 export const candidatesConfig: Record<CandidateId, Candidate> = {
   yes: {
     name: "Tak",
-    ...colors.lightGreen,
+    candidateId: "yes",
+    ...colors.green,
   },
   no: {
     name: "Nie",
+    candidateId: "no",
     ...colors.red,
   },
   bartosiewicz: {

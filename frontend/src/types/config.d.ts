@@ -34,6 +34,7 @@ export type Candidate = {
   name: string;
   short?: string;
   avatarUrl?: string;
+  candidateId?: CandidateId;
 } & Partial<ColorConfig> &
   GradientOptions;
 

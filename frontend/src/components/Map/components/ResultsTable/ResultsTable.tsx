@@ -10,8 +10,9 @@ import {
 } from "@mui/material";
 import React from "react";
 import { candidatesConfig } from "../../../../config";
+import { useElectionsStore } from "../../../../redux/electionsSlice";
 import { Results } from "../../../../types";
-import { useIsParliamentaryElection } from "../../../../utils/useIsParliamentaryElection";
+import { getNameColumnLabel } from "../../../../utils/getLabels";
 import Avatar from "./components/Avatar";
 import WinnerInfo from "./components/WinnerInfo";
 
@@ -27,9 +28,9 @@ const ResultsTable: React.FC<{ results: Results[]; full?: boolean }> = ({
   results,
   full,
 }) => {
-  const isParliamentaryElection = useIsParliamentaryElection();
-  const nameCellSx = { pl: full ? 9 : 3 };
+  const { elections } = useElectionsStore();
 
+  const nameCellSx = { pl: full ? 9 : 3 };
   const truncatedResults = full ? results : results.slice(0, 3);
 
   return (
@@ -37,7 +38,7 @@ const ResultsTable: React.FC<{ results: Results[]; full?: boolean }> = ({
       <TableHead>
         <TableRow>
           <TableCell align="left" sx={nameCellSx}>
-            {isParliamentaryElection ? "Lista" : "Kandydat"}
+            {getNameColumnLabel(elections)}
           </TableCell>
           <TableCell align="right">Głosy</TableCell>
           <TableCell align="right">Proc.</TableCell>

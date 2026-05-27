@@ -9,13 +9,16 @@ import {
   CandidatesKey,
   useElectionsStore,
 } from "../../../../../redux/electionsSlice";
-import { useIsParliamentaryElection } from "../../../../../utils/useIsParliamentaryElection";
+import {
+  getAllWinnersLabel,
+  getNameColumnLabel,
+} from "../../../../../utils/getLabels";
 import TextField from "../../../../TextField";
 
 const ElectionsSelects: React.FC = () => {
   const { elections, setElections, candidate, setCandidate } =
     useElectionsStore();
-  const isParliamentaryElection = useIsParliamentaryElection();
+  const electionConfig = electionsConfig[elections];
 
   const onChangeElections = (e: React.ChangeEvent<HTMLInputElement>) => {
     const elections = e.target.value as ElectionId;
@@ -29,10 +32,10 @@ const ElectionsSelects: React.FC = () => {
 
   const candidates = useMemo(
     () =>
-      electionsConfig[elections].candidates.filter(
+      electionConfig.candidates.filter(
         (candidate) => !!candidatesConfig[candidate].gradient,
       ),
-    [elections],
+    [electionConfig],
   );
 
   return (
@@ -49,21 +52,21 @@ const ElectionsSelects: React.FC = () => {
           </MenuItem>
         ))}
       </TextField>
-      <TextField
-        select
-        onChange={onChangeCandidate}
-        label={isParliamentaryElection ? "Nazwa listy" : "Kandydat"}
-        value={candidate}
-      >
-        <MenuItem value="all">
-          {isParliamentaryElection ? "Wszystkie listy" : "Wszyscy"}
-        </MenuItem>
-        {candidates.map((candidate) => (
-          <MenuItem key={candidate} value={candidate}>
-            {candidatesConfig[candidate].name}
-          </MenuItem>
-        ))}
-      </TextField>
+      {!electionConfig.hideWinners && (
+        <TextField
+          select
+          onChange={onChangeCandidate}
+          label={getNameColumnLabel(elections)}
+          value={candidate}
+        >
+          <MenuItem value="all">{getAllWinnersLabel(elections)}</MenuItem>
+          {candidates.map((candidate) => (
+            <MenuItem key={candidate} value={candidate}>
+              {candidatesConfig[candidate].name}
+            </MenuItem>
+          ))}
+        </TextField>
+      )}
     </Stack>
   );
 };

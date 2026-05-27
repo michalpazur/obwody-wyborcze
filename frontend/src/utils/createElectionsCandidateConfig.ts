@@ -14,7 +14,6 @@ export const createElectionsCandidateConfig = (
     const candidateConfig = candidatesConfig[key];
 
     config[key] = {
-      numColors,
       ...baseConfig[key],
       ...createColorConfig(
         candidateConfig.baseColor || colors.grey.baseColor,

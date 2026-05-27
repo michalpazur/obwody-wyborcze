@@ -17,7 +17,6 @@ import { getGradientOptions } from "../../../../utils/getGradientOptions";
 import { getLastName } from "../../../../utils/getLastName";
 import { mergeSx } from "../../../../utils/mergeSx";
 
-const colorBoxWidth = 5;
 const colorBoxSpacing = 0.25;
 
 const root: SxProps<Theme> = (theme) => ({
@@ -50,7 +49,7 @@ const text: SxProps<Theme> = (theme) => ({
 const legendText: SxProps<Theme> = {
   fontSize: "10px",
   color: (theme) => theme.palette.secondary.light,
-  width: (theme) => theme.spacing(colorBoxWidth),
+  width: (theme) => theme.spacing(2.5),
   textAlign: "center",
   "&:last-child::after": {
     content: "'%'",
@@ -58,7 +57,6 @@ const legendText: SxProps<Theme> = {
 };
 
 const colorBox: SxProps<Theme> = {
-  width: (theme) => theme.spacing(colorBoxWidth),
   height: (theme) => theme.spacing(2),
   opacity: mapOpacity,
 };
@@ -71,6 +69,7 @@ const Legend: React.FC = () => {
     maxGradient = 100,
     numColors = GRADIENT_COLORS,
   } = getGradientOptions(candidate, elections);
+  const colorBoxWidth = numColors <= 5 ? 5 : 2.5;
 
   const winners = useMemo(() => {
     const electionWinners = electionConfig.winners.filter(
@@ -107,6 +106,10 @@ const Legend: React.FC = () => {
     electionConfig.type !== "president" ? { minWidth: "unset" } : {},
   ]);
 
+  const widthSx: SxProps<Theme> = (theme) => ({
+    width: theme.spacing(colorBoxWidth),
+  });
+
   return (
     <Card variant="outlined" elevation={1} sx={root}>
       <Typography sx={{ fontFamily: "'Bree Serif'", mb: 2 }}>Wynik</Typography>
@@ -121,6 +124,7 @@ const Legend: React.FC = () => {
                   key={idx}
                   sx={[
                     colorBox,
+                    widthSx,
                     {
                       backgroundColor:
                         getCandidateConfig(winner, elections).gradient?.[idx] ||
@@ -143,12 +147,16 @@ const Legend: React.FC = () => {
           }}
           spacing={colorBoxSpacing}
         >
-          {colorsArr.slice(0, numColors - 1).map((_, idx) => (
-            <Typography sx={legendText} key={idx}>
-              {((idx + 1) * (maxGradient - minGradient)) / numColors +
-                minGradient}
-            </Typography>
-          ))}
+          {colorsArr.slice(0, numColors - 1).map((_, idx) =>
+            numColors <= 5 || idx % 2 == 0 ? (
+              <Typography sx={[legendText, widthSx]} key={idx}>
+                {((idx + 1) * (maxGradient - minGradient)) / numColors +
+                  minGradient}
+              </Typography>
+            ) : (
+              <Box key={idx} sx={widthSx} />
+            ),
+          )}
         </Stack>
       </Stack>
     </Card>
