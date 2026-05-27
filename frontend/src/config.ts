@@ -1,48 +1,17 @@
 import { colors } from "./colors";
 import { parties, presidentialCandidates } from "./static";
-
-export type CandidateId =
-  | "yes"
-  | "no"
-  | "bartosiewicz"
-  | "biejat"
-  | "braun"
-  | "holownia"
-  | "jakubiak"
-  | "maciak"
-  | "mentzen"
-  | "nawrocki"
-  | "senyszyn"
-  | "stanowski"
-  | "trzaskowski"
-  | "woch"
-  | "zandberg"
-  | "ap"
-  | "bs"
-  | "ko"
-  | "konfederacja"
-  | "mn"
-  | "nk"
-  | "nl"
-  | "pis"
-  | "pjj"
-  | "p2050_psl"
-  | "rdip"
-  | "rnp";
-
-export type Candidate = {
-  name: string;
-  short?: string;
-  color?: string;
-  gradient?: string[];
-  avatarUrl?: string;
-  maxGradient?: number;
-};
+import {
+  Candidate,
+  CandidateId,
+  ElectionCandidateConfig,
+} from "./types/config";
+import { createElectionsCandidateConfig } from "./utils/createElectionsCandidateConfig";
+import { GradientOptions } from "./utils/generateFillColors";
 
 export const candidatesConfig: Record<CandidateId, Candidate> = {
   yes: {
     name: "Tak",
-    ...colors.green,
+    ...colors.lightGreen,
   },
   no: {
     name: "Nie",
@@ -171,10 +140,13 @@ type ElectionConfig = {
   candidates: CandidateId[];
   winners: CandidateId[];
   sourceLayer: string;
-} & (
-  | { type: "parliament" | "president"; question?: never }
-  | { type: "referendum"; question: string }
-);
+  candidatesConfig?: Partial<Record<CandidateId, ElectionCandidateConfig>>;
+  hideWinners?: boolean;
+} & GradientOptions &
+  (
+    | { type: "parliament" | "president"; question?: never }
+    | { type: "referendum"; question: string }
+  );
 
 export const electionsConfig: Record<ElectionId, ElectionConfig> = {
   parl_2023: {
@@ -241,6 +213,13 @@ export const electionsConfig: Record<ElectionId, ElectionConfig> = {
     candidates: ["yes", "no"],
     winners: ["yes", "no"],
     sourceLayer: "ref_krk2026_1",
+    minGradient: 90,
+    numColors: 10,
+    hideWinners: true,
+    candidatesConfig: createElectionsCandidateConfig(
+      { yes: { minGradient: 90 }, no: { maxGradient: 5, hideInLegend: true } },
+      10,
+    ),
   },
   ref_krk2026_2: {
     id: "ref_krk2026_2",
@@ -252,10 +231,18 @@ export const electionsConfig: Record<ElectionId, ElectionConfig> = {
     candidates: ["yes", "no"],
     winners: ["yes", "no"],
     sourceLayer: "ref_krk2026_2",
+    minGradient: 90,
+    numColors: 10,
+    hideWinners: true,
+    candidatesConfig: createElectionsCandidateConfig(
+      { yes: { minGradient: 90 }, no: { minGradient: 5, hideInLegend: true } },
+      10,
+    ),
   },
 };
 
-export const tieGradient = colors.grey.gradient;
+export const tieColorConfig = colors.grey;
+export const tieGradient = tieColorConfig.gradient;
 
 export const mapOpacity = 1;
 
@@ -267,3 +254,5 @@ export const layerIds = {
   outline: "outline",
   city: "city",
 };
+
+export type { Candidate, CandidateId };

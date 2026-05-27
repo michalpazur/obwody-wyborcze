@@ -15,15 +15,16 @@ import React, {
 } from "react";
 import { Layer, Map as MapComponent, MapRef } from "react-map-gl/maplibre";
 import {
-  candidatesConfig,
   electionsConfig,
   layerIds,
   mapOpacity,
-  tieGradient,
+  tieColorConfig,
 } from "../../config";
 import { useElectionsStore } from "../../redux/electionsSlice";
 import { DistrictInfo } from "../../types";
 import { generateFillColors } from "../../utils/generateFillColors";
+import { getCandidateConfig } from "../../utils/getCandidateConfig";
+import { getGradientOptions } from "../../utils/getGradientOptions";
 import DistrictInfoComponent from "./components/DistrictInfo";
 import { ElectionsDataSource } from "./components/Layers/ElectionDataSource";
 import FeaturesSource from "./components/Layers/FeaturesSource";
@@ -52,7 +53,7 @@ const Map = () => {
       source: elections,
       sourceLayer: electionsConfig[elections].sourceLayer,
     }),
-    [elections]
+    [elections],
   );
 
   useEffect(() => {
@@ -77,7 +78,7 @@ const Map = () => {
     if (hoveredId) {
       mapRef.current?.setFeatureState(
         { ...featureSelector, id: hoveredId },
-        { hovered: false }
+        { hovered: false },
       );
     }
 
@@ -86,7 +87,7 @@ const Map = () => {
       setHovered({ ...feature.properties, id: feature.id } as DistrictInfo);
       mapRef.current?.setFeatureState(
         { ...featureSelector, id: feature.id },
-        { hovered: true }
+        { hovered: true },
       );
     } else {
       setHovered(undefined);
@@ -105,7 +106,7 @@ const Map = () => {
 
     mapRef.current?.setFeatureState(
       { ...featureSelector, id: hoveredId },
-      { hovered: false }
+      { hovered: false },
     );
     hoveredId = undefined;
     setHovered(undefined);
@@ -119,7 +120,7 @@ const Map = () => {
       if (clicked) {
         mapRef.current?.setFeatureState(
           { ...featureSelector, id: clicked.id },
-          { clicked: false }
+          { clicked: false },
         );
       }
 
@@ -129,21 +130,25 @@ const Map = () => {
         setClicked({ ...feature.properties, id: feature.id } as DistrictInfo);
         mapRef.current?.setFeatureState(
           { ...featureSelector, id: feature.id },
-          { clicked: true }
+          { clicked: true },
         );
       }
     },
-    [clicked]
+    [clicked],
   );
 
   const mapLayers = useMemo(() => {
+    const electionConfig = electionsConfig[elections];
+    const gradientOptions = getGradientOptions(candidate, elections);
+
     return (
       <ElectionsDataSource>
         {candidate === "all" ? (
-          electionsConfig[elections].winners.map((winnerId) => {
+          electionConfig.winners.map((winnerId) => {
             const fill = generateFillColors(
               `${winnerId}_proc`,
-              candidatesConfig[winnerId].gradient
+              getCandidateConfig(winnerId, elections),
+              gradientOptions,
             );
             return (
               <Layer
@@ -170,8 +175,8 @@ const Map = () => {
             paint={{
               "fill-color": generateFillColors(
                 `${candidate}_proc`,
-                candidatesConfig[candidate].gradient,
-                candidatesConfig[candidate].maxGradient
+                getCandidateConfig(candidate, elections),
+                gradientOptions,
               ),
               "fill-opacity": mapOpacity,
             }}
@@ -182,7 +187,7 @@ const Map = () => {
             filter={[
               "all",
               ...electionsConfig[elections].winners.map(
-                (winner) => ["!=", "winner", winner] as ExpressionSpecification
+                (winner) => ["!=", "winner", winner] as ExpressionSpecification,
               ),
             ]}
             id="tie"
@@ -190,7 +195,11 @@ const Map = () => {
             type="fill"
             source-layer={selectedElections.sourceLayer}
             paint={{
-              "fill-color": generateFillColors("winner_proc", tieGradient),
+              "fill-color": generateFillColors(
+                "winner_proc",
+                { baseColor: tieColorConfig.baseColor },
+                gradientOptions,
+              ),
               "fill-opacity": mapOpacity,
             }}
           />

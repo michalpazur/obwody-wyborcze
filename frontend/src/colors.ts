@@ -12,17 +12,7 @@ import {
   yellow,
 } from "@mui/material/colors";
 import chroma from "chroma-js";
-
-export const GRADIENT_COLORS = 5;
-
-type Color = Record<keyof typeof blue, string>;
-
-const createColorConfig = (color: Color) => {
-  return {
-    color: color[700],
-    gradient: chroma.scale([color[300], color[900]]).colors(GRADIENT_COLORS),
-  };
-};
+import { createColorConfig, GRADIENT_COLORS } from "./utils/createColorConfig";
 
 export const colors = {
   blue: createColorConfig(blue),

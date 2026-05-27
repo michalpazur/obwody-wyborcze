@@ -1,24 +1,50 @@
 import { ExpressionSpecification } from "maplibre-gl";
-import { GRADIENT_COLORS } from "../colors";
-import { tieGradient } from "../config";
 import { ProcentKey } from "../types";
+import {
+  ColorConfig,
+  createColorConfig,
+  GRADIENT_COLORS,
+} from "./createColorConfig";
+import { tieGradient } from "../config";
+import { colors } from "../colors";
+
+export type GradientOptions = {
+  minGradient?: number;
+  maxGradient?: number;
+  numColors?: number;
+};
 
 export const generateFillColors = (
   key: ProcentKey,
-  gradient: string[] = tieGradient,
-  maxGradient: number = 100
+  colorConfig: Partial<ColorConfig>,
+  options?: GradientOptions,
 ) => {
-  if (!gradient) {
+  const {
+    minGradient = 0,
+    maxGradient = 100,
+    numColors = GRADIENT_COLORS,
+  } = options || {};
+
+  if (!colorConfig) {
     return "#616161";
   }
 
+  const gradient = colorConfig.gradient
+    ? colorConfig.gradient
+    : numColors !== GRADIENT_COLORS
+      ? createColorConfig(colors.grey.baseColor, numColors).gradient
+      : tieGradient;
+
   const arr = ["step", ["get", key]];
-  Array(GRADIENT_COLORS - 1)
+  Array(numColors - 1)
     .fill(0)
     .forEach((_, idx) => {
-      // @ts-ignore
-      arr.push(gradient[idx], ((idx + 1) * maxGradient) / GRADIENT_COLORS);
+      arr.push(
+        gradient[idx],
+        // @ts-expect-error
+        ((idx + 1) * (maxGradient - minGradient)) / numColors + minGradient,
+      );
     });
-  arr.push(gradient[GRADIENT_COLORS - 1]);
+  arr.push(gradient[numColors - 1]);
   return arr as ExpressionSpecification;
 };

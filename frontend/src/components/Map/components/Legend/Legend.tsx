@@ -1,18 +1,22 @@
 import { Box, Card, Stack, SxProps, Theme, Typography } from "@mui/material";
-import React, { useCallback } from "react";
-import { GRADIENT_COLORS } from "../../../../colors";
+import React, { useCallback, useMemo } from "react";
 import {
   CandidateId,
   candidatesConfig,
   electionsConfig,
   mapOpacity,
-  tieGradient,
+  tieColorConfig,
 } from "../../../../config";
 import { useElectionsStore } from "../../../../redux/electionsSlice";
+import {
+  createColorConfig,
+  GRADIENT_COLORS,
+} from "../../../../utils/createColorConfig";
+import { getCandidateConfig } from "../../../../utils/getCandidateConfig";
+import { getGradientOptions } from "../../../../utils/getGradientOptions";
 import { getLastName } from "../../../../utils/getLastName";
-import { useIsParliamentaryElection } from "../../../../utils/useIsParliamentaryElection";
+import { mergeSx } from "../../../../utils/mergeSx";
 
-const colors = Array(GRADIENT_COLORS).fill(0);
 const colorBoxWidth = 5;
 const colorBoxSpacing = 0.25;
 
@@ -61,30 +65,47 @@ const colorBox: SxProps<Theme> = {
 
 const Legend: React.FC = () => {
   const { elections, candidate } = useElectionsStore();
-  const isParliamentaryElection = useIsParliamentaryElection();
+  const electionConfig = electionsConfig[elections];
+  const {
+    minGradient = 0,
+    maxGradient = 100,
+    numColors = GRADIENT_COLORS,
+  } = getGradientOptions(candidate, elections);
 
-  const winners =
-    candidate === "all"
-      ? electionsConfig[elections].winners.slice(0, 3)
-      : [candidate];
+  const winners = useMemo(() => {
+    const electionWinners = electionConfig.winners.filter(
+      (candidate) =>
+        !electionConfig.candidatesConfig?.[candidate]?.hideInLegend,
+    );
 
-  const maxGradient =
-    candidate === "all"
-      ? 100
-      : (candidatesConfig[candidate].maxGradient ?? 100);
+    return candidate === "all" ? electionWinners.slice(0, 3) : [candidate];
+  }, [candidate, elections]);
+
+  const tieGradient = useMemo(() => {
+    if (numColors !== GRADIENT_COLORS) {
+      return createColorConfig(tieColorConfig.baseColor, numColors).gradient;
+    }
+
+    return tieColorConfig.gradient;
+  }, [numColors]);
+
+  const colorsArr = Array.from(Array(numColors));
 
   const getLegendName = useCallback(
     (winner: CandidateId) => {
       const candidateConfig = candidatesConfig[winner];
 
-      if (isParliamentaryElection) {
-        return candidateConfig.name;
-      }
-
-      return getLastName(candidateConfig.name);
+      return electionConfig.type === "president"
+        ? getLastName(candidateConfig.name)
+        : candidateConfig.name;
     },
-    [isParliamentaryElection, candidatesConfig, electionsConfig],
+    [candidatesConfig, electionConfig],
   );
+
+  const nameSx = mergeSx([
+    text,
+    electionConfig.type !== "president" ? { minWidth: "unset" } : {},
+  ]);
 
   return (
     <Card variant="outlined" elevation={1} sx={root}>
@@ -92,9 +113,9 @@ const Legend: React.FC = () => {
       <Stack spacing={1}>
         {winners.map((winner) => (
           <Stack spacing={2} direction="row" alignItems="center" key={winner}>
-            <Typography sx={text}>{getLegendName(winner)}</Typography>
+            <Typography sx={nameSx}>{getLegendName(winner)}</Typography>
             <Stack direction="row" spacing={colorBoxSpacing}>
-              {colors.map((_, idx) => (
+              {colorsArr.map((_, idx) => (
                 <Box
                   component="span"
                   key={idx}
@@ -102,7 +123,7 @@ const Legend: React.FC = () => {
                     colorBox,
                     {
                       backgroundColor:
-                        candidatesConfig[winner].gradient?.[idx] ||
+                        getCandidateConfig(winner, elections).gradient?.[idx] ||
                         tieGradient[idx],
                     },
                   ]}
@@ -122,9 +143,10 @@ const Legend: React.FC = () => {
           }}
           spacing={colorBoxSpacing}
         >
-          {colors.slice(0, GRADIENT_COLORS - 1).map((_, idx) => (
+          {colorsArr.slice(0, numColors - 1).map((_, idx) => (
             <Typography sx={legendText} key={idx}>
-              {((idx + 1) * maxGradient) / GRADIENT_COLORS}
+              {((idx + 1) * (maxGradient - minGradient)) / numColors +
+                minGradient}
             </Typography>
           ))}
         </Stack>
