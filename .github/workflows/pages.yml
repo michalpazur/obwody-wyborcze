@@ -45,6 +45,8 @@ jobs:
           VITE_G_TAG: ${{ secrets.VITE_G_TAG }}
       - name: Setup Pages
         uses: actions/configure-pages@v5
+      - run: echo ${{ secrets.DOMAIN_NAME }} > CNAME
+        working-directory: './frontend/dist'
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

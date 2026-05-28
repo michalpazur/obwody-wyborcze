@@ -303,7 +303,7 @@ const Map = () => {
           : [candidate]
       }
       style={{ width: "100%", height: "100%" }}
-      mapStyle="/obwody-wyborcze/map-style.json"
+      mapStyle="/map-style.json"
     >
       {featuresMapLayers}
       {mapLayers}
