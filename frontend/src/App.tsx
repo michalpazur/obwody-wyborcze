@@ -11,7 +11,6 @@ const App = () => {
   const { elections } = useElectionsStore();
 
   useEffect(() => {
-    history.replaceState(null, "", `?election=${elections}`);
     document.title = electionsConfig[elections].htmlTitle;
   }, [elections]);
 
@@ -22,7 +21,10 @@ const App = () => {
         <Routes>
           <Route index element={<Navigate replace to="/map" />} />
           <Route path="/map" element={<MapScreen />} />
-          <Route path="/local/:id" element={<LocalElectionsScreen />} />
+          <Route
+            path="/local/:localElectionId"
+            element={<LocalElectionsScreen />}
+          />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>

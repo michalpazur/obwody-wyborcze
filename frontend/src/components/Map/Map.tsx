@@ -26,6 +26,7 @@ import { DistrictInfo } from "../../types";
 import { generateFillColors } from "../../utils/generateFillColors";
 import { getCandidateConfig } from "../../utils/getCandidateConfig";
 import { getGradientOptions } from "../../utils/getGradientOptions";
+import BoundsController from "./components/BoundsController";
 import DistrictInfoComponent from "./components/DistrictInfo";
 import { ElectionsDataSource } from "./components/Layers/ElectionDataSource";
 import FeaturesSource from "./components/Layers/FeaturesSource";
@@ -312,6 +313,7 @@ const Map = () => {
       ) : null}
       <Legend />
       <DistrictInfoComponent districtInfo={clicked} />
+      <BoundsController />
     </MapComponent>
   );
 };

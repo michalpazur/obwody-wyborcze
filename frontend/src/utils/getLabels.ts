@@ -25,3 +25,13 @@ export const getAllWinnersLabel = (elections: ElectionId) => {
       return "Wszyscy";
   }
 };
+
+export const getElectionLabel = (election: ElectionId) => {
+  const electionConfig = electionsConfig[election];
+
+  if (electionConfig.tabName) {
+    return electionConfig.tabName;
+  }
+
+  return electionConfig.name;
+};

@@ -14,6 +14,7 @@ const rootSx: SxProps = {
 
 const MapScreen: React.FC<Partial<MapContextType>> = ({
   availableElections,
+  localElections = false,
 }) => {
   const elections = useMemo(() => {
     if (!availableElections) {
@@ -28,7 +29,7 @@ const MapScreen: React.FC<Partial<MapContextType>> = ({
   useElectionParam(elections);
 
   return (
-    <MapContext value={{ availableElections: elections }}>
+    <MapContext value={{ availableElections: elections, localElections }}>
       <Box component="main" sx={rootSx}>
         <Map />
       </Box>

@@ -1,4 +1,5 @@
 import { colors } from "./colors";
+import { krakow } from "./const/bounds";
 import { parties, presidentialCandidates } from "./static";
 import {
   Candidate,
@@ -232,6 +233,7 @@ export const localElectionsConfig: Record<
   ref_krk2026: {
     name: "Referendum Kraków 2026",
     elections: ["ref_krk2026_1", "ref_krk2026_2"],
+    bounds: krakow,
   },
 };
 

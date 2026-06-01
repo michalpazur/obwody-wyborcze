@@ -1,3 +1,4 @@
+import { LngLatBoundsLike, LngLatLike } from "maplibre-gl";
 import { ColorConfig } from "../utils/createColorConfig";
 import { GradientOptions } from "../utils/generateFillColors";
 
@@ -71,7 +72,10 @@ export type ElectionCandidatesConfig = Partial<
   Record<CandidateId, ElectionCandidateConfig>
 >;
 
+export type BoundsAndCenter = { bounds: LngLatBoundsLike; center: LngLatLike };
+
 export type LocalElectionsConfig = {
   name: string;
   elections: ElectionId[];
+  bounds: BoundsAndCenter;
 };
