@@ -1,10 +1,11 @@
 import { MenuItem, Stack } from "@mui/material";
-import React, { useMemo } from "react";
+import React, { useContext, useMemo } from "react";
 import {
   candidatesConfig,
   ElectionId,
   electionsConfig,
 } from "../../../../../config";
+import { MapContext } from "../../../../../context/MapContext";
 import {
   CandidatesKey,
   useElectionsStore,
@@ -19,6 +20,7 @@ const ElectionsSelects: React.FC = () => {
   const { elections, setElections, candidate, setCandidate } =
     useElectionsStore();
   const electionConfig = electionsConfig[elections];
+  const { availableElections } = useContext(MapContext);
 
   const onChangeElections = (e: React.ChangeEvent<HTMLInputElement>) => {
     const elections = e.target.value as ElectionId;
@@ -46,7 +48,7 @@ const ElectionsSelects: React.FC = () => {
         label="Wybory"
         value={elections}
       >
-        {(Object.keys(electionsConfig) as ElectionId[]).map((key) => (
+        {availableElections.map((key) => (
           <MenuItem key={key} value={key}>
             {electionsConfig[key].name}
           </MenuItem>

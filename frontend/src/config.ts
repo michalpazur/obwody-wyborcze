@@ -3,16 +3,18 @@ import { parties, presidentialCandidates } from "./static";
 import {
   Candidate,
   CandidateId,
-  ElectionCandidateConfig,
+  ElectionConfig,
+  ElectionId,
+  LocalElectionId,
+  LocalElectionsConfig,
 } from "./types/config";
 import { createElectionsCandidateConfig } from "./utils/createElectionsCandidateConfig";
-import { GradientOptions } from "./utils/generateFillColors";
 
 export const candidatesConfig: Record<CandidateId, Candidate> = {
   yes: {
     name: "Tak",
     candidateId: "yes",
-    ...colors.green,
+    ...colors.lightGreen,
   },
   no: {
     name: "Nie",
@@ -128,28 +130,6 @@ export const candidatesConfig: Record<CandidateId, Candidate> = {
   rnp: { name: "Ruch Naprawy Polski", short: "RNP" },
 };
 
-export type ElectionId =
-  | "parl_2023"
-  | "pres_2025_1"
-  | "pres_2025_2"
-  | "ref_krk2026_1"
-  | "ref_krk2026_2";
-
-type ElectionConfig = {
-  id: ElectionId;
-  name: string;
-  htmlTitle: string;
-  candidates: CandidateId[];
-  winners: CandidateId[];
-  sourceLayer: string;
-  candidatesConfig?: Partial<Record<CandidateId, ElectionCandidateConfig>>;
-  hideWinners?: boolean;
-} & GradientOptions &
-  (
-    | { type: "parliament" | "president"; question?: never }
-    | { type: "referendum"; question: string }
-  );
-
 export const electionsConfig: Record<ElectionId, ElectionConfig> = {
   parl_2023: {
     id: "parl_2023",
@@ -209,6 +189,7 @@ export const electionsConfig: Record<ElectionId, ElectionConfig> = {
     id: "ref_krk2026_1",
     name: "Referendum Kraków 2026 (Prezydent)",
     htmlTitle: "Referendum w sprawie odwołania Prezydenta Krakowa",
+    tabName: "Pytanie 1",
     type: "referendum",
     question:
       "Czy jest Pan/Pani za odwołaniem Pana Aleksandra Jana Miszalskiego z funkcji Prezydenta Miasta Krakowa przed upływem kadencji?",
@@ -227,6 +208,7 @@ export const electionsConfig: Record<ElectionId, ElectionConfig> = {
     id: "ref_krk2026_2",
     name: "Referendum Kraków 2026 (Rada Miasta)",
     htmlTitle: "Referendum w sprawie odwołania Rady Miasta Krakowa",
+    tabName: "Pytanie 2",
     type: "referendum",
     question:
       "Czy jest Pan/Pani za odwołaniem Rady Miasta Krakowa przed upływem kadencji?",
@@ -243,6 +225,23 @@ export const electionsConfig: Record<ElectionId, ElectionConfig> = {
   },
 };
 
+export const localElectionsConfig: Record<
+  LocalElectionId,
+  LocalElectionsConfig
+> = {
+  ref_krk2026: {
+    name: "Referendum Kraków 2026",
+    elections: ["ref_krk2026_1", "ref_krk2026_2"],
+  },
+};
+
+export const allLocalElections = Object.keys(localElectionsConfig).flatMap(
+  (k) => {
+    const key = k as LocalElectionId;
+    return localElectionsConfig[key].elections;
+  },
+);
+
 export const tieColorConfig = colors.grey;
 export const tieGradient = tieColorConfig.gradient;
 
@@ -258,4 +257,6 @@ export const layerIds = {
   city: "city",
 };
 
-export type { Candidate, CandidateId };
+export type { Candidate, CandidateId, ElectionConfig, ElectionId };
+
+export const homePath = "/map";
