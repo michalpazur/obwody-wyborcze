@@ -11,10 +11,11 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useElectionsStore } from "../../../../redux/electionsSlice";
 import { DistrictInfo } from "../../../../types";
 import { sortResults } from "../../../../utils/sortResults";
+import { useLocalElectionConfig } from "../../../../utils/useLocalElectionConfig";
 import ResultsTable from "../ResultsTable";
 import ElectionsSelects from "./components/ElectionsSelects";
 import SideButtons from "./components/SideButtons";
-import { stackSpacing } from "./components/styles";
+import { stackSpacing, textSx } from "./components/styles";
 
 const stackSx: SxProps<Theme> = (theme) => ({
   position: "absolute",
@@ -50,11 +51,6 @@ const countyName: SxProps = {
   fontFamily: "'Bree Serif'",
 };
 
-const text: SxProps<Theme> = {
-  fontSize: "14px",
-  color: (theme) => theme.palette.secondary.main,
-};
-
 const CardWithSlide: React.FC<{
   children: React.ReactNode;
   open: boolean;
@@ -87,6 +83,7 @@ const DistrictInfoComponent: React.FC<{
 }> = ({ districtInfo }) => {
   const [open, setOpen] = useState(true);
   const { elections } = useElectionsStore();
+  const localElectionsConfig = useLocalElectionConfig();
 
   useEffect(() => {
     if (districtInfo) {
@@ -109,15 +106,19 @@ const DistrictInfoComponent: React.FC<{
   return (
     <CardWithSlide open={open} onClose={onCloseClick}>
       <Stack spacing={4}>
-        <Typography variant="h2">Szczegółowe wyniki</Typography>
+        <Typography variant="h2">
+          {localElectionsConfig
+            ? localElectionsConfig.name
+            : "Szczegółowe wyniki"}
+        </Typography>
         <ElectionsSelects />
         {districtInfo ? (
           <Box>
-            <Typography sx={text}>
+            <Typography sx={textSx}>
               Obwodowa Komisja Wyborcza {districtInfo.number}
             </Typography>
             <Typography sx={countyName}>{districtInfo.gmina}</Typography>
-            <Typography sx={text}>
+            <Typography sx={textSx}>
               Frekwencja{" "}
               <Typography component="span" sx={countyName}>
                 {districtInfo.turnout}%
@@ -125,7 +126,7 @@ const DistrictInfoComponent: React.FC<{
             </Typography>
           </Box>
         ) : (
-          <Typography sx={text}>
+          <Typography sx={textSx}>
             Kliknij na mapie żeby zobaczyć szczegółowe wyniki w wybranej
             Obwodowej Komisji Wyborczej.
           </Typography>

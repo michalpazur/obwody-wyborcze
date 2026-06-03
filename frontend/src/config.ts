@@ -231,7 +231,7 @@ export const localElectionsConfig: Record<
   LocalElectionsConfig
 > = {
   ref_krk2026: {
-    name: "Referendum Kraków 2026",
+    name: "Referendum w Krakowie",
     elections: ["ref_krk2026_1", "ref_krk2026_2"],
     bounds: krakow,
   },

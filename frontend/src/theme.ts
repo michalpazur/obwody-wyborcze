@@ -1,4 +1,16 @@
-import { alpha, createTheme } from "@mui/material";
+import {
+  alpha,
+  createTheme,
+  CSSObject,
+  tabClasses,
+  Theme,
+} from "@mui/material";
+
+const glassStyle = (theme: Theme): CSSObject => ({
+  backgroundColor: alpha(theme.palette.background.paper, 0.8),
+  backdropFilter: "blur(10px)",
+  boxShadow: `0 4px 12px 0 ${alpha(theme.palette.text.primary, 0.1)}`,
+});
 
 export const theme = createTheme({
   typography: {
@@ -8,11 +20,11 @@ export const theme = createTheme({
       fontFamily: "'Bree Serif'",
     },
     h2: {
-      fontSize: "32px",
+      fontSize: "24px",
       fontFamily: "'Bree Serif'",
     },
     h3: {
-      fontSize: "28px",
+      fontSize: "18px",
       fontFamily: "'Bree Serif'",
     },
   },
@@ -41,9 +53,7 @@ export const theme = createTheme({
         root: ({ ownerState }) => ({
           ...(ownerState.variant === "outlined" && {
             border: "none",
-            backgroundColor: alpha(theme.palette.background.paper, 0.8),
-            backdropFilter: "blur(10px)",
-            boxShadow: `0 4px 12px 0 ${alpha(theme.palette.text.primary, 0.1)}`,
+            ...glassStyle(theme),
           }),
         }),
       },
@@ -60,12 +70,7 @@ export const theme = createTheme({
               props: { variant: "outlined" },
               style: {
                 borderRadius: theme.shape.borderRadius,
-                backgroundColor: alpha(theme.palette.background.paper, 0.8),
-                backdropFilter: "blur(10px)",
-                boxShadow: `0 4px 12px 0 ${alpha(
-                  theme.palette.text.primary,
-                  0.1
-                )}`,
+                ...glassStyle(theme),
                 "&:hover": {
                   backgroundColor: alpha(theme.palette.background.default, 0.8),
                 },
@@ -138,6 +143,45 @@ export const theme = createTheme({
       styleOverrides: {
         root: ({ theme }) => ({
           color: theme.palette.background.paper,
+        }),
+      },
+    },
+    MuiTabs: {
+      styleOverrides: {
+        root: {
+          minHeight: "unset",
+        },
+        list: ({ theme }) => ({
+          borderRadius: theme.spacing(10),
+          border: "1px solid",
+          borderColor: theme.palette.divider,
+        }),
+        indicator: ({ theme }) => ({
+          top: "0px",
+          height: "unset",
+          borderRadius: theme.spacing(10),
+          backgroundColor: theme.palette.text.primary,
+        }),
+      },
+    },
+    MuiTab: {
+      styleOverrides: {
+        root: ({ theme }) => ({
+          textTransform: "unset",
+          flex: "1",
+          fontSize: "1rem",
+          zIndex: "1",
+          color: theme.palette.text.primary,
+          padding: theme.spacing(2, 3),
+          borderRadius: theme.spacing(10),
+          minHeight: "unset",
+          transition: theme.transitions.create("color", {
+            duration: theme.transitions.duration.short,
+          }),
+          [`&.${tabClasses.selected}`]: {
+            color: theme.palette.background.paper,
+            fontWeight: "bold",
+          },
         }),
       },
     },
