@@ -115,7 +115,12 @@ const Legend: React.FC = () => {
       <Typography sx={{ fontFamily: "'Bree Serif'", mb: 2 }}>Wynik</Typography>
       <Stack spacing={1}>
         {winners.map((winner) => (
-          <Stack spacing={2} direction="row" alignItems="center" key={winner}>
+          <Stack
+            spacing={2}
+            direction="row"
+            sx={{ alignItems: "center" }}
+            key={winner}
+          >
             <Typography sx={nameSx}>{getLegendName(winner)}</Typography>
             <Stack direction="row" spacing={colorBoxSpacing}>
               {colorsArr.map((_, idx) => (
@@ -138,7 +143,7 @@ const Legend: React.FC = () => {
         ))}
       </Stack>
       <Stack direction="row" spacing={2}>
-        <Box flexGrow="1" />
+        <Box sx={{ flexGrow: 1 }} />
         <Stack
           direction="row"
           sx={{

@@ -18,6 +18,7 @@ import SideButtons from "./components/SideButtons";
 import { stackSpacing, textSx } from "./components/styles";
 
 const stackSx: SxProps<Theme> = (theme) => ({
+  alignItems: "flex-start",
   position: "absolute",
   zIndex: 6,
   top: theme.spacing(6),
@@ -59,7 +60,6 @@ const CardWithSlide: React.FC<{
   return (
     <Stack
       direction="row"
-      alignItems="flex-start"
       spacing={stackSpacing}
       sx={stackSx}
     >

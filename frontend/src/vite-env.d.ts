@@ -1,5 +1,11 @@
 /// <reference types="vite/client" />
 
+declare module "@mui/material/IconButton" {
+  interface IconButtonOwnProps {
+    variant?: import("@mui/material/Button").ButtonOwnProps["variant"];
+  }
+}
+
 interface ViteTypeOptions {
   strictImportMetaEnv: unknown
 }
