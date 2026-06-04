@@ -7,8 +7,12 @@ export const useElectionParam = (
   availableElections: ElectionId[],
   defaultParam: ElectionId = "pres_2025_1",
 ) => {
-  const { setElections } = useElectionsStore();
+  const { elections, setElections } = useElectionsStore();
   const [searchParams, setSearchParams] = useSearchParams();
+
+  useEffect(() => {
+    setSearchParams({ election: elections }, { replace: true });
+  }, [elections]);
 
   useEffect(() => {
     const param = searchParams.get("election") as ElectionId;
@@ -17,7 +21,7 @@ export const useElectionParam = (
       setElections(param as ElectionId);
     } else {
       setElections(defaultParam);
-      setSearchParams({ election: defaultParam });
+      setSearchParams({ election: defaultParam }, { replace: true });
     }
   }, [searchParams]);
 };
