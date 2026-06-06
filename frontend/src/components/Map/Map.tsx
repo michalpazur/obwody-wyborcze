@@ -1,11 +1,6 @@
 import { useTheme } from "@mui/material";
 import { grey } from "@mui/material/colors";
-import {
-  ExpressionSpecification,
-  GeoJSONFeature,
-  LngLat,
-  MapLayerMouseEvent,
-} from "maplibre-gl";
+import { GeoJSONFeature, LngLat, MapLayerMouseEvent } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import React, {
   useCallback,
@@ -15,20 +10,13 @@ import React, {
   useState,
 } from "react";
 import { Layer, Map as MapComponent, MapRef } from "react-map-gl/maplibre";
-import {
-  electionsConfig,
-  layerIds,
-  mapOpacity,
-  tieColorConfig,
-} from "../../config";
+import { electionsConfig, layerIds } from "../../config";
 import { useElectionsStore } from "../../redux/electionsSlice";
 import { DistrictInfo } from "../../types";
-import { generateFillColors } from "../../utils/generateFillColors";
-import { getCandidateConfig } from "../../utils/getCandidateConfig";
-import { getGradientOptions } from "../../utils/getGradientOptions";
 import BoundsController from "./components/BoundsController";
 import DistrictInfoComponent from "./components/DistrictInfo";
 import { ElectionsDataSource } from "./components/Layers/ElectionDataSource";
+import ElectionsResultsLayer from "./components/Layers/ElectionResultsLayer";
 import FeaturesSource from "./components/Layers/FeaturesSource";
 import {
   placeClasses,
@@ -146,74 +134,7 @@ const Map = () => {
   );
 
   const mapLayers = useMemo(() => {
-    const electionConfig = electionsConfig[elections];
-    const gradientOptions = getGradientOptions(candidate, elections);
-
-    return (
-      <ElectionsDataSource>
-        {candidate === "all" ? (
-          electionConfig.winners.map((winnerId) => {
-            const fill = generateFillColors(
-              `${winnerId}_proc`,
-              getCandidateConfig(winnerId, elections),
-              gradientOptions,
-            );
-            return (
-              <Layer
-                key={winnerId}
-                filter={["==", "winner", winnerId]}
-                id={winnerId}
-                beforeId={layerIds.water}
-                type="fill"
-                source-layer={selectedElections.sourceLayer}
-                paint={{
-                  "fill-color": fill,
-                  "fill-opacity": mapOpacity,
-                }}
-              />
-            );
-          })
-        ) : (
-          <Layer
-            key={candidate}
-            id={candidate}
-            beforeId={layerIds.water}
-            type="fill"
-            source-layer={selectedElections.sourceLayer}
-            paint={{
-              "fill-color": generateFillColors(
-                `${candidate}_proc`,
-                getCandidateConfig(candidate, elections),
-                gradientOptions,
-              ),
-              "fill-opacity": mapOpacity,
-            }}
-          />
-        )}
-        {candidate === "all" && (
-          <Layer
-            filter={[
-              "all",
-              ...electionsConfig[elections].winners.map(
-                (winner) => ["!=", "winner", winner] as ExpressionSpecification,
-              ),
-            ]}
-            id="tie"
-            beforeId={layerIds.water}
-            type="fill"
-            source-layer={selectedElections.sourceLayer}
-            paint={{
-              "fill-color": generateFillColors(
-                "winner_proc",
-                { baseColor: tieColorConfig.baseColor },
-                gradientOptions,
-              ),
-              "fill-opacity": mapOpacity,
-            }}
-          />
-        )}
-      </ElectionsDataSource>
-    );
+    return <ElectionsResultsLayer />;
   }, [elections, candidate]);
 
   const featuresMapLayers = useMemo(() => {
@@ -300,8 +221,8 @@ const Map = () => {
       maxPitch={0}
       interactiveLayerIds={
         candidate === "all"
-          ? [...electionsConfig[elections].winners, "tie"]
-          : [candidate]
+          ? [...electionsConfig[elections].winners, "tie", "turnout"]
+          : [candidate, "turnout"]
       }
       style={{ width: "100%", height: "100%" }}
       mapStyle="/map-style.json"

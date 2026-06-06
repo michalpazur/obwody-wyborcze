@@ -9,16 +9,15 @@ import {
   LocalElectionId,
   LocalElectionsConfig,
 } from "./types/config";
-import { createElectionsCandidateConfig } from "./utils/createElectionsCandidateConfig";
 
 export const candidatesConfig: Record<CandidateId, Candidate> = {
   yes: {
-    name: "Tak",
+    name: "TAK",
     candidateId: "yes",
     ...colors.lightGreen,
   },
   no: {
-    name: "Nie",
+    name: "NIE",
     candidateId: "no",
     ...colors.red,
   },
@@ -153,6 +152,9 @@ export const electionsConfig: Record<ElectionId, ElectionConfig> = {
     ],
     winners: ["pis", "ko", "p2050_psl", "nl", "konfederacja"],
     sourceLayer: "parl_2023",
+    turnoutGradientOptions: {
+      minGradient: 40,
+    },
   },
   pres_2025_1: {
     id: "pres_2025_1",
@@ -176,6 +178,9 @@ export const electionsConfig: Record<ElectionId, ElectionConfig> = {
     ],
     winners: ["trzaskowski", "nawrocki", "mentzen", "braun", "zandberg"],
     sourceLayer: "pres_2025_1",
+    turnoutGradientOptions: {
+      minGradient: 40,
+    },
   },
   pres_2025_2: {
     id: "pres_2025_2",
@@ -185,6 +190,9 @@ export const electionsConfig: Record<ElectionId, ElectionConfig> = {
     candidates: ["nawrocki", "trzaskowski"],
     winners: ["nawrocki", "trzaskowski"],
     sourceLayer: "pres_2025_2",
+    turnoutGradientOptions: {
+      minGradient: 40,
+    },
   },
   ref_krk2026_1: {
     id: "ref_krk2026_1",
@@ -197,13 +205,19 @@ export const electionsConfig: Record<ElectionId, ElectionConfig> = {
     candidates: ["yes", "no"],
     winners: ["yes", "no"],
     sourceLayer: "ref_krk2026_1",
-    minGradient: 90,
-    numColors: 10,
     hideWinners: true,
-    candidatesConfig: createElectionsCandidateConfig(
-      { yes: { minGradient: 90 }, no: { maxGradient: 5, hideInLegend: true } },
-      10,
-    ),
+    gradientOptions: {
+      minGradient: 90,
+    },
+    turnoutGradientOptions: {
+      minGradient: 10,
+      maxGradient: 50,
+      numColors: 8,
+    },
+    candidatesConfig: {
+      yes: { minGradient: 90 },
+      no: { maxGradient: 5, hideInLegend: true },
+    },
   },
   ref_krk2026_2: {
     id: "ref_krk2026_2",
@@ -216,13 +230,19 @@ export const electionsConfig: Record<ElectionId, ElectionConfig> = {
     candidates: ["yes", "no"],
     winners: ["yes", "no"],
     sourceLayer: "ref_krk2026_2",
-    minGradient: 90,
-    numColors: 10,
     hideWinners: true,
-    candidatesConfig: createElectionsCandidateConfig(
-      { yes: { minGradient: 90 }, no: { minGradient: 5, hideInLegend: true } },
-      10,
-    ),
+    gradientOptions: {
+      minGradient: 90,
+    },
+    turnoutGradientOptions: {
+      minGradient: 10,
+      maxGradient: 50,
+      numColors: 8,
+    },
+    candidatesConfig: {
+      yes: { minGradient: 90 },
+      no: { maxGradient: 5, hideInLegend: true },
+    },
   },
 };
 
@@ -246,6 +266,9 @@ export const allLocalElections = Object.keys(localElectionsConfig).flatMap(
 
 export const tieColorConfig = colors.grey;
 export const tieGradient = tieColorConfig.gradient;
+
+export const turnoutColorConfig = colors.teal;
+export const turnoutGradient = turnoutColorConfig.gradient;
 
 export const mapOpacity = 1;
 

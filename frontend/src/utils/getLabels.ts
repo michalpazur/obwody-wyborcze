@@ -1,4 +1,6 @@
-import { ElectionId, electionsConfig } from "../config";
+import { CandidateId, ElectionId, electionsConfig } from "../config";
+import { getCandidateConfig } from "./getCandidateConfig";
+import { getLastName } from "./getLastName";
 
 export const getNameColumnLabel = (elections: ElectionId) => {
   const electionConfig = electionsConfig[elections];
@@ -23,6 +25,21 @@ export const getAllWinnersLabel = (elections: ElectionId) => {
       return "Wszystkie odpowiedzi";
     default:
       return "Wszyscy";
+  }
+};
+
+export const getWinnerName = (
+  candidate: CandidateId,
+  elections: ElectionId,
+) => {
+  const electionConfig = electionsConfig[elections];
+  const candidateConfig = getCandidateConfig(candidate, elections);
+
+  switch (electionConfig.type) {
+    case "president":
+      return getLastName(candidateConfig.name);
+    default:
+      return candidateConfig.name;
   }
 };
 

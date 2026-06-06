@@ -1,4 +1,4 @@
-import { MenuItem, Stack, Tab, Tabs, Typography } from "@mui/material";
+import { Box, MenuItem, Stack, Tab, Tabs, Typography } from "@mui/material";
 import React, { useContext, useMemo } from "react";
 import {
   candidatesConfig,
@@ -20,8 +20,14 @@ import TextField from "../../../../TextField";
 import { textSx } from "./styles";
 
 const ElectionsSelects: React.FC = () => {
-  const { elections, setElections, candidate, setCandidate } =
-    useElectionsStore();
+  const {
+    elections,
+    setElections,
+    candidate,
+    setCandidate,
+    showTurnout,
+    setShowTurnout,
+  } = useElectionsStore();
   const electionConfig = electionsConfig[elections];
   const { availableElections, localElections } = useContext(MapContext);
 
@@ -32,6 +38,13 @@ const ElectionsSelects: React.FC = () => {
 
   const onTabChange = (e: React.SyntheticEvent, value: ElectionId) => {
     setElections(value);
+  };
+
+  const onChangeShowTurnout = (
+    e: React.SyntheticEvent,
+    value: "turnout" | "results",
+  ) => {
+    setShowTurnout(value === "turnout");
   };
 
   const onChangeCandidate = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -48,7 +61,7 @@ const ElectionsSelects: React.FC = () => {
   );
 
   return (
-    <Stack spacing={localElections ? 4 : 2}>
+    <Stack spacing={2}>
       {!localElections ? (
         <TextField
           select
@@ -73,6 +86,13 @@ const ElectionsSelects: React.FC = () => {
           ))}
         </Tabs>
       )}
+      <Tabs
+        value={showTurnout ? "turnout" : "results"}
+        onChange={onChangeShowTurnout}
+      >
+        <Tab value="results" label="Wyniki" />
+        <Tab value="turnout" label="Frekwencja" />
+      </Tabs>
       {electionConfig.type === "referendum" && (
         <Typography
           variant="h3"
@@ -81,20 +101,23 @@ const ElectionsSelects: React.FC = () => {
           {electionConfig.question}
         </Typography>
       )}
-      {!electionConfig.hideWinners && (
-        <TextField
-          select
-          onChange={onChangeCandidate}
-          label={getNameColumnLabel(elections)}
-          value={candidate}
-        >
-          <MenuItem value="all">{getAllWinnersLabel(elections)}</MenuItem>
-          {candidates.map((candidate) => (
-            <MenuItem key={candidate} value={candidate}>
-              {candidatesConfig[candidate].name}
-            </MenuItem>
-          ))}
-        </TextField>
+      {!electionConfig.hideWinners && !showTurnout && (
+        <Box>
+          <TextField
+            select
+            onChange={onChangeCandidate}
+            label={getNameColumnLabel(elections)}
+            value={candidate}
+            sx={{ mt: 1, width: "100%" }}
+          >
+            <MenuItem value="all">{getAllWinnersLabel(elections)}</MenuItem>
+            {candidates.map((candidate) => (
+              <MenuItem key={candidate} value={candidate}>
+                {candidatesConfig[candidate].name}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Box>
       )}
     </Stack>
   );

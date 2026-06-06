@@ -2,7 +2,7 @@ import { GeoJSONFeature } from "maplibre-gl";
 import { CandidateId } from "../config";
 
 type VoteCount = Record<CandidateId, number>;
-export type ProcentKey = `${CandidateId | "winner"}_proc`;
+export type ProcentKey = `${CandidateId | "winner"}_proc` | "turnout";
 type VoteResult = Record<ProcentKey, number>;
 
 export type DistrictInfo = {

@@ -1,12 +1,7 @@
 import { ExpressionSpecification } from "maplibre-gl";
 import { ProcentKey } from "../types";
-import {
-  ColorConfig,
-  createColorConfig,
-  GRADIENT_COLORS,
-} from "./createColorConfig";
-import { tieGradient } from "../config";
-import { colors } from "../colors";
+import { ColorConfig, GRADIENT_COLORS } from "./createColorConfig";
+import { getGradient } from "./getGradient";
 
 export type GradientOptions = {
   minGradient?: number;
@@ -29,11 +24,7 @@ export const generateFillColors = (
     return "#616161";
   }
 
-  const gradient = colorConfig.gradient
-    ? colorConfig.gradient
-    : numColors !== GRADIENT_COLORS
-      ? createColorConfig(colors.grey.baseColor, numColors).gradient
-      : tieGradient;
+  const gradient = getGradient(colorConfig, numColors);
 
   const arr = ["step", ["get", key]];
   Array(numColors - 1)

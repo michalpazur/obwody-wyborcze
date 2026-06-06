@@ -1,20 +1,17 @@
 import { Box, Card, Stack, SxProps, Theme, Typography } from "@mui/material";
-import React, { useCallback, useMemo } from "react";
+import React, { useMemo } from "react";
 import {
   CandidateId,
-  candidatesConfig,
   electionsConfig,
   mapOpacity,
-  tieColorConfig,
+  turnoutColorConfig,
 } from "../../../../config";
 import { useElectionsStore } from "../../../../redux/electionsSlice";
-import {
-  createColorConfig,
-  GRADIENT_COLORS,
-} from "../../../../utils/createColorConfig";
+import { ColorConfig } from "../../../../utils/createColorConfig";
 import { getCandidateConfig } from "../../../../utils/getCandidateConfig";
+import { getGradient } from "../../../../utils/getGradient";
 import { getGradientOptions } from "../../../../utils/getGradientOptions";
-import { getLastName } from "../../../../utils/getLastName";
+import { getWinnerName } from "../../../../utils/getLabels";
 import { mergeSx } from "../../../../utils/mergeSx";
 
 const colorBoxSpacing = 0.25;
@@ -37,7 +34,6 @@ const text: SxProps<Theme> = (theme) => ({
   fontSize: "12px",
   color: (theme) => theme.palette.secondary.light,
   flex: "1",
-  minWidth: (theme) => theme.spacing(20),
   whiteSpace: "nowrap",
   overflow: "hidden",
   textOverflow: "ellipsis",
@@ -49,7 +45,6 @@ const text: SxProps<Theme> = (theme) => ({
 const legendText: SxProps<Theme> = {
   fontSize: "10px",
   color: (theme) => theme.palette.secondary.light,
-  width: (theme) => theme.spacing(2.5),
   textAlign: "center",
   "&:last-child::after": {
     content: "'%'",
@@ -61,14 +56,73 @@ const colorBox: SxProps<Theme> = {
   opacity: mapOpacity,
 };
 
-const Legend: React.FC = () => {
-  const { elections, candidate } = useElectionsStore();
+type WinnerRowProps = {
+  numColors: number;
+  colorBoxWidth: number;
+} & (
+  | { candidateId: CandidateId; showTurnout?: false }
+  | { showTurnout: true; candidateId?: never }
+);
+
+const WinnerRow: React.FC<WinnerRowProps> = ({
+  candidateId,
+  numColors,
+  colorBoxWidth,
+  showTurnout,
+}) => {
+  const { elections } = useElectionsStore();
   const electionConfig = electionsConfig[elections];
-  const {
-    minGradient = 0,
-    maxGradient = 100,
-    numColors = GRADIENT_COLORS,
-  } = getGradientOptions(candidate, elections);
+
+  const nameSx = mergeSx([
+    text,
+    (electionConfig.type === "president" && !showTurnout) ? { minWidth: "80px" } : {},
+  ]);
+
+  const gradient = useMemo(() => {
+    let colorConfig: Partial<ColorConfig>;
+    if (showTurnout) {
+      colorConfig = turnoutColorConfig;
+    } else {
+      colorConfig = getCandidateConfig(candidateId, elections);
+    }
+
+    return getGradient(colorConfig, numColors);
+  }, [candidateId, elections, numColors]);
+
+  const colorsArr = Array.from(Array(numColors));
+
+  return (
+    <Stack spacing={2} direction="row" sx={{ alignItems: "center" }}>
+      <Typography sx={nameSx}>
+        {showTurnout ? "Frekwencja" : getWinnerName(candidateId, elections)}
+      </Typography>
+      <Stack direction="row" spacing={colorBoxSpacing}>
+        {colorsArr.map((_, idx) => (
+          <Box
+            component="span"
+            key={idx}
+            sx={[
+              colorBox,
+              (theme) => ({ width: theme.spacing(colorBoxWidth) }),
+              {
+                backgroundColor: gradient[idx],
+              },
+            ]}
+          />
+        ))}
+      </Stack>
+    </Stack>
+  );
+};
+
+const Legend: React.FC = () => {
+  const { elections, candidate, showTurnout } = useElectionsStore();
+  const electionConfig = electionsConfig[elections];
+  const { minGradient, maxGradient, numColors } = getGradientOptions(
+    showTurnout,
+    candidate,
+    elections,
+  );
   const colorBoxWidth = numColors <= 5 ? 5 : 2.5;
 
   const winners = useMemo(() => {
@@ -80,31 +134,7 @@ const Legend: React.FC = () => {
     return candidate === "all" ? electionWinners.slice(0, 3) : [candidate];
   }, [candidate, elections]);
 
-  const tieGradient = useMemo(() => {
-    if (numColors !== GRADIENT_COLORS) {
-      return createColorConfig(tieColorConfig.baseColor, numColors).gradient;
-    }
-
-    return tieColorConfig.gradient;
-  }, [numColors]);
-
   const colorsArr = Array.from(Array(numColors));
-
-  const getLegendName = useCallback(
-    (winner: CandidateId) => {
-      const candidateConfig = candidatesConfig[winner];
-
-      return electionConfig.type === "president"
-        ? getLastName(candidateConfig.name)
-        : candidateConfig.name;
-    },
-    [candidatesConfig, electionConfig],
-  );
-
-  const nameSx = mergeSx([
-    text,
-    electionConfig.type !== "president" ? { minWidth: "unset" } : {},
-  ]);
 
   const widthSx: SxProps<Theme> = (theme) => ({
     width: theme.spacing(colorBoxWidth),
@@ -112,35 +142,23 @@ const Legend: React.FC = () => {
 
   return (
     <Card variant="outlined" elevation={1} sx={root}>
-      <Typography sx={{ fontFamily: "'Bree Serif'", mb: 2 }}>Wynik</Typography>
       <Stack spacing={1}>
-        {winners.map((winner) => (
-          <Stack
-            spacing={2}
-            direction="row"
-            sx={{ alignItems: "center" }}
-            key={winner}
-          >
-            <Typography sx={nameSx}>{getLegendName(winner)}</Typography>
-            <Stack direction="row" spacing={colorBoxSpacing}>
-              {colorsArr.map((_, idx) => (
-                <Box
-                  component="span"
-                  key={idx}
-                  sx={[
-                    colorBox,
-                    widthSx,
-                    {
-                      backgroundColor:
-                        getCandidateConfig(winner, elections).gradient?.[idx] ||
-                        tieGradient[idx],
-                    },
-                  ]}
-                />
-              ))}
-            </Stack>
-          </Stack>
-        ))}
+        {!showTurnout ? (
+          winners.map((winner) => (
+            <WinnerRow
+              key={winner}
+              candidateId={winner}
+              numColors={numColors}
+              colorBoxWidth={colorBoxWidth}
+            />
+          ))
+        ) : (
+          <WinnerRow
+            showTurnout
+            numColors={numColors}
+            colorBoxWidth={colorBoxWidth}
+          />
+        )}
       </Stack>
       <Stack direction="row" spacing={2}>
         <Box sx={{ flexGrow: 1 }} />

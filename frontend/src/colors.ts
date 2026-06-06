@@ -9,6 +9,7 @@ import {
   pink,
   purple,
   red,
+  teal,
   yellow,
 } from "@mui/material/colors";
 import chroma from "chroma-js";
@@ -29,5 +30,6 @@ export const colors = {
   pink: createColorConfig(pink),
   purple: createColorConfig(purple),
   red: createColorConfig(red),
+  teal: createColorConfig(teal),
   yellow: createColorConfig(yellow),
 };

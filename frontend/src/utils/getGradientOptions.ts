@@ -1,29 +1,42 @@
 import { candidatesConfig, ElectionId, electionsConfig } from "../config";
 import { CandidatesKey } from "../redux/electionsSlice";
+import { GRADIENT_COLORS } from "./createColorConfig";
 import { GradientOptions } from "./generateFillColors";
 
 export const getGradientOptions = (
+  showTurnout: boolean,
   candidate: CandidatesKey,
   elections: ElectionId,
-) => {
+): Required<GradientOptions> => {
   const electionConfig = electionsConfig[elections];
-  let gradientOptions: GradientOptions = {};
 
-  if (candidate === "all") {
+  const {
+    minGradient = 0,
+    maxGradient = 100,
+    numColors = GRADIENT_COLORS,
+  } = electionConfig.gradientOptions ?? {};
+
+  let gradientOptions: Required<GradientOptions> = {
+    minGradient,
+    maxGradient,
+    numColors,
+  };
+
+  if (showTurnout) {
     gradientOptions = {
-      minGradient: electionConfig.minGradient,
-      maxGradient: electionConfig.maxGradient,
-      numColors: electionConfig.numColors,
+      ...gradientOptions,
+      ...electionConfig.turnoutGradientOptions,
     };
-  } else {
-    let { minGradient, maxGradient, numColors } = candidatesConfig[candidate];
-    const override = electionsConfig[elections].candidatesConfig?.[candidate];
+  } else if (candidate !== "all") {
+    const candidateOptions = candidatesConfig[candidate];
+    const electionOverride =
+      electionsConfig[elections].candidatesConfig?.[candidate];
 
-    if (override) {
-      gradientOptions = override;
-    } else {
-      gradientOptions = { minGradient, maxGradient, numColors: numColors };
-    }
+    return {
+      ...gradientOptions,
+      ...candidateOptions,
+      ...electionOverride,
+    };
   }
 
   return gradientOptions;

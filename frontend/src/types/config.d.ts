@@ -58,7 +58,9 @@ type ElectionConfig = {
   sourceLayer: string;
   candidatesConfig?: Partial<Record<CandidateId, ElectionCandidateConfig>>;
   hideWinners?: boolean;
-} & GradientOptions &
+  gradientOptions?: GradientOptions;
+  turnoutGradientOptions?: GradientOptions;
+} &
   (
     | { type: "parliament" | "president"; question?: never }
     | { type: "referendum"; question: string }

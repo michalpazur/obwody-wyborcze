@@ -172,7 +172,7 @@ export const theme = createTheme({
           fontSize: "1rem",
           zIndex: "1",
           color: theme.palette.text.primary,
-          padding: theme.spacing(2, 3),
+          padding: theme.spacing(1, 3),
           borderRadius: theme.spacing(10),
           minHeight: "unset",
           transition: theme.transitions.create("color", {
