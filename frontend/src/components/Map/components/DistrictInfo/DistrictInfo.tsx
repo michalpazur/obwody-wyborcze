@@ -12,7 +12,7 @@ import { useElectionsStore } from "../../../../redux/electionsSlice";
 import { DistrictInfo } from "../../../../types";
 import { sortResults } from "../../../../utils/sortResults";
 import { useLocalElectionConfig } from "../../../../utils/useLocalElectionConfig";
-import ResultsTable from "../ResultsTable";
+import { ResultsTable, TurnoutTable } from "../Tables";
 import ElectionsSelects from "./components/ElectionsSelects";
 import SideButtons from "./components/SideButtons";
 import { stackSpacing, textSx } from "./components/styles";
@@ -58,11 +58,7 @@ const CardWithSlide: React.FC<{
   onClose: () => void;
 }> = ({ open, onClose, children }) => {
   return (
-    <Stack
-      direction="row"
-      spacing={stackSpacing}
-      sx={stackSx}
-    >
+    <Stack direction="row" spacing={stackSpacing} sx={stackSx}>
       <Collapse
         in={open}
         orientation="horizontal"
@@ -82,7 +78,7 @@ const DistrictInfoComponent: React.FC<{
   districtInfo?: DistrictInfo;
 }> = ({ districtInfo }) => {
   const [open, setOpen] = useState(true);
-  const { elections } = useElectionsStore();
+  const { elections, showTurnout } = useElectionsStore();
   const localElectionsConfig = useLocalElectionConfig();
 
   useEffect(() => {
@@ -114,15 +110,9 @@ const DistrictInfoComponent: React.FC<{
         <ElectionsSelects />
         {districtInfo ? (
           <Box>
-            <Typography sx={textSx}>
-              Obwodowa Komisja Wyborcza {districtInfo.number}
-            </Typography>
             <Typography sx={countyName}>{districtInfo.gmina}</Typography>
             <Typography sx={textSx}>
-              Frekwencja{" "}
-              <Typography component="span" sx={countyName}>
-                {districtInfo.turnout}%
-              </Typography>
+              Obwodowa Komisja Wyborcza {districtInfo.number}
             </Typography>
           </Box>
         ) : (
@@ -131,7 +121,13 @@ const DistrictInfoComponent: React.FC<{
             Obwodowej Komisji Wyborczej.
           </Typography>
         )}
-        {districtInfo && <ResultsTable results={results} full />}
+        {districtInfo ? (
+          showTurnout ? (
+            <TurnoutTable results={results} district={districtInfo} />
+          ) : (
+            <ResultsTable results={results} district={districtInfo} full />
+          )
+        ) : null}
       </Stack>
     </CardWithSlide>
   );

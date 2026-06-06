@@ -88,18 +88,16 @@ export const theme = createTheme({
           padding: theme.spacing(1),
           lineHeight: "1.2",
         }),
-        body: {
-          "&:last-child": {
-            fontFamily: "'Bree Serif', sans-serif",
-          },
-        },
         head: ({ theme }) => ({
           color: theme.palette.secondary.main,
           fontSize: "12px",
         }),
         footer: ({ theme }) => ({
           color: theme.palette.text.primary,
-          borderBottom: "none",
+          borderBottomStyle: "dashed",
+          ".MuiTableRow-root:last-child &": {
+            borderBottom: "none",
+          },
         }),
       },
     },

@@ -31,6 +31,7 @@ export const electionsSlice = createSlice({
     },
     setShowTurnout: (state, action: PayloadAction<boolean>) => {
       state.showTurnout = action.payload;
+      state.candidate = "all";
     },
   },
 });

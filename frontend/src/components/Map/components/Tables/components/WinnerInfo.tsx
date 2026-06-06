@@ -1,17 +1,19 @@
-import { SxProps, TableCell, Theme } from "@mui/material";
+import { Box, TableCell, TableRow } from "@mui/material";
 import React, { useMemo } from "react";
 import { candidatesConfig, tieColorConfig } from "../../../../../config";
 import { useElectionsStore } from "../../../../../redux/electionsSlice";
 import { Results } from "../../../../../types";
-import { getWinnerName } from "../../../../../utils/getLabels";
 import { mergeSx } from "../../../../../utils/mergeSx";
 import { toDecimalPrecision } from "../../../../../utils/toDecimalPrecision";
+import { InfoRowSize } from "../types/props";
+import CandidateCell from "./CandidateCell";
+import { getNameCellSx, percentCellSx } from "./styles";
 
-const WinnerInfo: React.FC<{ results: Results[]; rootSx: SxProps<Theme> }> = ({
+const WinnerInfo: React.FC<{ results: Results[]; size: InfoRowSize }> = ({
   results,
-  rootSx,
+  size,
 }) => {
-  const { candidate, elections } = useElectionsStore();
+  const { candidate } = useElectionsStore();
 
   const { delta, topResult } = useMemo(() => {
     const topResult = results[0];
@@ -39,31 +41,39 @@ const WinnerInfo: React.FC<{ results: Results[]; rootSx: SxProps<Theme> }> = ({
   }
 
   const winner = candidatesConfig[topResult?.candidate];
+  const nameCellSx = getNameCellSx(size);
   const isTie = delta === 0;
 
   return (
-    <React.Fragment>
+    <TableRow>
+      {!isTie ? (
+        <CandidateCell candidate={topResult.candidate} size={size} />
+      ) : (
+        <TableCell sx={nameCellSx}>
+          <Box component="span" sx={{ display: "flex", alignItems: "center" }}>
+            <Box sx={{ height: "24px" }} />
+            Remis
+          </Box>
+        </TableCell>
+      )}
       <TableCell
-        colSpan={3}
+        colSpan={2}
         align="right"
-        sx={mergeSx(rootSx, {
+        sx={mergeSx(percentCellSx, {
           fontWeight: "bold",
-          fontSize: "14px",
           color: !winner.color || isTie ? tieColorConfig.color : winner.color,
         })}
       >
-        {delta === 0 ? (
-          "Remis +0"
+        {isTie ? (
+          "+0 p."
         ) : (
           <React.Fragment>
-            {getWinnerName(topResult.candidate, elections)}
-            {" "}
             {delta > 0 ? "+" : ""}
-            {toDecimalPrecision(delta)}
+            {toDecimalPrecision(delta)} p.
           </React.Fragment>
         )}
       </TableCell>
-    </React.Fragment>
+    </TableRow>
   );
 };
 
