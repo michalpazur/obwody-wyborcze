@@ -1,6 +1,7 @@
 import { LngLatBoundsLike, LngLatLike } from "maplibre-gl";
 import { ColorConfig } from "../utils/createColorConfig";
 import { GradientOptions } from "../utils/generateFillColors";
+import { ElectionResultsInfo } from "./results";
 
 export type CandidateId =
   | "yes"
@@ -48,6 +49,8 @@ export type ElectionId =
 
 export type LocalElectionId = "ref_krk2026";
 
+export type ElectionType = "parliament" | "president" | "referendum";
+
 type ElectionConfig = {
   id: ElectionId;
   name: string;
@@ -62,8 +65,16 @@ type ElectionConfig = {
   turnoutGradientOptions?: GradientOptions;
 } &
   (
-    | { type: "parliament" | "president"; question?: never }
-    | { type: "referendum"; question: string }
+    | {
+        type: "parliament" | "president";
+        question?: never;
+        results?: ElectionResultsInfo;
+      }
+    | {
+        type: "referendum";
+        question: string;
+        results?: ElectionResultsInfo<"referendum">;
+      }
   );
 
 export type ElectionCandidateConfig = {

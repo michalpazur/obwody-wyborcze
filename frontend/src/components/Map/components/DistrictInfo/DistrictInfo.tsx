@@ -9,12 +9,14 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import React, { useEffect, useMemo, useState } from "react";
+import { electionsConfig } from "../../../../config";
 import { useElectionsStore } from "../../../../redux/electionsSlice";
 import { useLayoutStore } from "../../../../redux/layoutSlice";
 import { DistrictInfo } from "../../../../types";
 import { sortResults } from "../../../../utils/sortResults";
 import { useLocalElectionConfig } from "../../../../utils/useLocalElectionConfig";
 import { mapComponentInset } from "../../../styles";
+import { StackedChart, TurnoutChart } from "../Charts";
 import { ResultsTable, TurnoutTable } from "../Tables";
 import ElectionsSelects from "./components/ElectionsSelects";
 import SideButtons from "./components/SideButtons";
@@ -76,6 +78,7 @@ const DistrictInfoComponent: React.FC<{
 }> = ({ districtInfo }) => {
   const [open, setOpen] = useState(true);
   const { elections, showTurnout } = useElectionsStore();
+  const electionConfig = electionsConfig[elections];
   const localElectionsConfig = useLocalElectionConfig();
   const { navigationOpen } = useLayoutStore();
   const isMobile = useMediaQuery((theme) => theme.breakpoints.down("md"));
@@ -104,6 +107,22 @@ const DistrictInfoComponent: React.FC<{
     return [];
   }, [districtInfo, elections]);
 
+  const chart = useMemo(() => {
+    const { turnout, results } = electionConfig.results || {};
+    console.log(turnout, results);
+
+    if (districtInfo) return null;
+
+    if (showTurnout) {
+      if (!turnout) return null;
+      return <TurnoutChart {...turnout} />;
+    }
+
+    if (!results) return null;
+
+    return <StackedChart results={results} />;
+  }, [districtInfo, electionConfig, showTurnout]);
+
   return (
     <CardWithSlide open={open} onClose={onCloseClick}>
       <Stack spacing={4}>
@@ -113,6 +132,7 @@ const DistrictInfoComponent: React.FC<{
             : "Szczegółowe wyniki"}
         </Typography>
         <ElectionsSelects />
+        {chart}
         {districtInfo ? (
           <Box>
             <Typography sx={countyName}>{districtInfo.gmina}</Typography>

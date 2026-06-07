@@ -1,5 +1,5 @@
 import { GeoJSONFeature } from "maplibre-gl";
-import { CandidateId } from "../config";
+import { CandidateId, ElectionType } from "./config";
 
 type VoteCount = Record<CandidateId, number>;
 export type ProcentKey = `${CandidateId | "winner"}_proc` | "turnout";
@@ -23,4 +23,17 @@ export type Results = {
   candidate: CandidateId;
   result: number;
   resultProc: number;
+};
+
+export type TurnoutResults<T extends ElectionType = any> = {
+  votes: number;
+  votesProc: number;
+  voters: number;
+} & (T extends "referendum"
+  ? { threshold: number; thresholdProc: number }
+  : { threshold?: never; thresholdProc?: never });
+
+export type ElectionResultsInfo<T extends ElectionType = any> = {
+  turnout?: TurnoutResults<T>;
+  results?: Results[];
 };

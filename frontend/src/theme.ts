@@ -119,6 +119,13 @@ export const theme = createTheme({
         }),
       },
     },
+    MuiTooltip: {
+      styleOverrides: {
+        tooltipPlacementBottom: ({ theme }) => ({
+          marginTop: `${theme.spacing(1)} !important`,
+        }),
+      },
+    },
     MuiPopover: {
       styleOverrides: {
         paper: ({ theme }) => ({

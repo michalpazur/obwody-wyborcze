@@ -218,6 +218,19 @@ export const electionsConfig: Record<ElectionId, ElectionConfig> = {
       yes: { minGradient: 90 },
       no: { maxGradient: 5, hideInLegend: true },
     },
+    results: {
+      turnout: {
+        votes: 176228,
+        voters: 587637,
+        votesProc: 29.99,
+        threshold: 158555,
+        thresholdProc: 26.98,
+      },
+      results: [
+        { candidate: "yes", result: 171581, resultProc: 97.93 },
+        { candidate: "no", result: 3631, resultProc: 2.07 },
+      ],
+    },
   },
   ref_krk2026_2: {
     id: "ref_krk2026_2",
@@ -242,6 +255,19 @@ export const electionsConfig: Record<ElectionId, ElectionConfig> = {
     candidatesConfig: {
       yes: { minGradient: 90 },
       no: { maxGradient: 5, hideInLegend: true },
+    },
+    results: {
+      turnout: {
+        votes: 176107,
+        voters: 587637,
+        votesProc: 29.97,
+        threshold: 179792,
+        thresholdProc: 30.6,
+      },
+      results: [
+        { candidate: "yes", result: 168010, resultProc: 96.16 },
+        { candidate: "no", result: 6713, resultProc: 3.84 },
+      ],
     },
   },
 };
