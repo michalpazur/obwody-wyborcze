@@ -1,10 +1,11 @@
 import { Divider, Drawer, List, SxProps, Theme } from "@mui/material";
-import React, { Dispatch, SetStateAction } from "react";
+import React from "react";
 import {
   countryWideElections,
   electionsConfig,
   localElectionsConfig,
 } from "../../../../config";
+import { useLayoutStore } from "../../../../redux/layoutSlice";
 import { LocalElectionId } from "../../../../types";
 import {
   glassStyle,
@@ -12,11 +13,6 @@ import {
   topComponentInset,
 } from "../../../styles";
 import CollapseNavItem from "./components/CollapseNavItem";
-
-type NavigationDrawerProps = {
-  open: boolean;
-  setOpen: Dispatch<SetStateAction<boolean>>;
-};
 
 const paperSx: SxProps<Theme> = (theme) => ({
   ...glassStyle(theme),
@@ -26,18 +22,17 @@ const paperSx: SxProps<Theme> = (theme) => ({
   height: "unset",
 });
 
-const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
-  open,
-  setOpen,
-}) => {
+const NavigationDrawer: React.FC = () => {
+  const { navigationOpen, setNavigationOpen } = useLayoutStore();
+
   const onClose = () => {
-    setOpen(false);
+    setNavigationOpen(false);
   };
 
   return (
     <Drawer
       variant="temporary"
-      open={open}
+      open={navigationOpen}
       onClose={onClose}
       anchor="right"
       elevation={0}

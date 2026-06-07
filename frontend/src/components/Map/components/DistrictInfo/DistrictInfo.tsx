@@ -6,17 +6,19 @@ import {
   SxProps,
   Theme,
   Typography,
+  useMediaQuery,
 } from "@mui/material";
 import React, { useEffect, useMemo, useState } from "react";
 import { useElectionsStore } from "../../../../redux/electionsSlice";
+import { useLayoutStore } from "../../../../redux/layoutSlice";
 import { DistrictInfo } from "../../../../types";
 import { sortResults } from "../../../../utils/sortResults";
 import { useLocalElectionConfig } from "../../../../utils/useLocalElectionConfig";
+import { mapComponentInset } from "../../../styles";
 import { ResultsTable, TurnoutTable } from "../Tables";
 import ElectionsSelects from "./components/ElectionsSelects";
 import SideButtons from "./components/SideButtons";
 import { stackSpacing, textSx } from "./components/styles";
-import { mapComponentInset } from "../../../styles";
 
 const stackSx: SxProps<Theme> = (theme) => ({
   alignItems: "flex-start",
@@ -75,12 +77,20 @@ const DistrictInfoComponent: React.FC<{
   const [open, setOpen] = useState(true);
   const { elections, showTurnout } = useElectionsStore();
   const localElectionsConfig = useLocalElectionConfig();
+  const { navigationOpen } = useLayoutStore();
+  const isMobile = useMediaQuery((theme) => theme.breakpoints.down("md"));
 
   useEffect(() => {
     if (districtInfo) {
       setOpen(true);
     }
   }, [districtInfo]);
+
+  useEffect(() => {
+    if (navigationOpen && isMobile) {
+      setOpen(false);
+    }
+  }, [navigationOpen, isMobile]);
 
   const onCloseClick = () => {
     setOpen((open) => !open);

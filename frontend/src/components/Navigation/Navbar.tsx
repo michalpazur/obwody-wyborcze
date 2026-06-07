@@ -7,9 +7,10 @@ import {
   Theme,
   Toolbar,
 } from "@mui/material";
-import React, { useState } from "react";
+import React from "react";
 import { Link } from "react-router";
 import { homePath } from "../../config";
+import { useLayoutStore } from "../../redux/layoutSlice";
 import { glassStyle, mapComponentInset } from "../styles";
 import Logo from "./components/Logo";
 import NavigationDrawer from "./components/NavigationDrawer";
@@ -31,10 +32,10 @@ const navbarSx: SxProps<Theme> = {
 };
 
 const Navbar: React.FC = () => {
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  const { setNavigationOpen } = useLayoutStore();
 
   const handleOpenDrawer = () => {
-    setDrawerOpen((open) => !open);
+    setNavigationOpen(true);
   };
 
   return (
@@ -52,7 +53,7 @@ const Navbar: React.FC = () => {
           <MenuIcon />
         </IconButton>
       </Toolbar>
-      <NavigationDrawer open={drawerOpen} setOpen={setDrawerOpen} />
+      <NavigationDrawer />
     </AppBar>
   );
 };

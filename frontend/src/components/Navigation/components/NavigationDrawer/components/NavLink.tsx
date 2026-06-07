@@ -7,6 +7,7 @@ import {
 } from "@mui/material";
 import React from "react";
 import { Link } from "react-router";
+import { useLayoutStore } from "../../../../../redux/layoutSlice";
 import { mergeSx } from "../../../../../utils/mergeSx";
 import { useIsLinkActive } from "../utils/useIsLinkActive";
 import { listItemSx, listItemTextSx } from "./styles";
@@ -22,14 +23,20 @@ const activeSx: SxProps<Theme> = {
 };
 
 const NavLink: React.FC<NavLinkProps> = ({ href, children, inset }) => {
+  const { setNavigationOpen } = useLayoutStore();
   const isLinkActive = useIsLinkActive();
   const isActive = isLinkActive(href);
+
+  const onClick = () => {
+    setNavigationOpen(false);
+  };
 
   return (
     <ListItem disablePadding>
       <ListItemButton
         component={Link}
         to={href}
+        onClick={onClick}
         sx={mergeSx(
           listItemSx,
           inset ? { pl: 6 } : {},
