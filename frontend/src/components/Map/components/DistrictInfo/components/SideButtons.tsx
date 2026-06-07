@@ -1,7 +1,5 @@
 import CloseIcon from "@mui/icons-material/ArrowForwardRounded";
-import GitHub from "@mui/icons-material/GitHub";
-import TwitterIcon from "@mui/icons-material/Twitter";
-import { IconButton, Link, Stack, SxProps, Theme } from "@mui/material";
+import { IconButton, Stack, SxProps, Theme } from "@mui/material";
 import React from "react";
 import { stackSpacing } from "./styles";
 
@@ -24,29 +22,11 @@ const SideButtons: React.FC<SideButtonProps> = ({ open, onClose }) => {
         aria-label={open ? "Zamknij szczegóły" : "Pokaż szczegóły"}
         onClick={onClose}
         variant="outlined"
+        size="small"
       >
         <CloseIcon
           sx={[iconSx, { transform: `rotate(${open ? "180" : "0"}deg)` }]}
         />
-      </IconButton>
-      <IconButton
-        aria-label="Twitter"
-        variant="outlined"
-        component={Link}
-        href="https://twitter.com/michalpazur"
-        target="_blank"
-        sx={{ color: "#1D9BF0" }}
-      >
-        <TwitterIcon />
-      </IconButton>
-      <IconButton
-        aria-label="GitHub"
-        variant="outlined"
-        component={Link}
-        href="https://github.com/michalpazur/obwody-wyborcze"
-        target="_blank"
-      >
-        <GitHub />
       </IconButton>
     </Stack>
   );
