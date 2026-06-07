@@ -16,24 +16,19 @@ import { ResultsTable, TurnoutTable } from "../Tables";
 import ElectionsSelects from "./components/ElectionsSelects";
 import SideButtons from "./components/SideButtons";
 import { stackSpacing, textSx } from "./components/styles";
+import { mapComponentInset } from "../../../styles";
 
 const stackSx: SxProps<Theme> = (theme) => ({
   alignItems: "flex-start",
   position: "absolute",
   zIndex: 6,
-  top: theme.spacing(6),
-  left: theme.spacing(6),
-  right: theme.spacing(6),
-  height: "calc(100% - 156px)",
+  inset: mapComponentInset,
+  top: theme.spacing(18) + " !important",
+  bottom: "unset",
+  height: { xs: "calc(100% - 200px)", sm: "calc(100% - 216px)" },
   pointerEvents: "none",
   "> *": {
     pointerEvents: "auto",
-  },
-  [theme.breakpoints.down("sm")]: {
-    top: theme.spacing(3),
-    left: theme.spacing(3),
-    right: theme.spacing(3),
-    height: "calc(100% - 140px)",
   },
 });
 

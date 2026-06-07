@@ -264,6 +264,10 @@ export const allLocalElections = Object.keys(localElectionsConfig).flatMap(
   },
 );
 
+export const countryWideElections = Object.keys(electionsConfig).filter(
+  (key) => !allLocalElections.includes(key as ElectionId),
+) as ElectionId[];
+
 export const tieColorConfig = colors.grey;
 export const tieGradient = tieColorConfig.gradient;
 

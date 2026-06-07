@@ -1,16 +1,5 @@
-import {
-  alpha,
-  createTheme,
-  CSSObject,
-  tabClasses,
-  Theme,
-} from "@mui/material";
-
-const glassStyle = (theme: Theme): CSSObject => ({
-  backgroundColor: alpha(theme.palette.background.paper, 0.8),
-  backdropFilter: "blur(10px)",
-  boxShadow: `0 4px 12px 0 ${alpha(theme.palette.text.primary, 0.1)}`,
-});
+import { alpha, createTheme, tabClasses } from "@mui/material";
+import { glassStyle } from "./components/styles";
 
 export const theme = createTheme({
   typography: {

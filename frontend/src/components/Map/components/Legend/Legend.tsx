@@ -13,21 +13,18 @@ import { getGradient } from "../../../../utils/getGradient";
 import { getGradientOptions } from "../../../../utils/getGradientOptions";
 import { getWinnerName } from "../../../../utils/getLabels";
 import { mergeSx } from "../../../../utils/mergeSx";
+import { mapComponentInset } from "../../../styles";
 
 const colorBoxSpacing = 0.25;
 
 const root: SxProps<Theme> = (theme) => ({
   position: "absolute",
   bottom: (theme) => theme.spacing(3),
-  right: (theme) => theme.spacing(3),
-  left: (theme) => theme.spacing(6),
+  right: mapComponentInset,
+  left: mapComponentInset,
   p: 2,
   zIndex: 5,
   maxWidth: "fit-content",
-  [theme.breakpoints.down("sm")]: {
-    left: (theme) => theme.spacing(3),
-    right: (theme) => theme.spacing(3),
-  },
 });
 
 const text: SxProps<Theme> = (theme) => ({
@@ -75,7 +72,9 @@ const WinnerRow: React.FC<WinnerRowProps> = ({
 
   const nameSx = mergeSx([
     text,
-    (electionConfig.type === "president" && !showTurnout) ? { minWidth: "80px" } : {},
+    electionConfig.type === "president" && !showTurnout
+      ? { minWidth: "80px" }
+      : {},
   ]);
 
   const gradient = useMemo(() => {

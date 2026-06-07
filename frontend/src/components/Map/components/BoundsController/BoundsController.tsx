@@ -15,7 +15,7 @@ const BoundsController: React.FC = () => {
 
     const { bounds, center } = localElectionsConfig.bounds;
     const camera = map.current.cameraForBounds(bounds, {
-      padding: 12,
+      padding: { top: 72, right: 12, left: 12, bottom: 12 },
     });
 
     const cameraZoom = camera?.zoom ?? 0;
