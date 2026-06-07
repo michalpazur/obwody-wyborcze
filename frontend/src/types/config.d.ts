@@ -6,6 +6,7 @@ import { ElectionResultsInfo } from "./results";
 export type CandidateId =
   | "yes"
   | "no"
+  | "rest"
   | "bartosiewicz"
   | "biejat"
   | "braun"

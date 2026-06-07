@@ -26,8 +26,8 @@ export type Results = {
 };
 
 export type TurnoutResults<T extends ElectionType = any> = {
-  votes: number;
-  votesProc: number;
+  allVotes: number;
+  turnout: number;
   voters: number;
 } & (T extends "referendum"
   ? { threshold: number; thresholdProc: number }

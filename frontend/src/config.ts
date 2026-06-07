@@ -21,6 +21,9 @@ export const candidatesConfig: Record<CandidateId, Candidate> = {
     candidateId: "no",
     ...colors.red,
   },
+  rest: {
+    name: "Reszta",
+  },
   bartosiewicz: {
     name: "Artur Bartoszewicz",
     avatarUrl: presidentialCandidates.bartoszewicz,
@@ -155,6 +158,22 @@ export const electionsConfig: Record<ElectionId, ElectionConfig> = {
     turnoutGradientOptions: {
       minGradient: 40,
     },
+    results: {
+      turnout: {
+        allVotes: 21966891,
+        turnout: 74.38,
+        voters: 29532595,
+      },
+      results: [
+        { candidate: "pis", result: 7640854, resultProc: 35.38},
+        { candidate: "ko", result: 6629402, resultProc: 30.7 },
+        { candidate: "p2050_psl", result: 3110670, resultProc: 14.4},
+        { candidate: "nl", result: 1859018, resultProc: 8.61},
+        { candidate: "konfederacja", result: 1547364, resultProc: 7.16 },
+        { candidate: "bs", result: 401054, resultProc: 1.86 },
+        { candidate: "rest", result: 408312, resultProc: 1.9 }
+      ]
+    },
   },
   pres_2025_1: {
     id: "pres_2025_1",
@@ -181,6 +200,23 @@ export const electionsConfig: Record<ElectionId, ElectionConfig> = {
     turnoutGradientOptions: {
       minGradient: 40,
     },
+    results: {
+      turnout: {
+        allVotes: 19689597,
+        turnout: 67.31,
+        voters: 29252340,
+      },
+      results: [
+        { candidate: "trzaskowski", result: 6147797, resultProc: 31.36 },
+        { candidate: "nawrocki", result: 5790804, resultProc: 29.54 },
+        { candidate: "mentzen", result: 2902448, resultProc: 14.81 },
+        { candidate: "braun", result: 1242917, resultProc: 6.34 },
+        { candidate: "holownia", result: 978901, resultProc: 4.99 },
+        { candidate: "zandberg", result: 952832, resultProc: 4.86 },
+        { candidate: "biejat", result: 829361, resultProc: 4.23 },
+        { candidate: "rest", result: 759084, resultProc: 3.87 },
+      ],
+    },
   },
   pres_2025_2: {
     id: "pres_2025_2",
@@ -192,6 +228,17 @@ export const electionsConfig: Record<ElectionId, ElectionConfig> = {
     sourceLayer: "pres_2025_2",
     turnoutGradientOptions: {
       minGradient: 40,
+    },
+    results: {
+      turnout: {
+        allVotes: 21033457,
+        turnout: 71.63,
+        voters: 29363722,
+      },
+      results: [
+        { candidate: "nawrocki", result: 10606877, resultProc: 50.89 },
+        { candidate: "trzaskowski", result: 10237286, resultProc: 49.11 },
+      ],
     },
   },
   ref_krk2026_1: {
@@ -220,9 +267,9 @@ export const electionsConfig: Record<ElectionId, ElectionConfig> = {
     },
     results: {
       turnout: {
-        votes: 176228,
+        allVotes: 176228,
         voters: 587637,
-        votesProc: 29.99,
+        turnout: 29.99,
         threshold: 158555,
         thresholdProc: 26.98,
       },
@@ -258,9 +305,9 @@ export const electionsConfig: Record<ElectionId, ElectionConfig> = {
     },
     results: {
       turnout: {
-        votes: 176107,
+        allVotes: 176107,
         voters: 587637,
-        votesProc: 29.97,
+        turnout: 29.97,
         threshold: 179792,
         thresholdProc: 30.6,
       },

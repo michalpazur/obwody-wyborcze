@@ -1,6 +1,7 @@
 import { Box, Stack, SxProps, Theme } from "@mui/material";
 import React from "react";
 import { colors } from "../../../../../colors";
+import { turnoutColorConfig } from "../../../../../config";
 import { TurnoutResults } from "../../../../../types";
 import { mergeSx } from "../../../../../utils/mergeSx";
 import Bar from "../components/Bar";
@@ -33,16 +34,20 @@ const thresholdLabelSx: SxProps<Theme> = {
 };
 
 const TurnoutChart: React.FC<TurnoutResults> = ({
-  votes,
-  votesProc,
+  allVotes,
+  turnout,
   threshold,
   thresholdProc,
 }) => {
-  const max = getMaxValue(votesProc);
-  const width = (votesProc * 100) / max;
+  const max = getMaxValue(turnout);
+  const width = (turnout * 100) / max;
   const thresholdPosition = ((thresholdProc ?? 0) * 100) / max;
-  const passedThreshold = thresholdProc ? votesProc >= thresholdProc : true;
-  const color = passedThreshold ? colors.green.color : colors.red.color;
+  const passedThreshold = thresholdProc ? turnout >= thresholdProc : true;
+  const color = thresholdProc
+    ? passedThreshold
+      ? colors.green.color
+      : colors.red.color
+    : turnoutColorConfig.color;
 
   return (
     <Stack spacing={1}>
@@ -52,7 +57,7 @@ const TurnoutChart: React.FC<TurnoutResults> = ({
             sx={{ color: (theme) => theme.palette.background.paper }}
             backgroundColor={color}
           >
-            {votesProc}% ({formatNumber(votes)})
+            {turnout}% ({formatNumber(allVotes)})
           </BarLabel>
         </Bar>
         <Box sx={mergeSx(thresholdBarSx, { left: `${thresholdPosition}%` })} />
