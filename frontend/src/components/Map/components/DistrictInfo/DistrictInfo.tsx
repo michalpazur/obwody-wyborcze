@@ -109,7 +109,6 @@ const DistrictInfoComponent: React.FC<{
 
   const chart = useMemo(() => {
     const { turnout, results } = electionConfig.results || {};
-    console.log(turnout, results);
 
     if (districtInfo) return null;
 

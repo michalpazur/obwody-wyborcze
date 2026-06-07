@@ -17,7 +17,6 @@ import {
 import { getCandidateConfig } from "../../../../utils/getCandidateConfig";
 import { getGradientOptions } from "../../../../utils/getGradientOptions";
 import { ElectionsDataSource } from "./ElectionDataSource";
-import { colors } from "../../../../colors";
 
 const SingleCandidateResultLayer: React.FC<{
   candidate: CandidateId;
@@ -96,7 +95,7 @@ const ElectionsResultsLayer: React.FC = () => {
         filterWinner
       />
     ));
-  }, [elections, candidate, showTurnout]);
+  }, [gradientOptions]);
 
   const tieLayer = useMemo(() => {
     return (
@@ -121,7 +120,7 @@ const ElectionsResultsLayer: React.FC = () => {
         }}
       />
     );
-  }, [elections]);
+  }, [gradientOptions]);
 
   return (
     <ElectionsDataSource>
