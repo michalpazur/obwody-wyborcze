@@ -1,4 +1,4 @@
-import { TableCell, TableRow } from "@mui/material";
+import { Box, TableCell, TableRow } from "@mui/material";
 import { turnoutColorConfig } from "../../../../../config";
 import { DistrictInfo } from "../../../../../types";
 import { mergeSx } from "../../../../../utils/mergeSx";
@@ -15,7 +15,12 @@ const TurnoutInfo: React.FC<TurnoutInfoProps> = ({ district, size }) => {
 
   return (
     <TableRow>
-      <TableCell sx={rootSx}>Frekwencja</TableCell>
+      <TableCell sx={rootSx}>
+        <Box component="span" sx={{ display: "flex", alignItems: "center" }}>
+          {size === "full" && <Box sx={{ height: "24px" }} />}
+          Frekwencja
+        </Box>
+      </TableCell>
       <TableCell
         align="right"
         colSpan={2}

@@ -51,7 +51,7 @@ const WinnerInfo: React.FC<{ results: Results[]; size: InfoRowSize }> = ({
       ) : (
         <TableCell sx={nameCellSx}>
           <Box component="span" sx={{ display: "flex", alignItems: "center" }}>
-            <Box sx={{ height: "24px" }} />
+            {size === "full" && <Box sx={{ height: "24px" }} />}
             Remis
           </Box>
         </TableCell>
