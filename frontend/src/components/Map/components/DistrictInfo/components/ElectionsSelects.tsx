@@ -75,7 +75,7 @@ const ElectionsSelects: React.FC = () => {
             </MenuItem>
           ))}
         </TextField>
-      ) : (
+      ) : availableElections.length > 1 ? (
         <Tabs value={elections} onChange={onTabChange}>
           {availableElections.map((electionId) => (
             <Tab
@@ -85,7 +85,7 @@ const ElectionsSelects: React.FC = () => {
             />
           ))}
         </Tabs>
-      )}
+      ) : null}
       <Tabs
         value={showTurnout ? "turnout" : "results"}
         onChange={onChangeShowTurnout}

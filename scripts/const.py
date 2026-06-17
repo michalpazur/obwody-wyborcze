@@ -57,6 +57,7 @@ results_columns = {
   "Liczba głosów ważnych oddanych łącznie na wszystkich kandydatów (z kart ważnych)": "total",
   "Liczba głosów ważnych oddanych łącznie na obu kandydatów (z kart ważnych)": "total",
   "Liczba głosów ważnych oddanych łącznie na wszystkie listy kandydatów": "total",
+  "Liczba głosów ważnych oddanych łącznie na wszystkich kandydatów": "total",
   "Liczba głosów ważnych": "total",
   "Liczba kart ważnych": "all_votes",
   "Liczba kart ważnych (liczba osób, które wzięły udział w głosowaniu)": "all_votes",
@@ -94,7 +95,14 @@ candidates = {
   "KOMITET WYBORCZY NORMALNY KRAJ": "nk",
   "KOMITET WYBORCZY ANTYPARTIA": "ap",
   "KOMITET WYBORCZY RUCH NAPRAWY POLSKI": "rnp",
-  "KOMITET WYBORCZY WYBORCÓW MNIEJSZOŚĆ NIEMIECKA": "mn"
+  "KOMITET WYBORCZY WYBORCÓW MNIEJSZOŚĆ NIEMIECKA": "mn",
+  # Warsaw mayor
+  "Głosy na kandydata nr 1 - BIEJAT Magdalena Agnieszka zarejestrowanego przez KKW LEWICA": "biejat",
+  "Głosy na kandydata nr 2 - BOCHEŃSKI Tobiasz Adam zarejestrowanego przez KW PRAWO I SPRAWIEDLIWOŚĆ": "bochenski",
+  "Głosy na kandydata nr 3 - KORWIN-MIKKE Janusz Ryszard zarejestrowanego przez KW BEZPARTYJNI": "korwin",
+  "Głosy na kandydata nr 4 - STAROSIELEC Romuald Tadeusz zarejestrowanego przez KW RUCH NAPRAWY POLSKI": "starosielec",
+  "Głosy na kandydata nr 5 - TRZASKOWSKI Rafał Kazimierz zarejestrowanego przez KKW KOALICJA OBYWATELSKA": "trzaskowski",
+  "Głosy na kandydata nr 6 - WIPLER Przemysław Janusz zarejestrowanego przez KWW KONFEDERACJA I BEZPARTYJNI SAMORZĄDOWCY": "wipler",
 }
 
 char_order = list("aąbcćdefghijklłmnńoópqrsśtuvwxyzżź0123456789")

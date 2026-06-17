@@ -1,6 +1,6 @@
 import { colors } from "./colors";
-import { krakow } from "./const/bounds";
-import { parties, presidentialCandidates } from "./static";
+import { krakow, warszawa } from "./const/bounds";
+import { parties, presidentialCandidates, warsawMayor } from "./static";
 import {
   Candidate,
   CandidateId,
@@ -34,6 +34,11 @@ export const candidatesConfig: Record<CandidateId, Candidate> = {
     maxGradient: 15,
     ...colors.brat,
   },
+  bochenski: {
+    name: "Tobiasz Bocheński",
+    avatarUrl: warsawMayor.bochenski,
+    ...colors.blue,
+  },
   braun: {
     name: "Grzegorz Braun",
     avatarUrl: presidentialCandidates.braun,
@@ -49,6 +54,11 @@ export const candidatesConfig: Record<CandidateId, Candidate> = {
   jakubiak: {
     name: "Marek Jakubiak",
     avatarUrl: presidentialCandidates.jakubiak,
+  },
+  korwin: {
+    name: "Janusz Korwin-Mikke",
+    avatarUrl: warsawMayor.korwin,
+    ...colors.teal,
   },
   maciak: {
     name: "Maciej Maciak",
@@ -73,10 +83,20 @@ export const candidatesConfig: Record<CandidateId, Candidate> = {
     name: "Krzysztof Stanowski",
     avatarUrl: presidentialCandidates.stanowski,
   },
+  starosielec: {
+    name: "Romuald Starosielec",
+    avatarUrl: warsawMayor.starosielec,
+    ...colors.brown,
+  },
   trzaskowski: {
     name: "Rafał Trzaskowski",
     avatarUrl: presidentialCandidates.trzaskowski,
     ...colors.orange,
+  },
+  wipler: {
+    name: "Przemysław Wipler",
+    avatarUrl: warsawMayor.wipler,
+    ...colors.indigo,
   },
   woch: {
     name: "Marek Woch",
@@ -165,14 +185,56 @@ export const electionsConfig: Record<ElectionId, ElectionConfig> = {
         voters: 29532595,
       },
       results: [
-        { candidate: "pis", result: 7640854, resultProc: 35.38},
+        { candidate: "pis", result: 7640854, resultProc: 35.38 },
         { candidate: "ko", result: 6629402, resultProc: 30.7 },
-        { candidate: "p2050_psl", result: 3110670, resultProc: 14.4},
-        { candidate: "nl", result: 1859018, resultProc: 8.61},
+        { candidate: "p2050_psl", result: 3110670, resultProc: 14.4 },
+        { candidate: "nl", result: 1859018, resultProc: 8.61 },
         { candidate: "konfederacja", result: 1547364, resultProc: 7.16 },
         { candidate: "bs", result: 401054, resultProc: 1.86 },
-        { candidate: "rest", result: 408312, resultProc: 1.9 }
-      ]
+        { candidate: "rest", result: 408312, resultProc: 1.9 },
+      ],
+    },
+  },
+  mayor_waw2024: {
+    id: "mayor_waw2024",
+    name: "Prezydent Warszawy 2024",
+    htmlTitle: "Wybory prezydenta Warszawy 2024",
+    type: "president",
+    candidates: [
+      "trzaskowski",
+      "bochenski",
+      "biejat",
+      "wipler",
+      "korwin",
+      "starosielec",
+    ],
+    winners: ["trzaskowski", "bochenski", "biejat", "wipler"],
+    sourceLayer: "mayor_waw2024",
+    candidatesConfig: {
+      bochenski: { maxGradient: 50 },
+      biejat: { maxGradient: 25 },
+      korwin: { maxGradient: 2.5 },
+      starosielec: { maxGradient: 2 },
+      wipler: { maxGradient: 15 },
+    },
+    turnoutGradientOptions: {
+      minGradient: 30,
+      maxGradient: 80,
+    },
+    results: {
+      turnout: {
+        turnout: 58.88,
+        voters: 1322897,
+        allVotes: 778887,
+      },
+      results: [
+        { candidate: "trzaskowski", result: 444006, resultProc: 57.41 },
+        { candidate: "bochenski", result: 178652, resultProc: 23.1 },
+        { candidate: "biejat", result: 99442, resultProc: 12.86 },
+        { candidate: "wipler", result: 34389, resultProc: 4.45 },
+        { candidate: "korwin", result: 10839, resultProc: 1.4 },
+        { candidate: "starosielec", result: 6019, resultProc: 0.78 },
+      ],
     },
   },
   pres_2025_1: {
@@ -323,6 +385,11 @@ export const localElectionsConfig: Record<
   LocalElectionId,
   LocalElectionsConfig
 > = {
+  mayor_waw2024: {
+    name: "Prezydent Warszawy 2024",
+    elections: ["mayor_waw2024"],
+    bounds: warszawa,
+  },
   ref_krk2026: {
     name: "Referendum w Krakowie",
     elections: ["ref_krk2026_1", "ref_krk2026_2"],

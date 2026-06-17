@@ -45,3 +45,17 @@ export const parties = {
   pis,
   pjj,
 };
+
+import bochenski from "./bochenski.png";
+import korwin from "./korwin.png";
+import starosielec from "./starosielec.png";
+import wipler from "./wipler.png";
+
+export const warsawMayor = {
+  biejat,
+  bochenski,
+  korwin,
+  trzaskowski,
+  starosielec,
+  wipler,
+};

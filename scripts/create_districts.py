@@ -99,6 +99,7 @@ def main():
 
   candidates_columns = [candidates[key] for key in candidates]
   candidates_columns = list(filter(lambda key: key in results, candidates_columns))
+  candidates_columns = list(dict.fromkeys(candidates_columns))
   merged_columns = filter(lambda key: key in results, [merged_columns[key] for key in merged_columns])
   merged_columns = list(merged_columns)
   tmp_merged_columns = []

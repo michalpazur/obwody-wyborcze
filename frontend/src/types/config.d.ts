@@ -9,15 +9,19 @@ export type CandidateId =
   | "rest"
   | "bartosiewicz"
   | "biejat"
+  | "bochenski"
   | "braun"
   | "holownia"
   | "jakubiak"
+  | "korwin"
   | "maciak"
   | "mentzen"
   | "nawrocki"
   | "senyszyn"
   | "stanowski"
+  | "starosielec"
   | "trzaskowski"
+  | "wipler"
   | "woch"
   | "zandberg"
   | "ap"
@@ -43,12 +47,13 @@ export type Candidate = {
 
 export type ElectionId =
   | "parl_2023"
+  | "mayor_waw2024"
   | "pres_2025_1"
   | "pres_2025_2"
   | "ref_krk2026_1"
   | "ref_krk2026_2";
 
-export type LocalElectionId = "ref_krk2026";
+export type LocalElectionId = "mayor_waw2024" | "ref_krk2026";
 
 export type ElectionType = "parliament" | "president" | "referendum";
 
