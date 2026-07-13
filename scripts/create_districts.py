@@ -25,7 +25,7 @@ def get_winner(row: pd.Series):
 
   return max_name
 
-def process_teryt(teryt: str, addresses: geo.GeoDataFrame, districts_df: geo.GeoDataFrame):
+def process_teryt(teryt: str, addresses: geo.GeoDataFrame, districts_df: geo.GeoDataFrame, forced_districts: pd.DataFrame):
   print(f"Processing districts for TERYT {teryt}...")
   has_extra_teryts = False
   for town in towns_with_districts:
@@ -57,7 +57,15 @@ def process_teryt(teryt: str, addresses: geo.GeoDataFrame, districts_df: geo.Geo
   districts_df = districts_df.reset_index()
   print(f"Found {len(unused_ids)} districts with no address points!")
   unused_districts = teryt_districts[teryt_districts["OBWOD"].isin(unused_ids)]
+  forced_districts_ids = forced_districts["district_id"].tolist()
   for i, row in unused_districts.iterrows():
+    if (row["OBWOD"] in forced_districts_ids):
+      forced_info = forced_districts[forced_districts["district_id"] == row["OBWOD"]].iloc[0]
+      row["district"] = f"{teryt}_{forced_info["district"]}"
+      district_df = geo.GeoDataFrame([row], geometry=[row.geometry], crs=districts_df.crs)
+      districts_df = concat(district_df, districts_df)
+      continue
+
     touching = districts_df[districts_df["geometry"].intersects(row.geometry)]
     touching["distance"] = touching.geometry.centroid.distance(row.geometry.centroid)
     if (len(touching) > 0):
@@ -79,8 +87,12 @@ def main():
   districts_df: geo.GeoDataFrame | None = geo.GeoDataFrame()
   districts = geo.read_file(f"data_in/statistical_districts.zip")
   addresses_to_skip = pd.read_csv("const/addresses_to_skip.csv", sep=";", converters={ "teryt": str })
+  forced_districts = pd.read_csv("const/forced_districts.csv", sep=";", converters={ "teryt": str, "district_id": str })
+  forced_districts = forced_districts[forced_districts["elections"] == elections]
+  forced_districts_ids = forced_districts["district_id"].tolist()
   districts["TERYT"] = districts["TERYT"].str[:-1]
-  districts["OBWOD"] = districts["OBWOD"].apply(lambda x: str(uuid.uuid4()))
+  not_forced = ~districts["OBWOD"].isin(forced_districts_ids)
+  districts.loc[not_forced, "OBWOD"] = districts[not_forced]["OBWOD"].apply(lambda x: str(uuid.uuid4()))
   file_names = list(sorted(filter(lambda x: x.endswith(".zip"), os.listdir("matched_addresses"))))
 
   for file_name in file_names:
@@ -89,7 +101,8 @@ def main():
     for teryt in teryts:
       teryt_addresses_to_skip = addresses_to_skip[addresses_to_skip["teryt"] == teryt]["f_address"].to_list()
       teryt_addresses = addresses[~addresses["f_address"].isin(teryt_addresses_to_skip)]
-      processed_districts = process_teryt(teryt, teryt_addresses, districts)
+      teryt_forced_districts = forced_districts[forced_districts["teryt"] == teryt]
+      processed_districts = process_teryt(teryt, teryt_addresses, districts, teryt_forced_districts)
       districts_df = concat(districts_df, processed_districts)
 
   print("Loading voting results...")
