@@ -11,6 +11,10 @@ from typing import Dict
 def head(df: DataFrame, n: int = 5):
   print(df.head(n))
 
+def get_election_id(elections: str):
+  split = elections.split("_")
+  return "_".join(split[0:2])
+
 def handle_capitalize(match: Match[str]):
   text = ""
   if (match.group(1)):

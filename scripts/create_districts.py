@@ -1,6 +1,6 @@
 import geopandas as geo
 import pandas as pd
-from utils import concat
+from utils import concat, get_election_id
 from const import results_columns, candidates
 import uuid
 import os
@@ -88,7 +88,8 @@ def main():
   districts = geo.read_file(f"data_in/statistical_districts.zip")
   addresses_to_skip = pd.read_csv("const/addresses_to_skip.csv", sep=";", converters={ "teryt": str })
   forced_districts = pd.read_csv("const/forced_districts.csv", sep=";", converters={ "teryt": str, "district_id": str })
-  forced_districts = forced_districts[forced_districts["elections"] == elections]
+  election_id = get_election_id(elections)
+  forced_districts = forced_districts[forced_districts["elections"] == election_id]
   forced_districts_ids = forced_districts["district_id"].tolist()
   districts["TERYT"] = districts["TERYT"].str[:-1]
   not_forced = ~districts["OBWOD"].isin(forced_districts_ids)
