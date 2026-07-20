@@ -852,10 +852,12 @@ def process_powiat(
     if (addresses_out is not None):
       duplicates = addresses_out.duplicated(subset=["f_address"], keep=False)
       addresses_to_save = addresses_out[~duplicates]
-      print(f"Found district for {len(addresses_to_save)} out of {len(teryt_addresses)} addresses.")
+      duplicated = addresses_out[duplicates]
+      print(f"Found district for {len(addresses_to_save)} out of {len(teryt_addresses)} ({len(addresses_to_save) * 100 / len(teryt_addresses):.2f}%) addresses.")
+      if (len(duplicated) > 0):
+        print(f"⚠️ {len(duplicated)} duplicated addresses.")
       powiat_addresses = concat(powiat_addresses, addresses_to_save)
       if (DEBUG):
-        duplicated = addresses_out[duplicates]
         duplicated.to_file(f"matched_addresses/duplicated_{teryt}.json", driver="GeoJSON")
         no_district = teryt_addresses[~(teryt_addresses["f_address"].isin(addresses_out.f_address))]
         no_district.to_file(f"matched_addresses/no_district_{teryt}.json", driver="GeoJSON")
