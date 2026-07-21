@@ -39,6 +39,7 @@ def process_teryt(teryt: str, addresses: geo.GeoDataFrame, districts_df: geo.Geo
     teryt_districts = districts_df[districts_df["TERYT"] == teryt]
   districts_df = geo.GeoDataFrame()
   unused_ids = []
+  forced_districts_ids = forced_districts["district_id"].to_list()
   
   processed_districts = 0
   for i, row in teryt_districts.iterrows():
@@ -46,7 +47,7 @@ def process_teryt(teryt: str, addresses: geo.GeoDataFrame, districts_df: geo.Geo
       print(f"Processed {processed_districts} out of {len(teryt_districts)} statistical districts...")
     geom = row.geometry
     district_addresses = addresses[addresses.geometry.covered_by(geom)]
-    if (len(district_addresses) == 0):
+    if (len(district_addresses) == 0 or row.OBWOD in forced_districts_ids):
       unused_ids.append(row.OBWOD)
       continue
     voronoi = district_addresses.voronoi_polygons(extend_to=geom).clip(geom)
@@ -56,8 +57,7 @@ def process_teryt(teryt: str, addresses: geo.GeoDataFrame, districts_df: geo.Geo
 
   districts_df = districts_df.reset_index()
   print(f"Found {len(unused_ids)} districts with no address points!")
-  unused_districts = teryt_districts[teryt_districts["OBWOD"].isin(unused_ids)]
-  forced_districts_ids = forced_districts["district_id"].tolist()
+  unused_districts = teryt_districts[teryt_districts["OBWOD"].isin(unused_ids)][["geometry", "OBWOD"]]
   for i, row in unused_districts.iterrows():
     if (row["OBWOD"] in forced_districts_ids):
       forced_info = forced_districts[forced_districts["district_id"] == row["OBWOD"]].iloc[0]
