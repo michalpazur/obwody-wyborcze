@@ -100,8 +100,9 @@ def main():
     addresses = geo.read_file(f"matched_addresses/{file_name}")
     teryts = addresses["teryt"].drop_duplicates()
     for teryt in teryts:
+      teryt_addresses = addresses[addresses["teryt"] == teryt]
       teryt_addresses_to_skip = addresses_to_skip[addresses_to_skip["teryt"] == teryt]["f_address"].to_list()
-      teryt_addresses = addresses[~addresses["f_address"].isin(teryt_addresses_to_skip)]
+      teryt_addresses = teryt_addresses[~teryt_addresses["f_address"].isin(teryt_addresses_to_skip)]
       teryt_forced_districts = forced_districts[forced_districts["teryt"] == teryt]
       processed_districts = process_teryt(teryt, teryt_addresses, districts, teryt_forced_districts)
       districts_df = concat(districts_df, processed_districts)
