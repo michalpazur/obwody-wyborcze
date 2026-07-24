@@ -434,6 +434,9 @@ def process_powiat(
           if (not is_except_token and (town is not None or restored_town != parsed_token["town"]) and prev_token and prev_token["town"] == parsed_token["town"] and prev_token["is_town"]):
             restored_prev_token = True
             restored_town = parsed_token["town"]
+            prev_except_addresses = prev_token["except_addresses"] if prev_token else []
+            if (is_except and len(prev_except_addresses) != 0):
+              continue
             if (restored_town not in parsed_token["token"]):
               parsed_token = parsed_tokens.pop()
               parsed_token["is_town"] = False
