@@ -138,7 +138,7 @@ def main():
     "encoding": "utf-8",
     "sep": ";",
   }
-  districts = pandas.read_csv("data_processed/districts.csv", converters={ "teryt": str }, sep="|", encoding="utf-8")
+  districts = pandas.read_csv(f"data_processed/districts_{elections}.csv", converters={ "teryt": str }, sep="|", encoding="utf-8")
   tokens_to_skip = pandas.read_csv("const/tokens_to_skip.csv", **args)
   extra_streets = pandas.read_csv("const/extra_streets.csv", **args)
   tokens_to_replace = pandas.read_csv("const/tokens_to_replace.csv", **args)

@@ -145,16 +145,18 @@ def process_addresses(df: T, column_names: dict[str, str], utils: Utils, is_addr
     df = df.drop_duplicates(subset=["f_address"])
   return df
 
+elections = "pres_2025"
+
 def process_data():
   print("Loading utils...")
   utils = Utils()
   print("Loading voting districts...")
-  districts = pd.read_excel("data_in/districts.xlsx", converters={ "TERYT gminy": str })
+  districts = pd.read_excel(f"data_in/districts_{elections}.xlsx", converters={ "TERYT gminy": str })
   districts = districts[[key for key in districts_columns]].rename(columns=districts_columns)
   districts = districts[~districts["teryt"].isna()]
   print("Processing districts...")
   districts = process_addresses(districts, districts_columns, utils)
-  districts.to_csv("data_processed/districts.csv", index=False, sep="|", encoding="utf-8")
+  districts.to_csv(f"data_processed/districts_{elections}.csv", index=False, sep="|", encoding="utf-8")
   print("Address points saved!")
 
   print("Loading address points...")
