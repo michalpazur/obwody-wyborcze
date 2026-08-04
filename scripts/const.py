@@ -53,6 +53,7 @@ results_columns = {
   "Powiat": "powiat",
   "Teryt Gminy": "teryt",
   "TERYT Gminy": "teryt",
+  "Nr okręgu": "constituency",
   "Nr komisji": "number",
   "Liczba głosów ważnych oddanych łącznie na wszystkich kandydatów (z kart ważnych)": "total",
   "Liczba głosów ważnych oddanych łącznie na obu kandydatów (z kart ważnych)": "total",

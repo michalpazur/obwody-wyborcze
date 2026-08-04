@@ -1,7 +1,9 @@
 import geopandas as geo
 import pandas as pd
+import numpy as np
 from utils import concat, get_election_id
 from const import results_columns, candidates
+from typing import TypeVar
 import uuid
 import os
 from os import path
@@ -24,6 +26,29 @@ def get_winner(row: pd.Series):
       max_name = "tie"
 
   return max_name
+
+def prepare_results(results: geo.GeoDataFrame, candidates_columns: list[str]):
+  results[candidates_columns] = results[candidates_columns].replace(0, np.nan)
+  # pd.DataFrame.idxmax doesn't show ties
+  results["winner"] = results[candidates_columns].apply(get_winner, axis=1)
+  for name in candidates_columns:
+    results[name + "_proc"] = results[name] * 100 / results["total"]
+    results[name + "_proc"] = results[name + "_proc"].fillna(0)
+  results["winner_proc"] = results[candidates_columns].max(axis=1) * 100 / results["total"]
+  results["winner_proc"] = results["winner_proc"].fillna(0)
+  results["turnout"] = results["all_votes"] * 100 / results["voters"]
+  results = results.round(2)
+
+  return results
+
+T = TypeVar("T", pd.DataFrame, geo.GeoDataFrame)
+def filter_columns(df: T, columns: list[str]) -> T:
+  columns_to_filter = []
+  for column in columns:
+    if (column in df):
+      columns_to_filter.append(column)
+
+  return df[columns_to_filter]
 
 def process_teryt(teryt: str, addresses: geo.GeoDataFrame, districts_df: geo.GeoDataFrame, forced_districts: pd.DataFrame):
   print(f"Processing districts for TERYT {teryt}...")
@@ -140,21 +165,14 @@ def main():
   results = results[results["teryt"] != "000000"]
   results["gmina"] = results.apply(lambda row: re.sub(r"^m\.\s+", "", row.gmina) if re.match(r"^g?m\.", row.gmina) else row.powiat, axis=1)
   results["district"] = results.apply(lambda row: f"{row.teryt}_{row.number}", axis=1)
-  # pd.DataFrame.idxmax doesn't show ties
-  results["winner"] = results[candidates_columns].apply(get_winner, axis=1)
-  for name in candidates_columns:
-    results[name + "_proc"] = results[name] * 100 / results["total"]
-    results[name + "_proc"] = results[name + "_proc"].fillna(0)
-  results["winner_proc"] = results[candidates_columns].max(axis=1) * 100 / results["total"]
-  results["winner_proc"] = results["winner_proc"].fillna(0)
-  results["turnout"] = results["all_votes"] * 100 / results["voters"]
 
   print("Merging results with districts...")
+  districts_df_columns = [*merged_columns, *proc_columns, "winner", "winner_proc", "turnout", "district", "geometry"]
   districts_df = districts_df.reset_index(names="district")
   districts_df = districts_df[["district", "geometry"]]
   districts_df = districts_df.merge(results, on="district")
-  districts_df = districts_df[[*merged_columns, *proc_columns, "winner", "winner_proc", "turnout", "district", "geometry"]]
-  districts_df = districts_df.round(2)
+  districts_df = prepare_results(districts_df, candidates_columns)
+  districts_df = filter_columns(districts_df, districts_df_columns)
   districts_df = districts_df.to_crs("EPSG:4326")
 
   print("Winners:", districts_df["winner"].drop_duplicates().to_list())
@@ -167,6 +185,26 @@ def main():
     woj_teryt = str((i + 1) * 2).rjust(2, "0")
     woj_districts = districts_df[districts_df["teryt"].str.startswith(woj_teryt)]
     woj_districts.to_file(f"{districts_path}/{woj_teryt}.json", driver="GeoJSON")
+
+  print("Saving gmina shapes...")
+  gminy_columns = ["gmina", "powiat", "constituency", "geometry"]
+  gminy_columns = filter(lambda key: key in districts_df_columns, gminy_columns)
+  gminy_columns = list(gminy_columns)
+
+  gminy_shapes = districts_df.dissolve(by="teryt").reset_index()
+  gminy_shapes = gminy_shapes[[*gminy_columns, "teryt"]]
+  gminy_results = districts_df.dissolve(by="teryt", aggfunc="sum").reset_index()
+  gminy_results = prepare_results(gminy_results, candidates_columns)
+  gminy_results = gminy_results.drop(columns=[*gminy_columns, "district", "number"])
+  gminy = gminy_shapes.merge(gminy_results, on="teryt")
+  gminy.to_file(f"{districts_path}/gminy.json", driver="GeoJSON")
+
+  if ("constituency" in districts_df):
+    print("Saving constituency shapes...")
+    constituencies = districts_df.dissolve(by="constituency", aggfunc="sum").reset_index()
+    constituencies = prepare_results(constituencies, candidates_columns)
+    constituencies = constituencies.drop(columns=["gmina", "powiat", "teryt", "district", "number"])
+    constituencies.to_file(f"{districts_path}/constituencies.json")
 
 if (__name__ == "__main__"):
   main()
