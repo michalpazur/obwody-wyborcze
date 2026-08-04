@@ -38,6 +38,7 @@ def process_teryt(teryt: str, addresses: geo.GeoDataFrame, districts_df: geo.Geo
   else:
     teryt_districts = districts_df[districts_df["TERYT"] == teryt]
   districts_df = geo.GeoDataFrame()
+  empty_voronoi = geo.GeoDataFrame()
   unused_ids = []
   forced_districts_ids = forced_districts["district_id"].to_list()
   
@@ -50,14 +51,25 @@ def process_teryt(teryt: str, addresses: geo.GeoDataFrame, districts_df: geo.Geo
     if (len(district_addresses) == 0 or row.OBWOD in forced_districts_ids):
       unused_ids.append(row.OBWOD)
       continue
+
     voronoi = district_addresses.voronoi_polygons(extend_to=geom).clip(geom)
-    district_addresses = geo.GeoDataFrame(geometry=voronoi, crs=district_addresses.crs).sjoin(district_addresses, predicate="covers")
+    exploded = voronoi.explode()
+
+    exploded_df = geo.GeoDataFrame(geometry=exploded, crs=district_addresses.crs)
+    exploded_df["id"] = exploded_df.apply(lambda x: str(uuid.uuid4()), axis=1)
+    district_addresses = exploded_df.sjoin(district_addresses, predicate="covers")
+    district_empty = exploded_df[~exploded_df["id"].isin(district_addresses["id"])]
+  
     districts_df = concat(district_addresses, districts_df)
+    empty_voronoi = concat(district_empty, empty_voronoi)
     processed_districts += 1
 
   districts_df = districts_df.reset_index()
-  print(f"Found {len(unused_ids)} districts with no address points!")
+  print(f"Found {len(unused_ids) + empty_voronoi.size} shapes with no address points!")
   unused_districts = teryt_districts[teryt_districts["OBWOD"].isin(unused_ids)][["geometry", "OBWOD"]]
+  crs = teryt_districts.crs if teryt_districts.crs is not None else "EPSG:2180"
+  unused_districts = concat(empty_voronoi.to_crs(crs), unused_districts)
+
   for i, row in unused_districts.iterrows():
     if (row["OBWOD"] in forced_districts_ids):
       forced_info = forced_districts[forced_districts["district_id"] == row["OBWOD"]].iloc[0]
