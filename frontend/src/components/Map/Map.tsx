@@ -130,7 +130,7 @@ const Map = () => {
         );
       }
     },
-    [clicked],
+    [clicked, featureSelector],
   );
 
   const mapLayers = useMemo(() => {
