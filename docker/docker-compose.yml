@@ -8,6 +8,8 @@ services:
       - "3333:3000"
     environment:
       - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@martin-db/${POSTGRES_DB}
+    volumes:
+      - ./martin/mbtiles:/martin/mbtiles
     depends_on:
       - martin-db
   martin-db:
