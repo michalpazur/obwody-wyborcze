@@ -2,7 +2,7 @@ import geopandas as geo
 import pandas as pd
 import numpy as np
 from utils import concat, get_election_id
-from const import results_columns, candidates
+from const import candidates, default_crs, results_columns
 from typing import TypeVar
 import uuid
 import os
@@ -92,8 +92,8 @@ def process_teryt(teryt: str, addresses: geo.GeoDataFrame, districts_df: geo.Geo
   districts_df = districts_df.reset_index()
   print(f"Found {len(unused_ids) + empty_voronoi.size} shapes with no address points!")
   unused_districts = teryt_districts[teryt_districts["OBWOD"].isin(unused_ids)][["geometry", "OBWOD"]]
-  crs = teryt_districts.crs if teryt_districts.crs is not None else "EPSG:2180"
-  unused_districts = concat(empty_voronoi.to_crs(crs), unused_districts)
+  target_crs = teryt_districts.crs if teryt_districts.crs is not None else default_crs
+  unused_districts = concat(empty_voronoi.to_crs(target_crs), unused_districts)
 
   for i, row in unused_districts.iterrows():
     if (row["OBWOD"] in forced_districts_ids):
@@ -135,6 +135,12 @@ def main():
 
   for file_name in file_names:
     addresses = geo.read_file(f"matched_addresses/{file_name}")
+    try:
+      # Getting empty GeoDataFrame CRS raises AttributeError
+      target_crs = districts_df.crs if districts_df.crs is not None else default_crs
+    except:
+      target_crs = default_crs
+    addresses = addresses.to_crs(target_crs)
     teryts = addresses["teryt"].drop_duplicates()
     for teryt in teryts:
       teryt_addresses = addresses[addresses["teryt"] == teryt]

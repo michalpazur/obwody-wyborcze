@@ -1,3 +1,5 @@
+default_crs = "EPSG:2180"
+
 districts_columns = {
   "TERYT gminy": "teryt",
   "Gmina": "gmina",
