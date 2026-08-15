@@ -1,7 +1,9 @@
 import { ExpressionSpecification } from "maplibre-gl";
-import { ProcentKey } from "../types";
+import { ElectionId, ProcentKey } from "../types";
 import { ColorConfig, GRADIENT_COLORS } from "./createColorConfig";
 import { getGradient } from "./getGradient";
+import { electionsConfig, tieColorConfig } from "../config";
+import { getCandidateConfig } from "./getCandidateConfig";
 
 export type GradientOptions = {
   minGradient?: number;
@@ -38,4 +40,27 @@ export const generateFillColors = (
     });
   arr.push(gradient[numColors - 1]);
   return arr as ExpressionSpecification;
+};
+
+export const getWinnerFillColors = (
+  election: ElectionId,
+  options?: GradientOptions,
+) => {
+  const fill: unknown[] = ["match", ["get", "winner"]];
+  const electionConfig = electionsConfig[election];
+
+  electionConfig.winners.forEach((winner) => {
+    fill.push(
+      winner,
+      generateFillColors(
+        `${winner}_proc`,
+        getCandidateConfig(winner, election),
+        options,
+      ),
+    );
+  });
+
+  fill.push(generateFillColors("winner_proc", tieColorConfig, options));
+
+  return fill as ExpressionSpecification;
 };
