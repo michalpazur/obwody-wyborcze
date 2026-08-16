@@ -2,6 +2,8 @@ default_crs = "EPSG:2180"
 
 districts_columns = {
   "TERYT gminy": "teryt",
+  "Okręg Sejm": "constituency",
+  "Wyborcy": "voters",
   "Gmina": "gmina",
   "Powiat": "powiat",
   "Województwo": "voivodeship",
@@ -51,11 +53,8 @@ district_types = {
 }
 
 results_columns = {
-  "Gmina": "gmina",
-  "Powiat": "powiat",
   "Teryt Gminy": "teryt",
   "TERYT Gminy": "teryt",
-  "Nr okręgu": "constituency",
   "Nr komisji": "number",
   "Liczba głosów ważnych oddanych łącznie na wszystkich kandydatów (z kart ważnych)": "total",
   "Liczba głosów ważnych oddanych łącznie na obu kandydatów (z kart ważnych)": "total",

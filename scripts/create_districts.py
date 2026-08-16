@@ -1,9 +1,9 @@
 import geopandas as geo
 import pandas as pd
 import numpy as np
-from utils import concat, get_election_id
+from df_utils import filter_columns, remove_columns
+from utils import concat, get_election_id, get_district
 from const import candidates, default_crs, results_columns
-from typing import TypeVar
 import uuid
 import os
 from os import path
@@ -41,14 +41,14 @@ def prepare_results(results: geo.GeoDataFrame, candidates_columns: list[str]):
 
   return results
 
-T = TypeVar("T", pd.DataFrame, geo.GeoDataFrame)
-def filter_columns(df: T, columns: list[str]) -> T:
-  columns_to_filter = []
-  for column in columns:
-    if (column in df):
-      columns_to_filter.append(column)
+def save_districts_df(districts_df: geo.GeoDataFrame, districts_path: str):
+  if (not path.exists(districts_path)):
+      os.mkdir(districts_path)
 
-  return df[columns_to_filter]
+  for i in range(16):
+      woj_teryt = str((i + 1) * 2).rjust(2, "0")
+      woj_districts = districts_df[districts_df["teryt"].str.startswith(woj_teryt)]
+      woj_districts.to_file(f"{districts_path}/{woj_teryt}.json", driver="GeoJSON")
 
 def process_teryt(teryt: str, addresses: geo.GeoDataFrame, districts_df: geo.GeoDataFrame, forced_districts: pd.DataFrame):
   print(f"Processing districts for TERYT {teryt}...")
@@ -119,6 +119,7 @@ def process_teryt(teryt: str, addresses: geo.GeoDataFrame, districts_df: geo.Geo
   return districts_df
 
 elections = "pres_2025_1"
+geometry_only = False
 
 def main():
   districts_df: geo.GeoDataFrame | None = geo.GeoDataFrame()
@@ -150,6 +151,22 @@ def main():
       processed_districts = process_teryt(teryt, teryt_addresses, districts, teryt_forced_districts)
       districts_df = concat(districts_df, processed_districts)
 
+  districts_df = districts_df.reset_index(names="district")
+  districts_df = districts_df[["district", "geometry"]]
+  districts_path = f"districts/{elections}"
+  districts_info = pd.read_csv(f"data_processed/districts_{election_id}.csv", sep="|", converters={ "teryt": str, "voters": int })
+  districts_df = districts_df.merge(districts_info, on="district")
+  districts_df["gmina"] = districts_df.apply(lambda row: re.sub(r"^m\.\s+", "", row.gmina), axis=1)
+  districts_df_columns = ["gmina", "powiat", "voivodeship", "district", "teryt", "number", "constituency", "voters", "geometry"]
+  districts_df = filter_columns(districts_df, districts_df_columns)
+  districts_df = districts_df.to_crs("EPSG:4326")
+
+  if (geometry_only):
+    print("Saving districts geometry...")
+    districts_df["counted"] = False
+    save_districts_df(districts_df, districts_path)
+    return
+
   print("Loading voting results...")
   results = pd.read_csv(f"data_in/results_{elections}.csv", sep=";", converters={ "Teryt Gminy": lambda x: x.zfill(6), "TERYT Gminy": lambda x: x.zfill(6) })
   merged_columns = { **results_columns, **candidates }
@@ -168,40 +185,35 @@ def main():
   proc_columns = [name + "_proc" for name in candidates_columns]
 
   results = results[merged_columns]
-  results = results[results["teryt"] != "000000"]
-  results["gmina"] = results.apply(lambda row: re.sub(r"^m\.\s+", "", row.gmina) if re.match(r"^g?m\.", row.gmina) else row.powiat, axis=1)
-  results["district"] = results.apply(lambda row: f"{row.teryt}_{row.number}", axis=1)
+  results["district"] = results.apply(get_district, axis=1)
+  results = remove_columns(results, ["teryt", "number"])
+  # Final voters count will be pulled from results as it can change throughout the day
+  districts_df = remove_columns(districts_df, ["voters"])
 
   print("Merging results with districts...")
-  districts_df_columns = [*merged_columns, *proc_columns, "winner", "winner_proc", "turnout", "district", "geometry"]
-  districts_df = districts_df.reset_index(names="district")
-  districts_df = districts_df[["district", "geometry"]]
+  districts_df_columns.extend(merged_columns)
+  districts_df_columns.extend(proc_columns)
+  districts_df_columns.extend(["winner", "winner_proc", "turnout"])
+  # TODO: include results with no matching geometry (ie. some hospitals and districts abroad)
   districts_df = districts_df.merge(results, on="district")
   districts_df = prepare_results(districts_df, candidates_columns)
+  districts_df["counted"] = True
   districts_df = filter_columns(districts_df, districts_df_columns)
-  districts_df = districts_df.to_crs("EPSG:4326")
 
   print("Winners:", districts_df["winner"].drop_duplicates().to_list())
   print("Saving data...")
-  districts_path = f"districts/{elections}"
-  if (not path.exists(districts_path)):
-    os.mkdir(districts_path)
-
-  for i in range(16):
-    woj_teryt = str((i + 1) * 2).rjust(2, "0")
-    woj_districts = districts_df[districts_df["teryt"].str.startswith(woj_teryt)]
-    woj_districts.to_file(f"{districts_path}/{woj_teryt}.json", driver="GeoJSON")
+  save_districts_df(districts_df, districts_path)
 
   print("Saving gmina shapes...")
-  gminy_columns = ["gmina", "powiat", "constituency", "geometry"]
+  gminy_columns = ["gmina", "powiat", "voivodeship", "constituency", "geometry"]
   gminy_columns = filter(lambda key: key in districts_df_columns, gminy_columns)
   gminy_columns = list(gminy_columns)
 
   gminy_shapes = districts_df.dissolve(by="teryt").reset_index()
-  gminy_shapes = gminy_shapes[[*gminy_columns, "teryt"]]
+  gminy_shapes = filter_columns(gminy_shapes, [*gminy_columns, "teryt"])
   gminy_results = districts_df.dissolve(by="teryt", aggfunc="sum").reset_index()
   gminy_results = prepare_results(gminy_results, candidates_columns)
-  gminy_results = gminy_results.drop(columns=[*gminy_columns, "district", "number"])
+  gminy_results = remove_columns(gminy_results, [*gminy_columns, "district", "number"])
   gminy = gminy_shapes.merge(gminy_results, on="teryt")
   gminy.to_file(f"{districts_path}/gminy.json", driver="GeoJSON")
 
@@ -209,7 +221,8 @@ def main():
     print("Saving constituency shapes...")
     constituencies = districts_df.dissolve(by="constituency", aggfunc="sum").reset_index()
     constituencies = prepare_results(constituencies, candidates_columns)
-    constituencies = constituencies.drop(columns=["gmina", "powiat", "teryt", "district", "number"])
+    # TODO: display voivodeship name in constituency
+    constituencies = constituencies.drop(columns=["gmina", "powiat", "voivodeship", "teryt", "district", "number"])
     constituencies.to_file(f"{districts_path}/constituencies.json")
 
 if (__name__ == "__main__"):

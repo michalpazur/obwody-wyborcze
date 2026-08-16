@@ -1,6 +1,7 @@
 import pandas as pd
 import geopandas as geo
 import numpy as np
+from df_utils import filter_columns
 from utils import load_replacements, load_replacements_exceptions, load_street_prefixes, capitalize_every_word, save_zip, concat, Utils, get_building_order
 from const import districts_columns, addresses_columns, streets_columns, towns_columns, building_num_regex, building_letter_regex, ordinal_regex, year_regex, quotation_regex, multiple_number_regex, dash_regex, apostrophe_regex
 from typing import TypeVar, cast
@@ -152,7 +153,8 @@ def process_data():
   utils = Utils()
   print("Loading voting districts...")
   districts = pd.read_excel(f"data_in/districts_{elections}.xlsx", converters={ "TERYT gminy": str })
-  districts = districts[[key for key in districts_columns]].rename(columns=districts_columns)
+  districts = filter_columns(districts, [key for key in districts_columns])
+  districts = districts.rename(columns=districts_columns)
   districts = districts[~districts["teryt"].isna()]
   print("Processing districts...")
   districts = process_addresses(districts, districts_columns, utils)
@@ -174,7 +176,8 @@ def process_data():
     streets = geo.read_file(f"data_in/addresses/{teryt}.zip!PRG_Ulice_{teryt}.shp")
     squares = geo.read_file(f"data_in/addresses/{teryt}.zip!PRG_Place_{teryt}.shp")
     streets = concat(streets, squares)
-    streets = streets[[key for key in streets_columns]].rename(columns=streets_columns)
+    streets = filter_columns(streets, [key for key in streets_columns])
+    streets = streets.rename(columns=streets_columns)
     print(f"Processing streets for voivodeship {teryt}...")
     streets = process_addresses(streets, streets_columns, utils, False)
     save_zip(f"{streets_path}/{teryt}", streets)
@@ -185,7 +188,8 @@ def process_data():
     streets = streets[["str_type", "ULIC_id", "teryt"]]
     addresses = addresses.merge(streets, left_on=["TERYT", "ULIC_id"], right_on=["teryt", "ULIC_id"], how="left")
     del addresses_columns["Cecha"]
-    addresses = addresses[[*[key for key in addresses_columns], "str_type"]].rename(columns=addresses_columns)
+    addresses = filter_columns(addresses, [*[key for key in addresses_columns], "str_type"])
+    addresses = addresses.rename(columns=addresses_columns)
     print(f"Processing data for voivodeship {teryt}...")
     addresses = process_addresses(addresses, addresses_columns, utils, True)
     save_zip(f"{addresses_path}/{teryt}", addresses)

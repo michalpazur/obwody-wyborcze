@@ -1,4 +1,4 @@
-from pandas import DataFrame
+from pandas import DataFrame, Series
 import pandas
 from geopandas import GeoDataFrame
 import os
@@ -14,6 +14,9 @@ def head(df: DataFrame, n: int = 5):
 def get_election_id(elections: str):
   split = elections.split("_")
   return "_".join(split[0:2])
+
+def get_district(row: Series):
+  return f"{row.teryt}_{row.number}"
 
 def handle_capitalize(match: Match[str]):
   text = ""
