@@ -107,6 +107,8 @@ candidates = {
   "Głosy na kandydata nr 6 - WIPLER Przemysław Janusz zarejestrowanego przez KWW KONFEDERACJA I BEZPARTYJNI SAMORZĄDOWCY": "wipler",
 }
 
+merged_columns = { **results_columns, **candidates }
+
 char_order = list("aąbcćdefghijklłmnńoópqrsśtuvwxyzżź0123456789")
 
 districts = [

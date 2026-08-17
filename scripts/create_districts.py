@@ -1,9 +1,9 @@
 import geopandas as geo
 import pandas as pd
 import numpy as np
-from df_utils import filter_columns, remove_columns
-from utils import concat, get_election_id, get_district
-from const import candidates, default_crs, results_columns
+from df_utils import filter_columns, remove_columns, load_results, get_results_columns, sort_by_district
+from utils import concat, get_election_id
+from const import default_crs
 import uuid
 import os
 from os import path
@@ -45,6 +45,7 @@ def save_districts_df(districts_df: geo.GeoDataFrame, districts_path: str):
   if (not path.exists(districts_path)):
       os.mkdir(districts_path)
 
+  districts_df = sort_by_district(districts_df)
   for i in range(16):
       woj_teryt = str((i + 1) * 2).rjust(2, "0")
       woj_districts = districts_df[districts_df["teryt"].str.startswith(woj_teryt)]
@@ -154,7 +155,8 @@ def main():
   districts_df = districts_df.reset_index(names="district")
   districts_df = districts_df[["district", "geometry"]]
   districts_path = f"districts/{elections}"
-  districts_info = pd.read_csv(f"data_processed/districts_{election_id}.csv", sep="|", converters={ "teryt": str, "voters": int })
+  districts_info = pd.read_csv(f"data_processed/districts_{election_id}.csv", sep="|", converters={ "teryt": str })
+  districts_info["voters"] = pd.to_numeric(districts_info["voters"], downcast="integer")
   districts_df = districts_df.merge(districts_info, on="district")
   districts_df["gmina"] = districts_df.apply(lambda row: re.sub(r"^m\.\s+", "", row.gmina), axis=1)
   districts_df_columns = ["gmina", "powiat", "voivodeship", "district", "teryt", "number", "constituency", "voters", "geometry"]
@@ -168,24 +170,8 @@ def main():
     return
 
   print("Loading voting results...")
-  results = pd.read_csv(f"data_in/results_{elections}.csv", sep=";", converters={ "Teryt Gminy": lambda x: x.zfill(6), "TERYT Gminy": lambda x: x.zfill(6) })
-  merged_columns = { **results_columns, **candidates }
-  results = results.rename(columns=merged_columns)
-
-  candidates_columns = [candidates[key] for key in candidates]
-  candidates_columns = list(filter(lambda key: key in results, candidates_columns))
-  candidates_columns = list(dict.fromkeys(candidates_columns))
-  merged_columns = filter(lambda key: key in results, [merged_columns[key] for key in merged_columns])
-  merged_columns = list(merged_columns)
-  tmp_merged_columns = []
-  for key in merged_columns:
-    if (key not in tmp_merged_columns):
-      tmp_merged_columns.append(key)
-  merged_columns = tmp_merged_columns
-  proc_columns = [name + "_proc" for name in candidates_columns]
-
-  results = results[merged_columns]
-  results["district"] = results.apply(get_district, axis=1)
+  results = load_results(elections)
+  merged_columns, candidates_columns, proc_columns = get_results_columns(results)
   results = remove_columns(results, ["teryt", "number"])
   # Final voters count will be pulled from results as it can change throughout the day
   districts_df = remove_columns(districts_df, ["voters"])

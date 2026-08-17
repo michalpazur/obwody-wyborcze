@@ -2,7 +2,7 @@ import pandas as pd
 import geopandas as geo
 import numpy as np
 from df_utils import filter_columns
-from utils import load_replacements, load_replacements_exceptions, load_street_prefixes, capitalize_every_word, save_zip, concat, Utils, get_building_order
+from utils import concat, load_replacements, load_replacements_exceptions, load_street_prefixes, capitalize_every_word, save_zip, concat, Utils, get_building_order, get_district
 from const import districts_columns, addresses_columns, streets_columns, towns_columns, building_num_regex, building_letter_regex, ordinal_regex, year_regex, quotation_regex, multiple_number_regex, dash_regex, apostrophe_regex
 from typing import TypeVar, cast
 import os
@@ -152,12 +152,18 @@ def process_data():
   print("Loading utils...")
   utils = Utils()
   print("Loading voting districts...")
-  districts = pd.read_excel(f"data_in/districts_{elections}.xlsx", converters={ "TERYT gminy": str })
+  districts = pd.read_excel(f"data_in/districts_{elections}.xlsx", converters={ "TERYT gminy": str, "Wyborcy": int })
   districts = filter_columns(districts, [key for key in districts_columns])
   districts = districts.rename(columns=districts_columns)
-  districts = districts[~districts["teryt"].isna()]
   print("Processing districts...")
-  districts = process_addresses(districts, districts_columns, utils)
+  no_teryt_loc = districts["teryt"].isna()
+  districts.loc[no_teryt_loc, "teryt"] = "000000"
+  districts["district"] = districts.apply(get_district, axis=1)
+  no_teryt_districts = districts[no_teryt_loc]
+  teryt_districts = districts[~no_teryt_loc].copy()
+  teryt_districts = process_addresses(teryt_districts, districts_columns, utils)
+  districts = pd.concat([teryt_districts, no_teryt_districts])
+  districts = districts.sort_values(by=["teryt", "number"])
   districts.to_csv(f"data_processed/districts_{elections}.csv", index=False, sep="|", encoding="utf-8")
   print("Address points saved!")
 
