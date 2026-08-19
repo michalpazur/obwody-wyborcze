@@ -3,3 +3,5 @@
 martin/mbtiles
 # Ignore PSQL files form Docker container
 postgres/pg_data
+# Ignore saved results files
+results/*

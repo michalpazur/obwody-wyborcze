@@ -9,7 +9,7 @@ from utils import get_election_id
 from df_utils import load_results, get_results_columns
 
 waw_tz = ZoneInfo("Europe/Warsaw")
-elections = "parl_2023"
+elections = "pres_2025_1"
 results_dir = path.join("..", "docker", "results")
 file_path = path.join(results_dir, f"{elections}.json")
 
@@ -59,11 +59,12 @@ def prepare_json():
     results_by_district[candidate] = results[candidate].astype(int).to_list()
 
   results_json = {
-    "districts": counted_districts,
-    "allDistricts": all_districts,
-    "countedDistricts": counted,
+    "candidates": candidates,
+    "districts": all_districts,
+    "counted": counted_districts,
+    "reported": counted,
     "totalDistricts": len(districts),
-    "districtResults": results_by_district,
+    "byDistrict": results_by_district,
     "results": results_by_candidate,
     "allVotes": int(all_votes),
     "total": int(total),

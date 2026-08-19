@@ -34,3 +34,4 @@ services:
       - martin
     volumes:
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./results:/www/data/results:ro
