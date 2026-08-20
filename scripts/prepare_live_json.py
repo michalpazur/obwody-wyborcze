@@ -16,6 +16,9 @@ file_path = path.join(results_dir, f"{elections}.json")
 def format_date(date: datetime):
   return date.strftime("%Y-%m-%d %H:%M:%S")
 
+def to_int_list(column: pd.Series):
+  return list(map(lambda x: None if np.isnan(x) else int(x), column.to_list()))
+
 def prepare_json():
   start = datetime.now(tz=waw_tz)
   print(f"Started preparing results at {start.strftime("%Y-%m-%d %H:%M:%S")}...")
@@ -26,7 +29,7 @@ def prepare_json():
   try:
     with open(file_path, "r", encoding="utf-8") as results_file:
       saved_results = json.load(results_file)
-      prev_counted = saved_results["countedDistricts"]
+      prev_counted = saved_results["reported"]
       to_count = len(results)
       if (prev_counted >= to_count):
         saved_modified_at = datetime.fromtimestamp(path.getmtime(file_path))
@@ -47,7 +50,7 @@ def prepare_json():
   total = results["total"].sum()
   voters = results["voters"].sum()
 
-  counted_districts = results["counted"].astype("int8").to_list()
+  counted_districts = to_int_list(results["counted"])
   all_districts = results["district"].to_list()
   counted = len(results[results["counted"] == 1])
 
@@ -55,8 +58,11 @@ def prepare_json():
   results_by_district = {}
   for candidate in candidates:
     results_by_candidate[candidate] = int(results[candidate].sum())
-    results[candidate] = results[candidate].fillna(-1)
-    results_by_district[candidate] = results[candidate].astype(int).to_list()
+    results_by_district[candidate] = to_int_list(results[candidate])
+
+  results_by_district["voters"] = to_int_list(results["voters"])
+  results_by_district["allVotes"] = to_int_list(results["all_votes"])
+  results_by_district["total"] = to_int_list(results["total"])
 
   results_json = {
     "candidates": candidates,
@@ -66,10 +72,10 @@ def prepare_json():
     "totalDistricts": len(districts),
     "byDistrict": results_by_district,
     "results": results_by_candidate,
+    "voters": int(voters),
     "allVotes": int(all_votes),
     "total": int(total),
-    "voters": int(voters),
-    "timestamp": datetime.now(tz=waw_tz).isoformat()
+    "timestamp": datetime.now(tz=waw_tz).isoformat(),
   }
 
   if (not path.exists(results_dir)):
