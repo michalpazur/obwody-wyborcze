@@ -16,6 +16,7 @@ export type DistrictInfo = {
   total: number;
   turnout: number;
   winner: CandidateId;
+  counted?: boolean;
 } & VoteCount &
   VoteResult;
 
@@ -37,3 +38,31 @@ export type ElectionResultsInfo<T extends ElectionType = any> = {
   turnout?: TurnoutResults<T>;
   results?: Results[];
 };
+
+type LiveByDistrictKey = CandidateId | "voters" | "allVotes" | "total";
+
+export type ResultsByCandidate = Record<CandidateId, number>;
+
+export type LiveResultsResponse = {
+  candidates: CandidateId[];
+  byDistrict: Record<LiveByDistrictKey, number[]>;
+  results: ResultsByCandidate;
+  districts: string[];
+  counted: (0 | 1)[];
+  reported: number;
+  totalDistricts: number;
+  allVotes: number;
+  total: number;
+  voters: number;
+  timestamp: string;
+};
+
+type LiveDistrictInfo = Omit<DistrictInfo, "id" | "number" | "teryt" | "gmina">;
+
+export type LiveResults = {
+  byDistrict: Map<DistrictInfo["district"], LiveDistrictInfo>;
+  results: ElectionResultsInfo;
+} & Pick<
+  LiveResultsResponse,
+  "candidates" | "reported" | "totalDistricts" | "timestamp"
+>;

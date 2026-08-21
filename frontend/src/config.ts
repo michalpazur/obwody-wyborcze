@@ -415,6 +415,7 @@ export const turnoutColorConfig = colors.teal;
 export const turnoutGradient = turnoutColorConfig.gradient;
 
 export const mapOpacity = 1;
+export const restThreshold = 1.75;
 
 export const layerIds = {
   elections: "elections",

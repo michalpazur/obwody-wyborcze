@@ -14,6 +14,7 @@ import { useElectionsStore } from "../../../../redux/electionsSlice";
 import { useLayoutStore } from "../../../../redux/layoutSlice";
 import { DistrictInfo } from "../../../../types";
 import { sortResults } from "../../../../utils/sortResults";
+import { useElectionResults } from "../../../../utils/useElectionResults";
 import { useLocalElectionConfig } from "../../../../utils/useLocalElectionConfig";
 import { mapComponentInset } from "../../../styles";
 import { StackedChart, TurnoutChart } from "../Charts";
@@ -78,6 +79,7 @@ const DistrictInfoComponent: React.FC<{
 }> = ({ districtInfo }) => {
   const [open, setOpen] = useState(true);
   const { elections, showTurnout } = useElectionsStore();
+  const electionResults = useElectionResults();
   const electionConfig = electionsConfig[elections];
   const localElectionsConfig = useLocalElectionConfig();
   const { navigationOpen } = useLayoutStore();
@@ -108,7 +110,7 @@ const DistrictInfoComponent: React.FC<{
   }, [districtInfo, elections]);
 
   const chart = useMemo(() => {
-    const { turnout, results } = electionConfig.results || {};
+    const { turnout, results } = electionResults || {};
 
     if (districtInfo) return null;
 
@@ -120,7 +122,7 @@ const DistrictInfoComponent: React.FC<{
     if (!results) return null;
 
     return <StackedChart results={results} />;
-  }, [districtInfo, electionConfig, showTurnout]);
+  }, [districtInfo, electionConfig, showTurnout, electionResults]);
 
   return (
     <CardWithSlide open={open} onClose={onCloseClick}>

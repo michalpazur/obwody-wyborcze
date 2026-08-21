@@ -31,7 +31,7 @@ def prepare_json():
       saved_results = json.load(results_file)
       prev_counted = saved_results["reported"]
       to_count = len(results)
-      if (prev_counted >= to_count):
+      if (prev_counted == to_count):
         saved_modified_at = datetime.fromtimestamp(path.getmtime(file_path))
         results_modified_at = datetime.fromtimestamp(path.getmtime(f"data_in/results_{elections}.csv"))
         print(f"Skipping results update. Previously counted: {prev_counted}, to count: {to_count}. Saved results files updated at {format_date(saved_modified_at)}, results source file updated at {format_date(results_modified_at)}.")

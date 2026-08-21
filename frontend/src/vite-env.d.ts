@@ -11,7 +11,9 @@ interface ViteTypeOptions {
 }
 
 interface ImportMetaEnv {
+  readonly VITE_API_BASE_URL: string;
   readonly VITE_TILE_SERVER_URL: string;
+  readonly VITE_LIVE_ELECTIONS?: string;
 }
 
 interface ImportMeta {
