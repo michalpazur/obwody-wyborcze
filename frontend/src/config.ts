@@ -414,6 +414,8 @@ export const tieGradient = tieColorConfig.gradient;
 export const turnoutColorConfig = colors.teal;
 export const turnoutGradient = turnoutColorConfig.gradient;
 
+export const notCountedColor = colors.blueGrey.baseColor.A200;
+
 export const mapOpacity = 1;
 export const restThreshold = 1.75;
 

@@ -12,7 +12,9 @@ import React, {
 import { Layer, Map as MapComponent, MapRef } from "react-map-gl/maplibre";
 import { electionsConfig, layerIds } from "../../config";
 import { useElectionsStore } from "../../redux/electionsSlice";
+import { useLiveElectionResults } from "../../services/useLiveElectionResults";
 import { DistrictInfo } from "../../types";
+import { useFeatureSelector } from "../../utils/useFeatureSelector";
 import BoundsController from "./components/BoundsController";
 import DistrictInfoComponent from "./components/DistrictInfo";
 import { ElectionsDataSource } from "./components/Layers/ElectionDataSource";
@@ -24,6 +26,7 @@ import {
 } from "./components/Layers/PlaceNameLayer";
 import { TransportationLayer } from "./components/Layers/TransportationLayer";
 import Legend from "./components/Legend";
+import LiveElectionsState from "./components/LiveElectionsState";
 import Popup from "./components/Popup";
 import {
   featureOutline,
@@ -41,21 +44,46 @@ const Map = () => {
   const [hovered, setHovered] = useState<DistrictInfo>();
   const [clicked, setClicked] = useState<DistrictInfo>();
   const [hoverPosition, setHoverPosition] = useState<LngLat>();
+  const { data: liveResults } = useLiveElectionResults();
   const { elections, candidate } = useElectionsStore();
   const selectedElections = electionsConfig[elections];
+  const featureSelector = useFeatureSelector();
 
-  const featureSelector = useMemo(
-    () => ({
-      source: elections,
-      sourceLayer: electionsConfig[elections].sourceLayer,
-    }),
-    [elections],
+  const getDistrictInfo = useCallback(
+    (feature: GeoJSONFeature) => {
+      return {
+        ...feature.properties,
+        ...liveResults?.byDistrict.get(feature.properties.district),
+        id: feature.id,
+      } as DistrictInfo;
+    },
+    [liveResults],
   );
 
   useEffect(() => {
     setHovered(undefined);
     setClicked(undefined);
   }, [elections]);
+
+  useEffect(() => {
+    if (!liveResults) {
+      return;
+    }
+
+    const mergeResults = (feature?: DistrictInfo) => {
+      if (!feature) {
+        return feature;
+      }
+
+      return {
+        ...feature,
+        ...liveResults.byDistrict.get(feature.district),
+      };
+    };
+
+    setHovered(mergeResults);
+    setClicked(mergeResults);
+  }, [liveResults]);
 
   const onMouseEnter = () => {
     if (mapRef.current) {
@@ -80,7 +108,7 @@ const Map = () => {
 
     if (feature) {
       hoveredId = feature.id;
-      setHovered({ ...feature.properties, id: feature.id } as DistrictInfo);
+      setHovered(getDistrictInfo(feature));
       mapRef.current?.setFeatureState(
         { ...featureSelector, id: feature.id },
         { hovered: true },
@@ -123,19 +151,19 @@ const Map = () => {
       if (clicked?.id === feature?.id) {
         setClicked(undefined);
       } else if (feature) {
-        setClicked({ ...feature.properties, id: feature.id } as DistrictInfo);
+        setClicked(getDistrictInfo(feature));
         mapRef.current?.setFeatureState(
           { ...featureSelector, id: feature.id },
           { clicked: true },
         );
       }
     },
-    [clicked, featureSelector],
+    [clicked, featureSelector, getDistrictInfo],
   );
 
   const mapLayers = useMemo(() => {
     return <ElectionsResultsLayer />;
-  }, [elections, candidate]);
+  }, []);
 
   const featuresMapLayers = useMemo(() => {
     const transparentFillPaint = {
@@ -219,11 +247,7 @@ const Map = () => {
       onMouseOut={onMouseLeave}
       onClick={onClick}
       maxPitch={0}
-      interactiveLayerIds={
-        candidate === "all"
-          ? [...electionsConfig[elections].winners, "tie", "turnout"]
-          : [candidate, "turnout"]
-      }
+      interactiveLayerIds={[layerIds.elections]}
       style={{ width: "100%", height: "100%" }}
       mapStyle="/map-style.json"
     >
@@ -235,6 +259,7 @@ const Map = () => {
       <Legend />
       <DistrictInfoComponent districtInfo={clicked} />
       <BoundsController />
+      <LiveElectionsState />
     </MapComponent>
   );
 };

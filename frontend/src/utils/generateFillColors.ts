@@ -13,6 +13,7 @@ export type GradientOptions = {
 
 export const generateFillColors = (
   key: ProcentKey,
+  isLive: boolean,
   colorConfig: Partial<ColorConfig>,
   options?: GradientOptions,
 ) => {
@@ -28,7 +29,7 @@ export const generateFillColors = (
 
   const gradient = getGradient(colorConfig, numColors);
 
-  const arr = ["step", ["get", key]];
+  const arr = ["step", [isLive ? "feature-state" : "get", key]];
   Array(numColors - 1)
     .fill(0)
     .forEach((_, idx) => {
@@ -44,9 +45,13 @@ export const generateFillColors = (
 
 export const getWinnerFillColors = (
   election: ElectionId,
+  isLive: boolean,
   options?: GradientOptions,
 ) => {
-  const fill: unknown[] = ["match", ["get", "winner"]];
+  const fill: unknown[] = [
+    "match",
+    [isLive ? "feature-state" : "get", "winner"],
+  ];
   const electionConfig = electionsConfig[election];
 
   electionConfig.winners.forEach((winner) => {
@@ -54,13 +59,14 @@ export const getWinnerFillColors = (
       winner,
       generateFillColors(
         `${winner}_proc`,
+        isLive,
         getCandidateConfig(winner, election),
         options,
       ),
     );
   });
 
-  fill.push(generateFillColors("winner_proc", tieColorConfig, options));
+  fill.push(generateFillColors("winner_proc", isLive, tieColorConfig, options));
 
   return fill as ExpressionSpecification;
 };

@@ -1,5 +1,6 @@
 import {
   blue,
+  blueGrey,
   brown,
   deepOrange,
   green,
@@ -17,6 +18,7 @@ import { createColorConfig, GRADIENT_COLORS } from "./utils/createColorConfig";
 
 export const colors = {
   blue: createColorConfig(blue),
+  blueGrey: createColorConfig(blueGrey),
   brat: {
     color: "#8ACE00",
     gradient: chroma.scale(["#B4FF1C", "#689B00"]).colors(GRADIENT_COLORS),
