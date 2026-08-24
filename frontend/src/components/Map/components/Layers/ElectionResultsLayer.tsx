@@ -64,8 +64,6 @@ const ElectionsResultsLayer: React.FC = () => {
     ] as ExpressionSpecification;
   }, [fillExpression, isLive]);
 
-  console.log(fill);
-
   return (
     <ElectionsDataSource>
       <Layer
