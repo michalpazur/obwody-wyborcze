@@ -34,4 +34,12 @@ services:
       - martin
     volumes:
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
-      - ./results:/www/data/results:ro
+      - ../scripts/live_results:/www/data/results:ro
+  mock_results:
+    build:
+      context: ..
+      dockerfile: ./docker/mock_results/Dockerfile
+    volumes:
+      - ../scripts/live_results:/app/live_results
+      - ../scripts/data_in:/app/data_in
+      - ../scripts/data_processed:/app/data_processed:ro

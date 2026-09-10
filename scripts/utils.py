@@ -1,11 +1,10 @@
 from pandas import DataFrame, Series
 import pandas
-from geopandas import GeoDataFrame
-import os
+from datetime import datetime
+from zoneinfo import ZoneInfo
 import re, regex
 from regex import Match
 from const import first_name_letter_regex, holy_name_regex, prince_queen_regex, char_order, ordinal_regex, year_regex, quotation_regex, apostrophe_regex, dash_regex, building_types_regex
-import typing
 from typing import Dict
 
 def head(df: DataFrame, n: int = 5):
@@ -17,6 +16,13 @@ def get_election_id(elections: str):
 
 def get_district(row: Series):
   return f"{row.teryt}_{row.number}"
+
+def now():
+  waw_tz = ZoneInfo("Europe/Warsaw")
+  return datetime.now(tz=waw_tz)
+
+def format_date(date: datetime):
+  return date.strftime("%Y-%m-%d %H:%M:%S")
 
 def handle_capitalize(match: Match[str]):
   text = ""
@@ -125,7 +131,8 @@ class Utils:
     match = regex.search(first_name_letter_regex, street)
     if (match):
       name_letter = match.group(3)
-      return street.replace(name_letter, "", 1)
+      if (not re.search(holy_name_regex, name_letter, flags=re.IGNORECASE)):
+        return street.replace(name_letter, "", 1)
 
     return street
 
@@ -199,12 +206,3 @@ def get_building_order(building_n: int | str, building_l: str):
     number += (char_ord * pow(10, curr_pow))
   
   return number
-
-def save_zip(path: str, gdf: GeoDataFrame):
-  gdf.to_file(f"{path}.shz", driver="ESRI Shapefile")
-  os.rename(f"{path}.shz", f"{path}.zip")
-
-def concat(df1: GeoDataFrame | None, df2: pandas.DataFrame | GeoDataFrame):
-  if (df1 is None):
-    return GeoDataFrame(df2)
-  return typing.cast(GeoDataFrame, pandas.concat([df1, df2]))

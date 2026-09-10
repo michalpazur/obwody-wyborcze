@@ -2,7 +2,8 @@ import pandas as pd
 import geopandas as geo
 import numpy as np
 from df_utils import filter_columns
-from utils import concat, load_replacements, load_replacements_exceptions, load_street_prefixes, capitalize_every_word, save_zip, concat, Utils, get_building_order, get_district
+from utils import load_replacements, load_replacements_exceptions, load_street_prefixes, capitalize_every_word, Utils, get_building_order, get_district
+from geo_utils import concat, save_zip
 from const import districts_columns, addresses_columns, streets_columns, towns_columns, building_num_regex, building_letter_regex, ordinal_regex, year_regex, quotation_regex, multiple_number_regex, dash_regex, apostrophe_regex
 from typing import TypeVar, cast
 import os

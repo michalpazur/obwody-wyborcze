@@ -4,24 +4,18 @@ import pandas as pd
 import os
 from os import path
 from datetime import datetime
-from zoneinfo import ZoneInfo
-from utils import get_election_id
+from utils import get_election_id, now, format_date
 from df_utils import load_results, get_results_columns
 
-waw_tz = ZoneInfo("Europe/Warsaw")
-elections = "pres_2025_1"
-results_dir = path.join("..", "docker", "results")
-file_path = path.join(results_dir, f"{elections}.json")
-
-def format_date(date: datetime):
-  return date.strftime("%Y-%m-%d %H:%M:%S")
+results_dir = path.join(".", "live_results")
 
 def to_int_list(column: pd.Series):
   return list(map(lambda x: None if np.isnan(x) else int(x), column.to_list()))
 
-def prepare_json():
-  start = datetime.now(tz=waw_tz)
+def prepare_json(elections: str):
+  start = now()
   print(f"Started preparing results at {start.strftime("%Y-%m-%d %H:%M:%S")}...")
+  file_path = path.join(results_dir, f"{elections}.json")
   results = load_results(elections)
   election_id = get_election_id(elections)
   districts = pd.read_csv(f"data_processed/districts_{election_id}.csv", sep="|", converters={ "teryt": str })
@@ -75,7 +69,7 @@ def prepare_json():
     "voters": int(voters),
     "allVotes": int(all_votes),
     "total": int(total),
-    "timestamp": datetime.now(tz=waw_tz).isoformat(),
+    "timestamp": now().isoformat(),
   }
 
   if (not path.exists(results_dir)):
@@ -86,8 +80,9 @@ def prepare_json():
     json.dump(results_json, dest_file, separators=(",", ":"))
 
   os.rename(tmp_path, file_path)
-  end = datetime.now(tz=waw_tz)
+  end = now()
   print(f"Finished preparing results at {format_date(end)} (took {end.timestamp() - start.timestamp():.2f} sec).")
 
 if (__name__ == "__main__"):
-  prepare_json()
+  elections = "pres_2025_1"
+  prepare_json(elections)

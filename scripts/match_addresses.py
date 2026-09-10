@@ -5,7 +5,8 @@ import re
 import regex
 import json
 from typing import List, NotRequired, TypedDict, cast
-from utils import concat, Utils, get_building_order, save_zip, capitalize_every_word
+from utils import Utils, get_building_order, capitalize_every_word
+from geo_utils import concat, save_zip
 from const import all_regex, odd_regex, even_regex, building_num_regex, building_letter_regex, district_types, dash_regex, multiple_number_regex, building_types_regex
 
 pandas.options.mode.copy_on_write = True

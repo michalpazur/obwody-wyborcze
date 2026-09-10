@@ -1,10 +1,9 @@
 import pandas as pd
-import geopandas as geo
 from typing import TypeVar
 from const import candidates, merged_columns
 from utils import get_district
 
-AnyDataFrame = TypeVar("AnyDataFrame", pd.DataFrame, geo.GeoDataFrame)
+AnyDataFrame = TypeVar("AnyDataFrame", bound=pd.DataFrame)
 
 def filter_columns(df: AnyDataFrame, columns: list[str]) -> AnyDataFrame:
   columns_to_filter = []
@@ -32,8 +31,12 @@ def get_results_columns(results: pd.DataFrame):
 
   return merged_columns_list, candidates_columns, proc_columns
 
-def load_results(elections: str):
+def load_results_csv(elections: str):
   results = pd.read_csv(f"data_in/results_{elections}.csv", sep=";", converters={ "Teryt Gminy": lambda x: x.zfill(6), "TERYT Gminy": lambda x: x.zfill(6) })
+  return results
+
+def load_results(elections: str):
+  results = load_results_csv(elections)
   results = results.rename(columns=merged_columns)
 
   merged_columns_list, _, _ = get_results_columns(results)

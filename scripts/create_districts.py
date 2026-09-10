@@ -2,7 +2,8 @@ import geopandas as geo
 import pandas as pd
 import numpy as np
 from df_utils import filter_columns, remove_columns, load_results, get_results_columns, sort_by_district
-from utils import concat, get_election_id
+from utils import get_election_id
+from geo_utils import concat
 from const import default_crs
 import uuid
 import os
