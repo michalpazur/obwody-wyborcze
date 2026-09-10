@@ -6,3 +6,8 @@ export const textSx: SxProps<Theme> = {
   fontSize: "14px",
   color: (theme) => theme.palette.secondary.main,
 };
+
+export const notCountedSx: SxProps<Theme> = {
+  fontSize: "14px",
+  color: (theme) => theme.palette.secondary.light,
+};

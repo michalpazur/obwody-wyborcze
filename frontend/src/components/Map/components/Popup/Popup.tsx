@@ -5,6 +5,8 @@ import { Popup as MapPopup } from "react-map-gl/maplibre";
 import { useElectionsStore } from "../../../../redux/electionsSlice";
 import { DistrictInfo } from "../../../../types";
 import { sortResults } from "../../../../utils/sortResults";
+import { useIsLive } from "../../../../utils/useIsLive";
+import { notCountedSx } from "../DistrictInfo/components/styles";
 import { ResultsTable, TurnoutTable } from "../Tables";
 
 type PopupProps = {
@@ -14,6 +16,7 @@ type PopupProps = {
 
 const Popup: React.FC<PopupProps> = ({ district, position }) => {
   const { elections, showTurnout } = useElectionsStore();
+  const isLive = useIsLive();
 
   const popupContent = useMemo(() => {
     const results = sortResults(district, elections);
@@ -31,7 +34,9 @@ const Popup: React.FC<PopupProps> = ({ district, position }) => {
             OKW {district.number}
           </Typography>
         </Typography>
-        {showTurnout ? (
+        {isLive && !district.counted ? (
+          <Typography sx={notCountedSx}>Brak wyników.</Typography>
+        ) : showTurnout ? (
           <TurnoutTable district={district} results={results} />
         ) : (
           <ResultsTable district={district} results={results} />

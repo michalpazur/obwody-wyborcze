@@ -11,18 +11,20 @@ import { useLayoutStore } from "../../../../../redux/layoutSlice";
 import { mergeSx } from "../../../../../utils/mergeSx";
 import { useIsLinkActive } from "../utils/useIsLinkActive";
 import { listItemSx, listItemTextSx } from "./styles";
+import LiveIndicator from "../../../../LiveIndicator";
 
 type NavLinkProps = {
   href: string;
   children: React.ReactNode;
   inset?: boolean;
+  live?: boolean;
 };
 
 const activeSx: SxProps<Theme> = {
   fontFamily: "'Bree Serif'",
 };
 
-const NavLink: React.FC<NavLinkProps> = ({ href, children, inset }) => {
+const NavLink: React.FC<NavLinkProps> = ({ href, children, inset, live }) => {
   const { setNavigationOpen } = useLayoutStore();
   const isLinkActive = useIsLinkActive();
   const isActive = isLinkActive(href);
@@ -43,6 +45,7 @@ const NavLink: React.FC<NavLinkProps> = ({ href, children, inset }) => {
           isActive ? activeSx : {},
         )}
       >
+        {live && <LiveIndicator />}
         <ListItemText sx={listItemTextSx} disableTypography>
           {children}
         </ListItemText>

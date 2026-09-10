@@ -15,13 +15,15 @@ import { useLayoutStore } from "../../../../redux/layoutSlice";
 import { DistrictInfo } from "../../../../types";
 import { sortResults } from "../../../../utils/sortResults";
 import { useElectionResults } from "../../../../utils/useElectionResults";
+import { useIsLive } from "../../../../utils/useIsLive";
 import { useLocalElectionConfig } from "../../../../utils/useLocalElectionConfig";
 import { mapComponentInset } from "../../../styles";
 import { StackedChart, TurnoutChart } from "../Charts";
 import { ResultsTable, TurnoutTable } from "../Tables";
 import ElectionsSelects from "./components/ElectionsSelects";
+import LiveResultsInfo from "./components/LiveResultsInfo";
 import SideButtons from "./components/SideButtons";
-import { stackSpacing, textSx } from "./components/styles";
+import { notCountedSx, stackSpacing, textSx } from "./components/styles";
 
 const stackSx: SxProps<Theme> = (theme) => ({
   alignItems: "flex-start",
@@ -48,7 +50,7 @@ const rootSx: SxProps<Theme> = (theme) => ({
   },
 });
 
-const countyName: SxProps = {
+const countyNameSx: SxProps = {
   fontFamily: "'Bree Serif'",
 };
 
@@ -82,6 +84,7 @@ const DistrictInfoComponent: React.FC<{
   const electionResults = useElectionResults();
   const electionConfig = electionsConfig[elections];
   const localElectionsConfig = useLocalElectionConfig();
+  const isLive = useIsLive();
   const { navigationOpen } = useLayoutStore();
   const isMobile = useMediaQuery((theme) => theme.breakpoints.down("md"));
 
@@ -124,6 +127,26 @@ const DistrictInfoComponent: React.FC<{
     return <StackedChart results={results} />;
   }, [districtInfo, electionConfig, showTurnout, electionResults]);
 
+  const infoTables = useMemo(() => {
+    if (!districtInfo) {
+      return null;
+    }
+
+    if (isLive && !districtInfo.counted) {
+      return (
+        <Typography sx={notCountedSx}>
+          Wyniki z tego obwodu nie zostały jeszcze opublikowane.
+        </Typography>
+      );
+    }
+
+    return showTurnout ? (
+      <TurnoutTable results={results} district={districtInfo} />
+    ) : (
+      <ResultsTable results={results} district={districtInfo} full />
+    );
+  }, [districtInfo, showTurnout, isLive]);
+
   return (
     <CardWithSlide open={open} onClose={onCloseClick}>
       <Stack spacing={4}>
@@ -133,10 +156,11 @@ const DistrictInfoComponent: React.FC<{
             : "Szczegółowe wyniki"}
         </Typography>
         <ElectionsSelects />
+        {isLive && <LiveResultsInfo />}
         {chart}
         {districtInfo ? (
           <Box>
-            <Typography sx={countyName}>{districtInfo.gmina}</Typography>
+            <Typography sx={countyNameSx}>{districtInfo.gmina}</Typography>
             <Typography sx={textSx}>
               Obwodowa Komisja Wyborcza {districtInfo.number}
             </Typography>
@@ -147,13 +171,7 @@ const DistrictInfoComponent: React.FC<{
             Obwodowej Komisji Wyborczej.
           </Typography>
         )}
-        {districtInfo ? (
-          showTurnout ? (
-            <TurnoutTable results={results} district={districtInfo} />
-          ) : (
-            <ResultsTable results={results} district={districtInfo} full />
-          )
-        ) : null}
+        {infoTables}
       </Stack>
     </CardWithSlide>
   );

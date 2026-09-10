@@ -18,6 +18,7 @@ import {
 } from "../../../../config";
 import { useLayoutStore } from "../../../../redux/layoutSlice";
 import { LocalElectionId } from "../../../../types";
+import { isLiveElection } from "../../../../utils/isLiveElection";
 import {
   glassStyle,
   mapComponentInset,
@@ -57,14 +58,23 @@ const NavigationDrawer: React.FC = () => {
         <CollapseNavItem label="Wybory ogólnokrajowe">
           {countryWideElections.map((election) => {
             const config = electionsConfig[election];
-            return { href: `/map?election=${election}`, label: config.name };
+            return {
+              href: `/map?election=${election}`,
+              label: config.name,
+              live: isLiveElection(election),
+            };
           })}
         </CollapseNavItem>
         <Divider sx={{ my: 2 }} />
         <CollapseNavItem label="Wybory lokalne">
-          {Object.keys(localElectionsConfig).map((key) => {
-            const config = localElectionsConfig[key as LocalElectionId];
-            return { href: `/local/${key}`, label: config.name };
+          {Object.keys(localElectionsConfig).map((k) => {
+            const key = k as LocalElectionId;
+            const config = localElectionsConfig[key];
+            return {
+              href: `/local/${key}`,
+              label: config.name,
+              live: isLiveElection(key),
+            };
           })}
         </CollapseNavItem>
         <Divider sx={{ my: 2 }} />

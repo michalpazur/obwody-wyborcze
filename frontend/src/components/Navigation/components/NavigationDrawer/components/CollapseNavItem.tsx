@@ -8,15 +8,14 @@ import {
   Theme,
 } from "@mui/material";
 import React, { useState } from "react";
-import { useLocation } from "react-router";
 import { mergeSx } from "../../../../../utils/mergeSx";
+import { useIsLinkActive } from "../utils/useIsLinkActive";
 import NavLink from "./NavLink";
 import { listItemSx, listItemTextSx } from "./styles";
-import { useIsLinkActive } from "../utils/useIsLinkActive";
 
 type CollapseNavItemProps = {
   label: React.ReactNode;
-  children: { href: string; label: string }[];
+  children: { href: string; label: string; live?: boolean }[];
 };
 
 const collapseTextSx: SxProps<Theme> = {
@@ -58,8 +57,8 @@ const CollapseNavItem: React.FC<CollapseNavItemProps> = ({
         </ListItemButton>
       </ListItem>
       <Collapse in={open} appear={false}>
-        {children.map(({ href, label }) => (
-          <NavLink key={href} href={href}>
+        {children.map(({ href, label, live }) => (
+          <NavLink key={href} href={href} live={live}>
             {label}
           </NavLink>
         ))}
