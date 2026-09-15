@@ -7,6 +7,8 @@ from regex import Match
 from const import first_name_letter_regex, holy_name_regex, prince_queen_regex, char_order, ordinal_regex, year_regex, quotation_regex, apostrophe_regex, dash_regex, building_types_regex
 from typing import Dict
 
+waw_tz = ZoneInfo("Europe/Warsaw")
+
 def head(df: DataFrame, n: int = 5):
   print(df.head(n))
 
@@ -18,10 +20,10 @@ def get_district(row: Series):
   return f"{row.teryt}_{row.number}"
 
 def now():
-  waw_tz = ZoneInfo("Europe/Warsaw")
   return datetime.now(tz=waw_tz)
 
 def format_date(date: datetime):
+  date = date.astimezone(waw_tz)
   return date.strftime("%Y-%m-%d %H:%M:%S")
 
 def handle_capitalize(match: Match[str]):

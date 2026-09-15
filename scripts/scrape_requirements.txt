@@ -1,0 +1,5 @@
+pandas
+regex
+bs4
+selenium
+webdriver_manager
