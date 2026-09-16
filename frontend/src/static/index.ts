@@ -59,3 +59,23 @@ export const warsawMayor = {
   starosielec,
   wipler,
 };
+
+import dgp from "./dgp.png";
+import drewnicki from "./drewnicki.png";
+import gibala from "./gibala.png";
+import hoffman from "./hoffman.png";
+import klimek from "./klimek.png";
+import owca from "./owca.png";
+import piatkowska from "./piatkowska.png";
+import pietrzyk from "./pietrzyk.png";
+
+export const krakowMayor = {
+  dgp,
+  drewnicki,
+  gibala,
+  hoffman,
+  klimek,
+  owca,
+  piatkowska,
+  pietrzyk,
+};

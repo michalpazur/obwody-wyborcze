@@ -11,12 +11,20 @@ export type CandidateId =
   | "biejat"
   | "bochenski"
   | "braun"
+  | "dgp"
+  | "drewnicki"
+  | "gibala"
+  | "hoffman"
   | "holownia"
   | "jakubiak"
+  | "klimek"
   | "korwin"
   | "maciak"
   | "mentzen"
   | "nawrocki"
+  | "owca"
+  | "piatkowska"
+  | "pietrzyk"
   | "senyszyn"
   | "stanowski"
   | "starosielec"
@@ -51,9 +59,10 @@ export type ElectionId =
   | "pres_2025_1"
   | "pres_2025_2"
   | "ref_krk2026_1"
-  | "ref_krk2026_2";
+  | "ref_krk2026_2"
+  | "mayor_krk2026_1";
 
-export type LocalElectionId = "mayor_waw2024" | "ref_krk2026";
+export type LocalElectionId = "mayor_waw2024" | "ref_krk2026" | "mayor_krk2026";
 
 export type ElectionType = "parliament" | "president" | "referendum";
 

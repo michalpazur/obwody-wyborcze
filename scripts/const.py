@@ -98,13 +98,22 @@ candidates = {
   "KOMITET WYBORCZY ANTYPARTIA": "ap",
   "KOMITET WYBORCZY RUCH NAPRAWY POLSKI": "rnp",
   "KOMITET WYBORCZY WYBORCÓW MNIEJSZOŚĆ NIEMIECKA": "mn",
-  # Warsaw mayor
+  # Warsaw mayor 2024
   "Głosy na kandydata nr 1 - BIEJAT Magdalena Agnieszka zarejestrowanego przez KKW LEWICA": "biejat",
   "Głosy na kandydata nr 2 - BOCHEŃSKI Tobiasz Adam zarejestrowanego przez KW PRAWO I SPRAWIEDLIWOŚĆ": "bochenski",
   "Głosy na kandydata nr 3 - KORWIN-MIKKE Janusz Ryszard zarejestrowanego przez KW BEZPARTYJNI": "korwin",
   "Głosy na kandydata nr 4 - STAROSIELEC Romuald Tadeusz zarejestrowanego przez KW RUCH NAPRAWY POLSKI": "starosielec",
   "Głosy na kandydata nr 5 - TRZASKOWSKI Rafał Kazimierz zarejestrowanego przez KKW KOALICJA OBYWATELSKA": "trzaskowski",
   "Głosy na kandydata nr 6 - WIPLER Przemysław Janusz zarejestrowanego przez KWW KONFEDERACJA I BEZPARTYJNI SAMORZĄDOWCY": "wipler",
+  # Kraków mayor 2026
+  "DREWNICKI Michał Krzysztof": "drewnicki",
+  "GIBAŁA Łukasz": "gibala",
+  "GOSEK-POPIOŁEK Daria Iwona": "dgp",
+  "HOFFMAN Jan Krzysztof": "hoffman",
+  "KLIMEK Michał Grzegorz": "klimek",
+  "OWCA Aleksandra Katarzyna": "owca",
+  "PIĄTKOWSKA Monika Jadwiga": "piatkowska",
+  "PIETRZYK Sławomir Jan": "pietrzyk",
 }
 
 merged_columns = { **results_columns, **candidates }

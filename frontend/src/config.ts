@@ -1,6 +1,11 @@
 import { colors } from "./colors";
 import { krakow, warszawa } from "./const/bounds";
-import { parties, presidentialCandidates, warsawMayor } from "./static";
+import {
+  krakowMayor,
+  parties,
+  presidentialCandidates,
+  warsawMayor,
+} from "./static";
 import {
   Candidate,
   CandidateId,
@@ -45,6 +50,26 @@ export const candidatesConfig: Record<CandidateId, Candidate> = {
     maxGradient: 20,
     ...colors.brown,
   },
+  dgp: {
+    name: "Daria Gosek-Popiołek",
+    avatarUrl: krakowMayor.dgp,
+    ...colors.pink,
+  },
+  drewnicki: {
+    name: "Michał Drewnicki",
+    avatarUrl: krakowMayor.drewnicki,
+    ...colors.blue,
+  },
+  gibala: {
+    name: "Łukasz Gibała",
+    avatarUrl: krakowMayor.gibala,
+    ...colors.teal,
+  },
+  hoffman: {
+    name: "Jan Hoffman",
+    avatarUrl: krakowMayor.hoffman,
+    ...colors.yellow,
+  },
   holownia: {
     name: "Szymon Hołownia",
     avatarUrl: presidentialCandidates.holownia,
@@ -54,6 +79,11 @@ export const candidatesConfig: Record<CandidateId, Candidate> = {
   jakubiak: {
     name: "Marek Jakubiak",
     avatarUrl: presidentialCandidates.jakubiak,
+  },
+  klimek: {
+    name: "Michał Klimek",
+    avatarUrl: krakowMayor.klimek,
+    ...colors.brown,
   },
   korwin: {
     name: "Janusz Korwin-Mikke",
@@ -74,6 +104,21 @@ export const candidatesConfig: Record<CandidateId, Candidate> = {
     name: "Karol Nawrocki",
     avatarUrl: presidentialCandidates.nawrocki,
     ...colors.blue,
+  },
+  owca: {
+    name: "Aleksandra Owca",
+    avatarUrl: krakowMayor.owca,
+    ...colors.purple,
+  },
+  piatkowska: {
+    name: "Monika Piątkowska",
+    avatarUrl: krakowMayor.piatkowska,
+    ...colors.orange,
+  },
+  pietrzyk: {
+    name: "Sławomir Pietrzyk",
+    avatarUrl: krakowMayor.pietrzyk,
+    ...colors.lightGreen,
   },
   senyszyn: {
     name: "Joanna Senyszyn",
@@ -379,6 +424,35 @@ export const electionsConfig: Record<ElectionId, ElectionConfig> = {
       ],
     },
   },
+  mayor_krk2026_1: {
+    id: "mayor_krk2026_1",
+    sourceLayer: "mayor_krk2026_1",
+    htmlTitle: "Wybory prezydenta Krakowa 2026 (I tura)",
+    name: "Prezydent Krakowa (I tura)",
+    tabName: "I tura",
+    type: "president",
+    candidates: [
+      "drewnicki",
+      "gibala",
+      "dgp",
+      "hoffman",
+      "klimek",
+      "owca",
+      "piatkowska",
+      "pietrzyk",
+    ],
+    winners: ["gibala", "piatkowska", "dgp", "drewnicki", "owca", "klimek"],
+    candidatesConfig: {
+      drewnicki: { maxGradient: 20 },
+      gibala: { maxGradient: 50 },
+      dgp: { maxGradient: 25 },
+      hoffman: { maxGradient: 10 },
+      klimek: { maxGradient: 10 },
+      owca: { maxGradient: 25 },
+      piatkowska: { maxGradient: 50 },
+      pietrzyk: { maxGradient: 2 },
+    },
+  },
 };
 
 export const localElectionsConfig: Record<
@@ -393,6 +467,11 @@ export const localElectionsConfig: Record<
   ref_krk2026: {
     name: "Referendum w Krakowie",
     elections: ["ref_krk2026_1", "ref_krk2026_2"],
+    bounds: krakow,
+  },
+  mayor_krk2026: {
+    name: "Prezydent Krakowa 2026",
+    elections: ["mayor_krk2026_1"],
     bounds: krakow,
   },
 };
