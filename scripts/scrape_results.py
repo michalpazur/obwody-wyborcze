@@ -1,36 +1,11 @@
-from selenium import webdriver
-from selenium.webdriver import ActionChains
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.chrome.service import Service as ChromeService
-from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.chrome.webdriver import WebDriver
-from webdriver_manager.chrome import ChromeDriverManager
-from bs4 import BeautifulSoup as BS, Tag
 import pandas as pd
 import time
-from os import path
 from prepare_live_json import prepare_json
 from utils import format_date, now
+from scrape_utils import base_url, elections, load_district, get_int_from_row, load_districts_list, create_driver
 
-base_url = "https://wybory.gov.pl"
-districts_url = "/wojtburmistrz_2024_2029/pl/4485/organy_wyborcze/komisje_obwodowe"
-elections = "mayor_krakow2026_1"
 sleep_time = 2 * 60
-# Installed by the Docker image, falls back to webdriver_manager when running locally.
-chromedriver_path = "/usr/bin/chromedriver"
-headless = path.exists(chromedriver_path)
-
-def load_district(url: str, driver: WebDriver):
-  driver.get(url)
-  WebDriverWait(driver, 10).until(EC.text_to_be_present_in_element((By.CSS_SELECTOR, ".obkw h1.title"), "Obwodowa Komisja Wyborcza"))
-  html = driver.execute_script("return document.body.innerHTML")
-  return BS(html, "html.parser")
-
-def get_int_from_row(row: Tag):
-  last_cell = row.select_one(".text-end")
-  return int(last_cell.text)
 
 def process_district_results(url: str, driver: WebDriver):
   district_url = base_url + url
@@ -62,67 +37,18 @@ def process_district_results(url: str, driver: WebDriver):
 
   return district_results
 
-def create_driver():
-  if (path.exists(chromedriver_path)):
-    service = ChromeService(executable_path=chromedriver_path)
-  else:
-    service = ChromeService(executable_path=ChromeDriverManager().install())
-  options = ChromeOptions()
-  options.add_argument("--window-size=1280,720")
-  if (headless):
-    options.add_argument("--headless=new")
-    options.add_argument("--no-sandbox")
-    options.add_argument("--disable-gpu")
-  return webdriver.Chrome(options=options, service=service)
-
 def scrape(driver: WebDriver):
-  driver.get(base_url + districts_url)
-  WebDriverWait(driver, 10).until(EC.text_to_be_present_in_element((By.CSS_SELECTOR, "h1[data-t='OBKW_SEARCH_L']"), "Wyszukiwarka obwodowych komisji wyborczych"))
-
-  try:
-    WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".cookies.actual [data-t='CLOSE']")))
-    close_cookies_button = driver.find_element(By.CSS_SELECTOR, ".cookies.actual [data-t='CLOSE']")
-    close_cookies_button.click()
-  except:
-    print("No cookie button found!")
-
-  num_elements = 10
-  page = 1
-  links = []
-
-  while (num_elements == 10):
-    print(f"Processing page {page}...")
-    source = driver.execute_script("return document.body.innerHTML")
-    parsed = BS(source, "html.parser")
-    table = parsed.find(id="DataTables_Table_0")
-    if (not table):
-      raise ValueError("No table found!")
-
-    district_rows = table.select("tbody > tr")
-    num_elements = len(district_rows)
-    for row in district_rows:
-      anchor = row.find("a")
-      if (not anchor):
-        raise ValueError("No anchor found!")
-      number = anchor.select_one(".hidden")["data-val"]
-      href = str(anchor["href"])
-      links.append({ "number": number, "url": href })
-    try:
-      next_button = driver.find_element(By.CSS_SELECTOR, ".page-item.next")
-      ActionChains(driver).move_to_element(next_button).perform()
-      next_button.click()
-      page += 1
-    except Exception as e:
-      print("No next page button found!")
+  links = load_districts_list(driver)
 
   results = []
   for district in links:
     print(f"Processing district number {district["number"]}...")
     district_info = {}
     district_info["Nr komisji"] = district["number"]
-    district_info["TERYT Gminy"] = "126101"
-    district_info["Gmina"] = "Kraków"
-    district_info["Powiat"] = "Kraków"
+    district_info["TERYT Gminy"] = district["teryt"]
+    district_info["Gmina"] = district["gmina"]
+    district_info["Powiat"] = district["powiat"]
+
     try:
       district_results = process_district_results(district["url"], driver)
       if (district_results):
