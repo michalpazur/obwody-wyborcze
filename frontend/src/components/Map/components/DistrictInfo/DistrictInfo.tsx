@@ -118,11 +118,11 @@ const DistrictInfoComponent: React.FC<{
     if (districtInfo) return null;
 
     if (showTurnout) {
-      if (!turnout) return null;
+      if (!turnout?.turnout) return null;
       return <TurnoutChart {...turnout} />;
     }
 
-    if (!results) return null;
+    if (!results || !results.length) return null;
 
     return <StackedChart results={results} />;
   }, [districtInfo, electionConfig, showTurnout, electionResults]);
