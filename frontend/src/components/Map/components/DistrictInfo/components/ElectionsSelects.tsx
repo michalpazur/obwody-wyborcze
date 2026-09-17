@@ -17,6 +17,8 @@ import {
   getNameColumnLabel,
 } from "../../../../../utils/getLabels";
 import { mergeSx } from "../../../../../utils/mergeSx";
+import { sortCandidates } from "../../../../../utils/sortCandidates";
+import { useElectionResults } from "../../../../../utils/useElectionResults";
 import TextField from "../../../../TextField";
 import { textSx } from "./styles";
 
@@ -31,6 +33,7 @@ const ElectionsSelects: React.FC = () => {
   } = useElectionsStore();
   const electionConfig = electionsConfig[elections];
   const { availableElections, localElections } = useContext(MapContext);
+  const results = useElectionResults();
 
   const onChangeElections = (e: React.ChangeEvent<HTMLInputElement>) => {
     const elections = e.target.value as ElectionId;
@@ -53,13 +56,12 @@ const ElectionsSelects: React.FC = () => {
     setCandidate(candidate);
   };
 
-  const candidates = useMemo(
-    () =>
-      electionConfig.candidates.filter(
-        (candidate) => !!candidatesConfig[candidate].gradient,
-      ),
-    [electionConfig],
-  );
+  const candidates = useMemo(() => {
+    const candidates = sortCandidates(electionConfig, results?.results);
+    return candidates.filter(
+      (candidate) => !!candidatesConfig[candidate].gradient,
+    );
+  }, [electionConfig, results]);
 
   return (
     <Stack spacing={2}>

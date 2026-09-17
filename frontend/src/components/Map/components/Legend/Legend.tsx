@@ -13,6 +13,8 @@ import { getGradient } from "../../../../utils/getGradient";
 import { getGradientOptions } from "../../../../utils/getGradientOptions";
 import { getWinnerName } from "../../../../utils/getLabels";
 import { mergeSx } from "../../../../utils/mergeSx";
+import { sortCandidates } from "../../../../utils/sortCandidates";
+import { useElectionResults } from "../../../../utils/useElectionResults";
 import { mapComponentInset } from "../../../styles";
 
 const colorBoxSpacing = 0.25;
@@ -117,6 +119,7 @@ const WinnerRow: React.FC<WinnerRowProps> = ({
 const Legend: React.FC = () => {
   const { elections, candidate, showTurnout } = useElectionsStore();
   const electionConfig = electionsConfig[elections];
+  const results = useElectionResults();
   const { minGradient, maxGradient, numColors } = getGradientOptions(
     showTurnout,
     candidate,
@@ -125,13 +128,17 @@ const Legend: React.FC = () => {
   const colorBoxWidth = numColors <= 5 ? 5 : 2.5;
 
   const winners = useMemo(() => {
-    const electionWinners = electionConfig.winners.filter(
+    if (candidate !== "all") {
+      return [candidate];
+    }
+
+    const winners = sortCandidates(electionConfig, results?.results);
+    const visibleWinners = winners.filter(
       (candidate) =>
         !electionConfig.candidatesConfig?.[candidate]?.hideInLegend,
     );
-
-    return candidate === "all" ? electionWinners.slice(0, 3) : [candidate];
-  }, [candidate, elections]);
+    return visibleWinners.slice(0, 3);
+  }, [candidate, elections, results]);
 
   const colorsArr = Array.from(Array(numColors));
 
