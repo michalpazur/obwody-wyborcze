@@ -1,6 +1,7 @@
 FROM node:24-alpine AS build
 WORKDIR /app
 COPY package.json .
+COPY patches ./patches
 RUN yarn install
 RUN yarn global add serve
 COPY . /app

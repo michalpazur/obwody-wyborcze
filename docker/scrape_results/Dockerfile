@@ -5,5 +5,5 @@ RUN apt-get update \
   && rm -rf /var/lib/apt/lists/*
 COPY scripts/scrape_requirements.txt ./
 RUN pip install --no-cache-dir -r scrape_requirements.txt
-COPY scripts/scrape_results.py scripts/const.py scripts/df_utils.py scripts/utils.py scripts/prepare_live_json.py ./
+COPY scripts/scrape_results.py scripts/const.py scripts/df_utils.py scripts/scrape_utils.py scripts/utils.py scripts/prepare_live_json.py ./
 CMD ["python", "-u", "scrape_results.py"]
