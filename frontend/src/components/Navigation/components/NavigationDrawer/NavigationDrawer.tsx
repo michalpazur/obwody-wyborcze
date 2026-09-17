@@ -73,7 +73,7 @@ const NavigationDrawer: React.FC = () => {
             return {
               href: `/local/${key}`,
               label: config.name,
-              live: isLiveElection(key),
+              live: !!config.elections.find((id) => isLiveElection(id)),
             };
           })}
         </CollapseNavItem>
