@@ -10,6 +10,7 @@ import {
   CandidatesKey,
   useElectionsStore,
 } from "../../../../../redux/electionsSlice";
+import { serifFont } from "../../../../../theme";
 import {
   getAllWinnersLabel,
   getElectionLabel,
@@ -96,7 +97,7 @@ const ElectionsSelects: React.FC = () => {
       {electionConfig.type === "referendum" && (
         <Typography
           variant="h3"
-          sx={mergeSx(textSx, { fontFamily: "'Bree Serif'" })}
+          sx={mergeSx(textSx, { fontFamily: serifFont })}
         >
           {electionConfig.question}
         </Typography>

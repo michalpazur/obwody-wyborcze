@@ -1,9 +1,11 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { isAxiosError } from "axios";
 import { useElectionsStore } from "../redux/electionsSlice";
 import { LiveResults, LiveResultsResponse } from "../types";
 import axios from "../utils/axios";
 import { processLiveResults } from "../utils/processLiveResults";
 import { useIsLive } from "../utils/useIsLive";
+import { useVotingHours } from "../utils/useVotingHours";
 
 const refreshInterval = 2 * 60 * 1000;
 
@@ -11,6 +13,7 @@ export const useLiveElectionResults = () => {
   const queryClient = useQueryClient();
   const { elections } = useElectionsStore();
   const isLive = useIsLive();
+  const votingHours = useVotingHours();
   const queryKey = ["LIVE_ELECTIONS", elections];
 
   return useQuery({
@@ -31,7 +34,14 @@ export const useLiveElectionResults = () => {
       return old;
     },
     retryDelay: (attempt) => Math.min(2 ** (attempt + 1) * 1000, 30 * 1000),
-    enabled: isLive,
+    retry: (count, error) => {
+      if (isAxiosError(error) && error.response?.status === 404) {
+        return false;
+      }
+
+      return count < 3;
+    },
+    enabled: isLive && (!votingHours || votingHours.timeToEnd <= 0),
     staleTime: refreshInterval,
     refetchInterval: refreshInterval,
   });

@@ -432,13 +432,13 @@ export const electionsConfig: Record<ElectionId, ElectionConfig> = {
     tabName: "I tura",
     type: "president",
     candidates: [
-      "drewnicki",
       "gibala",
+      "piatkowska",
       "dgp",
+      "drewnicki",
+      "owca",
       "hoffman",
       "klimek",
-      "owca",
-      "piatkowska",
       "pietrzyk",
     ],
     winners: ["gibala", "piatkowska", "dgp", "drewnicki", "owca", "klimek"],
@@ -451,6 +451,10 @@ export const electionsConfig: Record<ElectionId, ElectionConfig> = {
       owca: { maxGradient: 25 },
       piatkowska: { maxGradient: 50 },
       pietrzyk: { maxGradient: 2 },
+    },
+    votingHours: {
+      start: "2026-09-27T07:00:00+02:00",
+      end: "2026-09-27T21:00:00+02:00",
     },
   },
 };

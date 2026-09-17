@@ -8,10 +8,11 @@ import {
 import React from "react";
 import { Link } from "react-router";
 import { useLayoutStore } from "../../../../../redux/layoutSlice";
+import { serifFont } from "../../../../../theme";
 import { mergeSx } from "../../../../../utils/mergeSx";
+import LiveIndicator from "../../../../LiveIndicator";
 import { useIsLinkActive } from "../utils/useIsLinkActive";
 import { listItemSx, listItemTextSx } from "./styles";
-import LiveIndicator from "../../../../LiveIndicator";
 
 type NavLinkProps = {
   href: string;
@@ -21,7 +22,7 @@ type NavLinkProps = {
 };
 
 const activeSx: SxProps<Theme> = {
-  fontFamily: "'Bree Serif'",
+  fontFamily: serifFont,
 };
 
 const NavLink: React.FC<NavLinkProps> = ({ href, children, inset, live }) => {

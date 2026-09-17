@@ -12,6 +12,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { electionsConfig } from "../../../../config";
 import { useElectionsStore } from "../../../../redux/electionsSlice";
 import { useLayoutStore } from "../../../../redux/layoutSlice";
+import { serifFont } from "../../../../theme";
 import { DistrictInfo } from "../../../../types";
 import { sortResults } from "../../../../utils/sortResults";
 import { useElectionResults } from "../../../../utils/useElectionResults";
@@ -51,7 +52,7 @@ const rootSx: SxProps<Theme> = (theme) => ({
 });
 
 const countyNameSx: SxProps = {
-  fontFamily: "'Bree Serif'",
+  fontFamily: serifFont,
 };
 
 const CardWithSlide: React.FC<{

@@ -2,6 +2,7 @@ import { Box, Stack, SxProps, Theme, Tooltip } from "@mui/material";
 import React from "react";
 import { candidatesConfig, tieColorConfig } from "../../../../../config";
 import { useElectionsStore } from "../../../../../redux/electionsSlice";
+import { serifFont } from "../../../../../theme";
 import { Candidate, Results } from "../../../../../types";
 import { getWinnerName } from "../../../../../utils/getLabels";
 import Bar from "../components/Bar";
@@ -32,7 +33,7 @@ const CandidateTooltip: React.FC<{ result: Results }> = ({ result }) => {
     <Stack spacing={1}>
       <Stack spacing={1} direction="row" sx={{ alignItems: "center" }}>
         <LegendDot candidate={candidate} />
-        <BarLabel variant="light" sx={{ fontFamily: "'Bree Serif'" }}>
+        <BarLabel variant="light" sx={{ fontFamily: serifFont }}>
           {getWinnerName(result.candidate, elections)}
         </BarLabel>
       </Stack>

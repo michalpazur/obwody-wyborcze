@@ -1,20 +1,22 @@
 import { alpha, createTheme, tabClasses } from "@mui/material";
 import { glassStyle } from "./components/styles";
 
+export const serifFont = "'Bree Serif'";
+
 export const theme = createTheme({
   typography: {
     fontFamily: ["'Work Sans'", "Roboto", "sans-serif"].join(", "),
     h1: {
       fontSize: "40px",
-      fontFamily: "'Bree Serif'",
+      fontFamily: serifFont,
     },
     h2: {
       fontSize: "24px",
-      fontFamily: "'Bree Serif'",
+      fontFamily: serifFont,
     },
     h3: {
       fontSize: "18px",
-      fontFamily: "'Bree Serif'",
+      fontFamily: serifFont,
     },
   },
   palette: {

@@ -1,0 +1,43 @@
+diff --git a/node_modules/date-fns/formatDuration.cjs b/node_modules/date-fns/formatDuration.cjs
+index 3935b9c..81576e7 100644
+--- a/node_modules/date-fns/formatDuration.cjs
++++ b/node_modules/date-fns/formatDuration.cjs
+@@ -1,5 +1,6 @@
+ "use strict";
+ exports.formatDuration = formatDuration;
++exports.defaultDurationFormat = defaultFormat;
+ 
+ var _index = require("./_lib/defaultLocale.cjs");
+ var _index2 = require("./_lib/defaultOptions.cjs");
+diff --git a/node_modules/date-fns/formatDuration.d.cts b/node_modules/date-fns/formatDuration.d.cts
+index 7ad7ed7..e03ee80 100644
+--- a/node_modules/date-fns/formatDuration.d.cts
++++ b/node_modules/date-fns/formatDuration.d.cts
+@@ -73,3 +73,5 @@ export declare function formatDuration(
+   duration: Duration,
+   options?: FormatDurationOptions,
+ ): string;
++
++export declare const defaultDurationFormat: DurationUnit[];
+diff --git a/node_modules/date-fns/formatDuration.d.ts b/node_modules/date-fns/formatDuration.d.ts
+index 7ad7ed7..e03ee80 100644
+--- a/node_modules/date-fns/formatDuration.d.ts
++++ b/node_modules/date-fns/formatDuration.d.ts
+@@ -73,3 +73,5 @@ export declare function formatDuration(
+   duration: Duration,
+   options?: FormatDurationOptions,
+ ): string;
++
++export declare const defaultDurationFormat: DurationUnit[];
+diff --git a/node_modules/date-fns/formatDuration.js b/node_modules/date-fns/formatDuration.js
+index dd06f16..b389971 100644
+--- a/node_modules/date-fns/formatDuration.js
++++ b/node_modules/date-fns/formatDuration.js
+@@ -98,5 +98,7 @@ export function formatDuration(duration, options) {
+   return result;
+ }
+ 
++export { defaultFormat as defaultDurationFormat };
++
+ // Fallback for modularized imports:
+ export default formatDuration;

@@ -8,12 +8,15 @@ import {
 } from "@mui/material";
 import { AxiosError, isAxiosError } from "axios";
 import React, { useMemo } from "react";
-import { notCountedColorConfig } from "../../../../../config";
 import { useLiveElectionResults } from "../../../../../services/useLiveElectionResults";
+import { serifFont } from "../../../../../theme";
 import { getPercent } from "../../../../../utils/getPercent";
 import { mergeSx } from "../../../../../utils/mergeSx";
+import { useVotingHours } from "../../../../../utils/useVotingHours";
 import LiveIndicator from "../../../../LiveIndicator";
 import Skeleton from "../../../../Skeleton";
+import VotingHours from "./VotingHours";
+import { alertSx, progressSx } from "./styles";
 
 const liveBoxSx: SxProps<Theme> = {
   px: 2,
@@ -25,25 +28,9 @@ const liveBoxSx: SxProps<Theme> = {
   alignItems: "center",
 };
 
-const progressSx: SxProps<Theme> = {
-  height: "8px",
-  borderRadius: "4px",
-  backgroundColor: (theme) => theme.palette.divider,
-  "& .MuiLinearProgress-bar": {
-    backgroundColor: notCountedColorConfig.color,
-  },
-};
-
 const textSx: SxProps = { fontSize: "14px" };
 
-const countedSx: SxProps = { fontFamily: "'Bree Serif'", fontSize: "inherit" };
-
-const alertSx: SxProps = {
-  p: 0,
-  "& .MuiAlert-message": {
-    p: 3,
-  },
-};
+const countedSx: SxProps = { fontFamily: serifFont, fontSize: "inherit" };
 
 const getErrorMessage = (e: Error) => {
   let message = "W trakcie pobierania danych wystąpił błąd. ";
@@ -65,6 +52,7 @@ const getErrorMessage = (e: Error) => {
 
 const LiveResultsInfo: React.FC = () => {
   const { data: results, isLoading, error } = useLiveElectionResults();
+  const votingHours = useVotingHours();
 
   const { reported = 0, totalDistricts = 0 } = results ?? {};
   const countedProc = getPercent(reported, totalDistricts);
@@ -103,6 +91,10 @@ const LiveResultsInfo: React.FC = () => {
       </React.Fragment>
     );
   }, [results, isLoading]);
+
+  if (votingHours && votingHours.timeToEnd > 0) {
+    return <VotingHours votingHours={votingHours} />;
+  }
 
   if (!results && !isLoading && !error) {
     return null;

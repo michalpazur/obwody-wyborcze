@@ -66,6 +66,11 @@ export type LocalElectionId = "mayor_waw2024" | "ref_krk2026" | "mayor_krk2026";
 
 export type ElectionType = "parliament" | "president" | "referendum";
 
+export type VotingHoursConfig = {
+  start: string;
+  end: string;
+};
+
 type ElectionConfig = {
   id: ElectionId;
   name: string;
@@ -73,24 +78,24 @@ type ElectionConfig = {
   tabName?: string;
   candidates: CandidateId[];
   winners: CandidateId[];
+  votingHours?: VotingHoursConfig;
   sourceLayer: string;
   candidatesConfig?: Partial<Record<CandidateId, ElectionCandidateConfig>>;
   hideWinners?: boolean;
   gradientOptions?: GradientOptions;
   turnoutGradientOptions?: GradientOptions;
-} &
-  (
-    | {
-        type: "parliament" | "president";
-        question?: never;
-        results?: ElectionResultsInfo;
-      }
-    | {
-        type: "referendum";
-        question: string;
-        results?: ElectionResultsInfo<"referendum">;
-      }
-  );
+} & (
+  | {
+      type: "parliament" | "president";
+      question?: never;
+      results?: ElectionResultsInfo;
+    }
+  | {
+      type: "referendum";
+      question: string;
+      results?: ElectionResultsInfo<"referendum">;
+    }
+);
 
 export type ElectionCandidateConfig = {
   hideInLegend?: boolean;

@@ -1,8 +1,9 @@
 import { SxProps, tableCellClasses, tableRowClasses } from "@mui/material";
+import { serifFont } from "../../../../../theme";
 import { InfoRowSize } from "../types/props";
 
 export const percentCellSx: SxProps = {
-  fontFamily: "'Bree Serif', sans-serif",
+  fontFamily: serifFont,
   fontWeight: "bold",
 };
 

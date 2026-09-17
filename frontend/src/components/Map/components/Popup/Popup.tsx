@@ -3,6 +3,7 @@ import { LngLat } from "maplibre-gl";
 import React, { useMemo } from "react";
 import { Popup as MapPopup } from "react-map-gl/maplibre";
 import { useElectionsStore } from "../../../../redux/electionsSlice";
+import { serifFont } from "../../../../theme";
 import { DistrictInfo } from "../../../../types";
 import { sortResults } from "../../../../utils/sortResults";
 import { useIsLive } from "../../../../utils/useIsLive";
@@ -23,7 +24,7 @@ const Popup: React.FC<PopupProps> = ({ district, position }) => {
 
     return (
       <Card variant="outlined" sx={{ p: 2 }}>
-        <Typography sx={{ fontFamily: "'Bree Serif', sans-serif" }}>
+        <Typography sx={{ fontFamily: serifFont }}>
           {district.gmina}{" "}
           <Typography
             component="span"

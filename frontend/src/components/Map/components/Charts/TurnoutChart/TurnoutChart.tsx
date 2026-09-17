@@ -2,6 +2,7 @@ import { Box, Stack, SxProps, Theme } from "@mui/material";
 import React from "react";
 import { colors } from "../../../../../colors";
 import { turnoutColorConfig } from "../../../../../config";
+import { serifFont } from "../../../../../theme";
 import { TurnoutResults } from "../../../../../types";
 import { mergeSx } from "../../../../../utils/mergeSx";
 import Bar from "../components/Bar";
@@ -69,9 +70,7 @@ const TurnoutChart: React.FC<TurnoutResults> = ({
               left: `${thresholdPosition}%`,
             })}
           >
-            <BarLabel sx={{ fontFamily: "'Bree Serif'" }}>
-              Próg ważności
-            </BarLabel>
+            <BarLabel sx={{ fontFamily: serifFont }}>Próg ważności</BarLabel>
             <BarLabel>
               {thresholdProc}% ({formatNumber(threshold)})
             </BarLabel>
