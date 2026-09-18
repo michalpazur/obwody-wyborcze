@@ -443,7 +443,7 @@ export const electionsConfig: Record<ElectionId, ElectionConfig> = {
     ],
     winners: ["gibala", "piatkowska", "dgp", "drewnicki", "owca", "klimek"],
     candidatesConfig: {
-      drewnicki: { maxGradient: 20 },
+      drewnicki: { maxGradient: 25 },
       gibala: { maxGradient: 50 },
       dgp: { maxGradient: 25 },
       hoffman: { maxGradient: 10 },
@@ -451,6 +451,13 @@ export const electionsConfig: Record<ElectionId, ElectionConfig> = {
       owca: { maxGradient: 25 },
       piatkowska: { maxGradient: 50 },
       pietrzyk: { maxGradient: 2 },
+    },
+    gradientOptions: {
+      maxGradient: 50,
+    },
+    turnoutGradientOptions: {
+      minGradient: 20,
+      maxGradient: 70,
     },
     votingHours: {
       start: "2026-09-27T07:00:00+02:00",
