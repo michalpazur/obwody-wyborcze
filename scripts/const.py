@@ -114,6 +114,14 @@ candidates = {
   "OWCA Aleksandra Katarzyna": "owca",
   "PIĄTKOWSKA Monika Jadwiga": "piatkowska",
   "PIETRZYK Sławomir Jan": "pietrzyk",
+  "Głosy na kandydata nr 1 - DREWNICKI Michał Krzysztof zarejestrowanego przez KW PRAWO I SPRAWIEDLIWOŚĆ": "drewnicki",
+  "Głosy na kandydata nr 2 - GIBAŁA Łukasz zarejestrowanego przez KWW ŁUKASZA GIBAŁY - KRAKÓW DLA MIESZKAŃCÓW": "gibala",
+  "Głosy na kandydata nr 3 - GOSEK-POPIOŁEK Daria Iwona zarejestrowanego przez KW NL": "dgp",
+  "Głosy na kandydata nr 4 - HOFFMAN Jan Krzysztof zarejestrowanego przez KWW JANA HOFFMANA - REFERENDUMKRK": "hoffman",
+  "Głosy na kandydata nr 5 - KLIMEK Michał Grzegorz zarejestrowanego przez KW KONFEDERACJA KORONY POLSKIEJ": "klimek",
+  "Głosy na kandydata nr 6 - OWCA Aleksandra Katarzyna zarejestrowanego przez KW RAZEM": "owca",
+  "Głosy na kandydata nr 7 - PIĄTKOWSKA Monika Jadwiga zarejestrowanego przez KWW MONIKI PIĄTKOWSKIEJ - PONAD PODZIAŁAMI": "piatkowska",
+  "Głosy na kandydata nr 8 - PIETRZYK Sławomir Jan zarejestrowanego przez KW SOCJALDEMOKRACJA POLSKA": "pietrzyk"
 }
 
 merged_columns = { **results_columns, **candidates }
