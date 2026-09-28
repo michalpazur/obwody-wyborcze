@@ -426,6 +426,7 @@ export const electionsConfig: Record<ElectionId, ElectionConfig> = {
   },
   mayor_krk2026_1: {
     id: "mayor_krk2026_1",
+    layerId: "mayor_krk2026_1_results",
     sourceLayer: "mayor_krk2026_1",
     htmlTitle: "Wybory prezydenta Krakowa 2026 (I tura)",
     name: "Prezydent Krakowa (I tura)",
@@ -434,34 +435,52 @@ export const electionsConfig: Record<ElectionId, ElectionConfig> = {
     candidates: [
       "gibala",
       "piatkowska",
-      "dgp",
       "drewnicki",
       "owca",
-      "hoffman",
+      "dgp",
       "klimek",
       "pietrzyk",
     ],
-    winners: ["gibala", "piatkowska", "dgp", "drewnicki", "owca", "klimek"],
+    winners: ["gibala", "piatkowska", "drewnicki", "owca", "dgp", "klimek"],
     candidatesConfig: {
       drewnicki: { maxGradient: 25 },
       gibala: { maxGradient: 50 },
-      dgp: { maxGradient: 25 },
-      hoffman: { maxGradient: 10 },
+      dgp: { maxGradient: 10 },
       klimek: { maxGradient: 10 },
-      owca: { maxGradient: 25 },
+      owca: { maxGradient: 15 },
       piatkowska: { maxGradient: 50 },
-      pietrzyk: { maxGradient: 2 },
+      pietrzyk: { maxGradient: 1 },
     },
     gradientOptions: {
       maxGradient: 50,
     },
     turnoutGradientOptions: {
       minGradient: 20,
-      maxGradient: 70,
+      maxGradient: 60,
     },
     votingHours: {
       start: "2026-09-27T07:00:00+02:00",
       end: "2026-09-27T21:00:00+02:00",
+    },
+  },
+  mayor_krk2026_2: {
+    id: "mayor_krk2026_2",
+    layerId: "mayor_krk2026_2_live",
+    sourceLayer: "mayor_krk2026_2",
+    htmlTitle: "Wybory prezydenta Krakowa 2026 (II tura)",
+    name: "Prezydent Krakowa (II tura)",
+    tabName: "II tura",
+    type: "president",
+    candidates: ["gibala", "piatkowska"],
+    winners: ["gibala", "piatkowska"],
+    candidatesConfig: { piatkowska: { maxGradient: 60 } },
+    turnoutGradientOptions: {
+      minGradient: 20,
+      maxGradient: 60,
+    },
+    votingHours: {
+      start: "2026-10-11T07:00:00+02:00",
+      end: "2026-10-11T21:00:00+02:00",
     },
   },
 };
@@ -482,7 +501,7 @@ export const localElectionsConfig: Record<
   },
   mayor_krk2026: {
     name: "Prezydent Krakowa 2026",
-    elections: ["mayor_krk2026_1"],
+    elections: ["mayor_krk2026_1", "mayor_krk2026_2"],
     bounds: krakow,
   },
 };

@@ -121,7 +121,9 @@ candidates = {
   "Głosy na kandydata nr 5 - KLIMEK Michał Grzegorz zarejestrowanego przez KW KONFEDERACJA KORONY POLSKIEJ": "klimek",
   "Głosy na kandydata nr 6 - OWCA Aleksandra Katarzyna zarejestrowanego przez KW RAZEM": "owca",
   "Głosy na kandydata nr 7 - PIĄTKOWSKA Monika Jadwiga zarejestrowanego przez KWW MONIKI PIĄTKOWSKIEJ - PONAD PODZIAŁAMI": "piatkowska",
-  "Głosy na kandydata nr 8 - PIETRZYK Sławomir Jan zarejestrowanego przez KW SOCJALDEMOKRACJA POLSKA": "pietrzyk"
+  "Głosy na kandydata nr 8 - PIETRZYK Sławomir Jan zarejestrowanego przez KW SOCJALDEMOKRACJA POLSKA": "pietrzyk",
+  "Głosy na kandydata nr 1 - GIBAŁA Łukasz zarejestrowanego przez KWW ŁUKASZA GIBAŁY - KRAKÓW DLA MIESZKAŃCÓW": "gibala",
+  "Głosy na kandydata nr 2 - PIĄTKOWSKA Monika Jadwiga zarejestrowanego przez KWW MONIKI PIĄTKOWSKIEJ - PONAD PODZIAŁAMI": "piatkowska",
 }
 
 merged_columns = { **results_columns, **candidates }

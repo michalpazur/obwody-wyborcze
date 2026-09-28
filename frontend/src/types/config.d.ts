@@ -60,7 +60,8 @@ export type ElectionId =
   | "pres_2025_2"
   | "ref_krk2026_1"
   | "ref_krk2026_2"
-  | "mayor_krk2026_1";
+  | "mayor_krk2026_1"
+  | "mayor_krk2026_2";
 
 export type LocalElectionId = "mayor_waw2024" | "ref_krk2026" | "mayor_krk2026";
 
@@ -79,6 +80,7 @@ type ElectionConfig = {
   candidates: CandidateId[];
   winners: CandidateId[];
   votingHours?: VotingHoursConfig;
+  layerId?: string;
   sourceLayer: string;
   candidatesConfig?: Partial<Record<CandidateId, ElectionCandidateConfig>>;
   hideWinners?: boolean;
