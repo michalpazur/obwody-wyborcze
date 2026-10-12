@@ -220,7 +220,7 @@ export const electionsConfig: Record<ElectionId, ElectionConfig> = {
     ],
     winners: ["pis", "ko", "p2050_psl", "nl", "konfederacja"],
     sourceLayer: "parl_2023",
-    turnoutGradientOptions: {
+    turnoutConfig: {
       minGradient: 40,
     },
     results: {
@@ -262,7 +262,7 @@ export const electionsConfig: Record<ElectionId, ElectionConfig> = {
       starosielec: { maxGradient: 2 },
       wipler: { maxGradient: 15 },
     },
-    turnoutGradientOptions: {
+    turnoutConfig: {
       minGradient: 30,
       maxGradient: 80,
     },
@@ -304,7 +304,7 @@ export const electionsConfig: Record<ElectionId, ElectionConfig> = {
     ],
     winners: ["trzaskowski", "nawrocki", "mentzen", "braun", "zandberg"],
     sourceLayer: "pres_2025_1",
-    turnoutGradientOptions: {
+    turnoutConfig: {
       minGradient: 40,
     },
     results: {
@@ -333,7 +333,7 @@ export const electionsConfig: Record<ElectionId, ElectionConfig> = {
     candidates: ["nawrocki", "trzaskowski"],
     winners: ["nawrocki", "trzaskowski"],
     sourceLayer: "pres_2025_2",
-    turnoutGradientOptions: {
+    turnoutConfig: {
       minGradient: 40,
     },
     results: {
@@ -363,7 +363,7 @@ export const electionsConfig: Record<ElectionId, ElectionConfig> = {
     gradientOptions: {
       minGradient: 90,
     },
-    turnoutGradientOptions: {
+    turnoutConfig: {
       minGradient: 10,
       maxGradient: 50,
       numColors: 8,
@@ -401,7 +401,7 @@ export const electionsConfig: Record<ElectionId, ElectionConfig> = {
     gradientOptions: {
       minGradient: 90,
     },
-    turnoutGradientOptions: {
+    turnoutConfig: {
       minGradient: 10,
       maxGradient: 50,
       numColors: 8,
@@ -451,12 +451,10 @@ export const electionsConfig: Record<ElectionId, ElectionConfig> = {
       piatkowska: { maxGradient: 50 },
       pietrzyk: { maxGradient: 1 },
     },
-    gradientOptions: {
-      maxGradient: 50,
-    },
-    turnoutGradientOptions: {
+    turnoutConfig: {
       minGradient: 20,
       maxGradient: 60,
+      ...colors.green,
     },
     votingHours: {
       start: "2026-09-27T07:00:00+02:00",
@@ -474,9 +472,10 @@ export const electionsConfig: Record<ElectionId, ElectionConfig> = {
     candidates: ["gibala", "piatkowska"],
     winners: ["gibala", "piatkowska"],
     candidatesConfig: { piatkowska: { maxGradient: 60 } },
-    turnoutGradientOptions: {
+    turnoutConfig: {
       minGradient: 20,
       maxGradient: 60,
+      ...colors.green,
     },
     votingHours: {
       start: "2026-10-11T07:00:00+02:00",

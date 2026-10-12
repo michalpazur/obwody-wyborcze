@@ -25,7 +25,7 @@ export const getGradientOptions = (
   if (showTurnout) {
     gradientOptions = {
       ...gradientOptions,
-      ...electionConfig.turnoutGradientOptions,
+      ...electionConfig.turnoutConfig,
     };
   } else if (candidate !== "all") {
     const candidateOptions = candidatesConfig[candidate];

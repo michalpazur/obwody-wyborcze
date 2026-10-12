@@ -1,6 +1,7 @@
 import { Box, TableCell, TableRow } from "@mui/material";
-import { turnoutColorConfig } from "../../../../../config";
+import { useElectionsStore } from "../../../../../redux/electionsSlice";
 import { DistrictInfo } from "../../../../../types";
+import { getTurnoutColorConfig } from "../../../../../utils/getTurnoutColorConfig";
 import { mergeSx } from "../../../../../utils/mergeSx";
 import { InfoRowSize } from "../types/props";
 import { getNameCellSx, percentCellSx } from "./styles";
@@ -11,6 +12,8 @@ type TurnoutInfoProps = {
 };
 
 const TurnoutInfo: React.FC<TurnoutInfoProps> = ({ district, size }) => {
+  const { elections } = useElectionsStore();
+  const turnoutColorConfig = getTurnoutColorConfig(elections);
   const rootSx = getNameCellSx(size);
 
   return (

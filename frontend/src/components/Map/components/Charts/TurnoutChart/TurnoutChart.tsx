@@ -1,9 +1,10 @@
 import { Box, Stack, SxProps, Theme } from "@mui/material";
 import React from "react";
 import { colors } from "../../../../../colors";
-import { turnoutColorConfig } from "../../../../../config";
+import { useElectionsStore } from "../../../../../redux/electionsSlice";
 import { serifFont } from "../../../../../theme";
 import { TurnoutResults } from "../../../../../types";
+import { getTurnoutColorConfig } from "../../../../../utils/getTurnoutColorConfig";
 import { mergeSx } from "../../../../../utils/mergeSx";
 import Bar from "../components/Bar";
 import BarBackground from "../components/BarBackground";
@@ -40,6 +41,7 @@ const TurnoutChart: React.FC<TurnoutResults> = ({
   threshold,
   thresholdProc,
 }) => {
+  const { elections } = useElectionsStore();
   const max = getMaxValue(turnout);
   const width = (turnout * 100) / max;
   const thresholdPosition = ((thresholdProc ?? 0) * 100) / max;
@@ -48,7 +50,7 @@ const TurnoutChart: React.FC<TurnoutResults> = ({
     ? passedThreshold
       ? colors.green.color
       : colors.red.color
-    : turnoutColorConfig.color;
+    : getTurnoutColorConfig(elections).color;
 
   return (
     <Stack spacing={1}>

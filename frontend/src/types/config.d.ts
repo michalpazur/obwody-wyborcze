@@ -82,10 +82,10 @@ type ElectionConfig = {
   votingHours?: VotingHoursConfig;
   layerId?: string;
   sourceLayer: string;
-  candidatesConfig?: Partial<Record<CandidateId, ElectionCandidateConfig>>;
+  candidatesConfig?: ElectionCandidatesConfig;
   hideWinners?: boolean;
   gradientOptions?: GradientOptions;
-  turnoutGradientOptions?: GradientOptions;
+  turnoutConfig?: GradientOptions & Partial<ColorConfig>;
 } & (
   | {
       type: "parliament" | "president";
@@ -101,7 +101,7 @@ type ElectionConfig = {
 
 export type ElectionCandidateConfig = {
   hideInLegend?: boolean;
-} & Pick<Candidate, keyof GradientOptions>;
+} & Pick<Candidate, keyof GradientOptions | keyof ColorConfig>;
 
 export type ElectionCandidatesConfig = Partial<
   Record<CandidateId, ElectionCandidateConfig>

@@ -6,7 +6,6 @@ import {
   layerIds,
   mapOpacity,
   notCountedColor,
-  turnoutColorConfig,
 } from "../../../../config";
 import { useElectionsStore } from "../../../../redux/electionsSlice";
 import {
@@ -15,6 +14,7 @@ import {
 } from "../../../../utils/generateFillColors";
 import { getCandidateConfig } from "../../../../utils/getCandidateConfig";
 import { getGradientOptions } from "../../../../utils/getGradientOptions";
+import { getTurnoutColorConfig } from "../../../../utils/getTurnoutColorConfig";
 import { useIsLive } from "../../../../utils/useIsLive";
 import { ElectionsDataSource } from "./ElectionDataSource";
 
@@ -31,12 +31,9 @@ const ElectionsResultsLayer: React.FC = () => {
 
   const fillExpression = useMemo(() => {
     if (showTurnout) {
-      return generateFillColors(
-        "turnout",
-        isLive,
-        turnoutColorConfig,
-        gradientOptions,
-      );
+      const config = getTurnoutColorConfig(elections);
+
+      return generateFillColors("turnout", isLive, config, gradientOptions);
     }
 
     if (candidate === "all") {

@@ -1,17 +1,13 @@
 import { Box, Card, Stack, SxProps, Theme, Typography } from "@mui/material";
 import React, { useMemo } from "react";
-import {
-  CandidateId,
-  electionsConfig,
-  mapOpacity,
-  turnoutColorConfig,
-} from "../../../../config";
+import { CandidateId, electionsConfig, mapOpacity } from "../../../../config";
 import { useElectionsStore } from "../../../../redux/electionsSlice";
 import { ColorConfig } from "../../../../utils/createColorConfig";
 import { getCandidateConfig } from "../../../../utils/getCandidateConfig";
 import { getGradient } from "../../../../utils/getGradient";
 import { getGradientOptions } from "../../../../utils/getGradientOptions";
 import { getWinnerName } from "../../../../utils/getLabels";
+import { getTurnoutColorConfig } from "../../../../utils/getTurnoutColorConfig";
 import { mergeSx } from "../../../../utils/mergeSx";
 import { sortCandidates } from "../../../../utils/sortCandidates";
 import { useElectionResults } from "../../../../utils/useElectionResults";
@@ -82,7 +78,7 @@ const WinnerRow: React.FC<WinnerRowProps> = ({
   const gradient = useMemo(() => {
     let colorConfig: Partial<ColorConfig>;
     if (showTurnout) {
-      colorConfig = turnoutColorConfig;
+      colorConfig = getTurnoutColorConfig(elections);
     } else {
       colorConfig = getCandidateConfig(candidateId, elections);
     }
