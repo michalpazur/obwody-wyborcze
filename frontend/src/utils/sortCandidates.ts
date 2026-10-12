@@ -8,5 +8,8 @@ export const sortCandidates = (
     return electionConfig.candidates;
   }
 
-  return results.map((r) => r.candidate);
+  return results
+    .filter((r) => !r.withdrawn)
+    .sort((a, b) => b.result - a.result)
+    .map((r) => r.candidate);
 };

@@ -22,9 +22,10 @@ export type DistrictInfo = {
 
 export type Results = {
   candidate: CandidateId;
-  result: number;
-  resultProc: number;
-};
+} & (
+  | { result: number; resultProc: number; withdrawn?: never }
+  | { result?: never; resultProc?: never; withdrawn: true }
+);
 
 export type TurnoutResults<T extends ElectionType = any> = {
   allVotes: number;

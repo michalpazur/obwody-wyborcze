@@ -443,7 +443,7 @@ export const electionsConfig: Record<ElectionId, ElectionConfig> = {
     ],
     winners: ["gibala", "piatkowska", "drewnicki", "owca", "dgp", "klimek"],
     candidatesConfig: {
-      drewnicki: { maxGradient: 25 },
+      drewnicki: { maxGradient: 40 },
       gibala: { maxGradient: 50 },
       dgp: { maxGradient: 10 },
       klimek: { maxGradient: 10 },
@@ -460,10 +460,23 @@ export const electionsConfig: Record<ElectionId, ElectionConfig> = {
       start: "2026-09-27T07:00:00+02:00",
       end: "2026-09-27T21:00:00+02:00",
     },
+    results: {
+      results: [
+        { candidate: "gibala", result: 93042, resultProc: 36.38 },
+        { candidate: "piatkowska", result: 76514, resultProc: 29.91 },
+        { candidate: "drewnicki", result: 44772, resultProc: 17.5 },
+        { candidate: "owca", result: 17684, resultProc: 6.91 },
+        { candidate: "dgp", result: 12303, resultProc: 4.81 },
+        { candidate: "klimek", result: 10523, resultProc: 4.11 },
+        { candidate: "pietrzyk", result: 947, resultProc: 0.37 },
+        { candidate: "hoffman", withdrawn: true },
+      ],
+      turnout: { allVotes: 257177, voters: 591230, turnout: 43.5 },
+    },
   },
   mayor_krk2026_2: {
     id: "mayor_krk2026_2",
-    layerId: "mayor_krk2026_2_live",
+    layerId: "mayor_krk2026_2",
     sourceLayer: "mayor_krk2026_2",
     htmlTitle: "Wybory prezydenta Krakowa 2026 (II tura)",
     name: "Prezydent Krakowa (II tura)",
@@ -471,7 +484,10 @@ export const electionsConfig: Record<ElectionId, ElectionConfig> = {
     type: "president",
     candidates: ["gibala", "piatkowska"],
     winners: ["gibala", "piatkowska"],
-    candidatesConfig: { piatkowska: { maxGradient: 60 } },
+    candidatesConfig: {
+      gibala: { minGradient: 20 },
+      piatkowska: { maxGradient: 80 },
+    },
     turnoutConfig: {
       minGradient: 20,
       maxGradient: 60,
@@ -480,6 +496,13 @@ export const electionsConfig: Record<ElectionId, ElectionConfig> = {
     votingHours: {
       start: "2026-10-11T07:00:00+02:00",
       end: "2026-10-11T21:00:00+02:00",
+    },
+    results: {
+      results: [
+        { candidate: "gibala", result: 161184, resultProc: 62.12 },
+        { candidate: "piatkowska", result: 98306, resultProc: 37.88 },
+      ],
+      turnout: { allVotes: 262027, voters: 591974, turnout: 44.27 },
     },
   },
 };

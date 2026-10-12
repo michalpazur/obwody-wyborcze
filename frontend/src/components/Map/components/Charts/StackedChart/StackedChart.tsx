@@ -37,9 +37,13 @@ const CandidateTooltip: React.FC<{ result: Results }> = ({ result }) => {
           {getWinnerName(result.candidate, elections)}
         </BarLabel>
       </Stack>
-      <BarLabel variant="light">
-        {result.resultProc}% ({formatNumber(result.result)})
-      </BarLabel>
+      {!result.withdrawn ? (
+        <BarLabel variant="light">
+          {result.resultProc}% ({formatNumber(result.result)})
+        </BarLabel>
+      ) : (
+        <BarLabel variant="light">Kandydat skreślony</BarLabel>
+      )}
     </Stack>
   );
 };
@@ -51,7 +55,9 @@ const CandidateLegend: React.FC<{ result: Results }> = ({ result }) => {
   return (
     <Stack spacing={1} direction="row" sx={{ alignItems: "center" }}>
       <LegendDot candidate={candidate} />
-      <BarLabel>{getWinnerName(result.candidate, elections)}</BarLabel>
+      <BarLabel sx={result.withdrawn ? { textDecoration: "line-through" } : {}}>
+        {getWinnerName(result.candidate, elections)}
+      </BarLabel>
     </Stack>
   );
 };
@@ -70,6 +76,11 @@ const StackedChart: React.FC<{ results: Results[] }> = ({ results }) => {
         {results.map((result) => {
           const candidate = candidatesConfig[result.candidate];
           const color = candidate.color || tieColorConfig.color;
+
+          if (result.withdrawn) {
+            return null;
+          }
+
           return (
             <Tooltip
               title={<CandidateTooltip result={result} />}
