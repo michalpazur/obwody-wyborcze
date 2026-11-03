@@ -8,6 +8,7 @@ from const import default_crs
 import uuid
 import os
 from os import path
+from typing import TypeVar
 import re
 
 pd.options.mode.copy_on_write = True
@@ -28,8 +29,9 @@ def get_winner(row: pd.Series):
 
   return max_name
 
-def prepare_results(results: geo.GeoDataFrame, candidates_columns: list[str]):
-  results[candidates_columns] = results[candidates_columns].replace(0, np.nan)
+T = TypeVar("T", pd.DataFrame, geo.GeoDataFrame)
+
+def prepare_results(results: T, candidates_columns: list[str]) -> T:
   # pd.DataFrame.idxmax doesn't show ties
   results["winner"] = results[candidates_columns].apply(get_winner, axis=1)
   for name in candidates_columns:
@@ -198,7 +200,8 @@ def main():
 
   gminy_shapes = districts_df.dissolve(by="teryt").reset_index()
   gminy_shapes = filter_columns(gminy_shapes, [*gminy_columns, "teryt"])
-  gminy_results = districts_df.dissolve(by="teryt", aggfunc="sum").reset_index()
+  # min_count=1 - preserve NaNs
+  gminy_results = districts_df.dissolve(by="teryt", aggfunc="sum", min_count=1).reset_index()
   gminy_results = prepare_results(gminy_results, candidates_columns)
   gminy_results = remove_columns(gminy_results, [*gminy_columns, "district", "number"])
   gminy = gminy_shapes.merge(gminy_results, on="teryt")
@@ -206,7 +209,7 @@ def main():
 
   if ("constituency" in districts_df):
     print("Saving constituency shapes...")
-    constituencies = districts_df.dissolve(by="constituency", aggfunc="sum").reset_index()
+    constituencies = districts_df.dissolve(by="constituency", aggfunc="sum", min_count=1).reset_index()
     constituencies = prepare_results(constituencies, candidates_columns)
     # TODO: display voivodeship name in constituency
     constituencies = constituencies.drop(columns=["gmina", "powiat", "voivodeship", "teryt", "district", "number"])
