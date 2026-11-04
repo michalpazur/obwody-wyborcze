@@ -28,22 +28,32 @@ export const presidentialCandidates = {
   zandberg,
 };
 
+import ap from "./ap.png";
 import bs from "./bs.png";
 import ko from "./ko.png";
 import konfederacja from "./konfederacja.png";
+import mn from "./mn.png";
 import nl from "./nl.png";
+import nk from "./nk.png";
 import p2050_psl from "./p2050_psl.png";
 import pis from "./pis.png";
 import pjj from "./pjj.png";
+import rdip from "./rdip.png";
+import rnp from "./rnp.png";
 
 export const parties = {
+  ap,
   bs,
   ko,
   konfederacja,
+  mn,
   nl,
+  nk,
   p2050_psl,
   pis,
   pjj,
+  rdip,
+  rnp,
 };
 
 import bochenski from "./bochenski.png";

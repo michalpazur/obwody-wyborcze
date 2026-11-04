@@ -153,7 +153,7 @@ export const candidatesConfig: Record<CandidateId, Candidate> = {
     maxGradient: 20,
     ...colors.purple,
   },
-  ap: { name: "Antypartia" },
+  ap: { name: "Antypartia", avatarUrl: parties.ap },
   bs: {
     name: "Bezpartyjni Samorządowcy",
     short: "BS",
@@ -175,12 +175,12 @@ export const candidatesConfig: Record<CandidateId, Candidate> = {
   },
   mn: {
     name: "Mniejszość Niemiecka",
-    short: "MN",
+    avatarUrl: parties.mn,
     showInWinners: true,
     maxGradient: 40,
     ...colors.teal,
   },
-  nk: { name: "Normalny Kraj" },
+  nk: { name: "Normalny Kraj", avatarUrl: parties.nk },
   nl: {
     name: "Nowa Lewica",
     avatarUrl: parties.nl,
@@ -195,7 +195,6 @@ export const candidatesConfig: Record<CandidateId, Candidate> = {
   },
   pjj: {
     name: "Polska Jest Jedna",
-    short: "PJJ",
     avatarUrl: parties.pjj,
     ...colors.lightBlue,
     showInWinners: true,
@@ -207,8 +206,12 @@ export const candidatesConfig: Record<CandidateId, Candidate> = {
     maxGradient: 30,
     ...colors.lightGreen,
   },
-  rdip: { name: "Ruch Dobrobytu i Pokoju", short: "RDiP" },
-  rnp: { name: "Ruch Naprawy Polski", short: "RNP" },
+  rdip: {
+    name: "Ruch Dobrobytu i Pokoju",
+    short: "RDiP",
+    avatarUrl: parties.rdip,
+  },
+  rnp: { name: "Ruch Naprawy Polski", avatarUrl: parties.rnp },
 };
 
 export const electionsConfig: Record<ElectionId, ElectionConfig> = {
