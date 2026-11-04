@@ -57,11 +57,11 @@ const ElectionsSelects: React.FC = () => {
   };
 
   const candidates = useMemo(() => {
-    const candidates = sortCandidates(electionConfig, results?.results);
+    const candidates = sortCandidates(elections, results?.results);
     return candidates.filter(
       (candidate) => !!candidatesConfig[candidate].gradient,
     );
-  }, [electionConfig, results]);
+  }, [elections, results]);
 
   return (
     <Stack spacing={2}>

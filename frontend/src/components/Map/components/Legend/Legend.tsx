@@ -128,7 +128,7 @@ const Legend: React.FC = () => {
       return [candidate];
     }
 
-    const winners = sortCandidates(electionConfig, results?.results);
+    const winners = sortCandidates(elections, results?.results);
     const visibleWinners = winners.filter(
       (candidate) =>
         !electionConfig.candidatesConfig?.[candidate]?.hideInLegend,

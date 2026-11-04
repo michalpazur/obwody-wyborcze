@@ -50,6 +50,7 @@ export type Candidate = {
   short?: string;
   avatarUrl?: string;
   candidateId?: CandidateId;
+  showInWinners?: boolean;
 } & Partial<ColorConfig> &
   GradientOptions;
 
@@ -101,7 +102,10 @@ type ElectionConfig = {
 
 export type ElectionCandidateConfig = {
   hideInLegend?: boolean;
-} & Pick<Candidate, keyof GradientOptions | keyof ColorConfig>;
+} & Pick<
+  Candidate,
+  "showInWinners" | keyof GradientOptions | keyof ColorConfig
+>;
 
 export type ElectionCandidatesConfig = Partial<
   Record<CandidateId, ElectionCandidateConfig>

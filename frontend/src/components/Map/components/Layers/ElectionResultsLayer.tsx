@@ -40,12 +40,19 @@ const ElectionsResultsLayer: React.FC = () => {
       return getWinnerFillColors(elections, isLive, gradientOptions);
     }
 
-    return generateFillColors(
+    const gradientArr = generateFillColors(
       `${candidate}_proc`,
       isLive,
       getCandidateConfig(candidate, elections),
       gradientOptions,
     );
+
+    return [
+      "case",
+      ["==", [isLive ? "feature-state" : "get", candidate], null],
+      notCountedColor,
+      gradientArr,
+    ] as ExpressionSpecification;
   }, [gradientOptions, isLive]);
 
   const fill = useMemo(() => {
