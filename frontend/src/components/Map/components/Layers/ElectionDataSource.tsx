@@ -1,19 +1,28 @@
 import { Source } from "react-map-gl/maplibre";
-import { useElectionConfig } from "../../../../utils/useElectionConfig";
+import { useElectionsStore } from "../../../../redux/electionsSlice";
+import { LayersConfig } from "../../../../types";
+import { useLayerConfig } from "../../../../utils/useLayerConfig";
+
+const promoteId: Record<keyof LayersConfig, string> = {
+  districts: "district",
+  gminy: "teryt",
+  constituencies: "constituency",
+};
 
 export const ElectionsDataSource: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const electionConfig = useElectionConfig();
-  const layer = electionConfig.layerId || electionConfig.sourceLayer;
+  const { layer } = useElectionsStore();
+  const layerConfig = useLayerConfig();
+  const layerName = layerConfig.layerId ?? layerConfig.sourceLayer;
 
   return (
     <Source
-      id={electionConfig.id}
-      key={electionConfig.id}
+      id={layerConfig.sourceLayer}
+      key={layerConfig.sourceLayer}
       type="vector"
-      promoteId="district"
-      url={`${import.meta.env.VITE_TILE_SERVER_URL}/${layer}`}
+      promoteId={promoteId[layer]}
+      url={`${import.meta.env.VITE_TILE_SERVER_URL}/${layerName}`}
     >
       {children}
     </Source>

@@ -13,7 +13,7 @@ import { electionsConfig } from "../../../../config";
 import { useElectionsStore } from "../../../../redux/electionsSlice";
 import { useLayoutStore } from "../../../../redux/layoutSlice";
 import { serifFont } from "../../../../theme";
-import { DistrictInfo } from "../../../../types";
+import { DistrictInfo, LayersConfig } from "../../../../types";
 import { sortResults } from "../../../../utils/sortResults";
 import { useElectionResults } from "../../../../utils/useElectionResults";
 import { useIsLive } from "../../../../utils/useIsLive";
@@ -25,6 +25,14 @@ import ElectionsSelects from "./components/ElectionsSelects";
 import LiveResultsInfo from "./components/LiveResultsInfo";
 import SideButtons from "./components/SideButtons";
 import { notCountedSx, stackSpacing, textSx } from "./components/styles";
+
+const helperText: Record<keyof LayersConfig, string> = {
+  districts:
+    "Kliknij na mapie żeby zobaczyć szczegółowe wyniki w wybranej Obwodowej Komisji Wyborczej.",
+  gminy: "Kliknij na mapie żeby zobaczyć szczegółowe wyniki w wybranej gminie.",
+  constituencies:
+    "Kliknij na mapie żeby zobaczyć szczegółowe wyniki w wybranym okręgu wyborczym.",
+};
 
 const stackSx: SxProps<Theme> = (theme) => ({
   alignItems: "flex-start",
@@ -81,7 +89,7 @@ const DistrictInfoComponent: React.FC<{
   districtInfo?: DistrictInfo;
 }> = ({ districtInfo }) => {
   const [open, setOpen] = useState(true);
-  const { elections, showTurnout } = useElectionsStore();
+  const { elections, layer, showTurnout } = useElectionsStore();
   const electionResults = useElectionResults();
   const electionConfig = electionsConfig[elections];
   const localElectionsConfig = useLocalElectionConfig();
@@ -161,16 +169,21 @@ const DistrictInfoComponent: React.FC<{
         {chart}
         {districtInfo ? (
           <Box>
-            <Typography sx={countyNameSx}>{districtInfo.gmina}</Typography>
-            <Typography sx={textSx}>
-              Obwodowa Komisja Wyborcza {districtInfo.number}
+            <Typography sx={countyNameSx}>
+              {layer !== "constituencies"
+                ? districtInfo.gmina
+                : `Okręg numer ${districtInfo.constituency}`}
             </Typography>
+            {layer === "districts" || districtInfo.voivodeship ? (
+              <Typography sx={textSx}>
+                {layer === "districts"
+                  ? `Obwodowa Komisja Wyborcza ${districtInfo.number}`
+                  : `województwo ${districtInfo.voivodeship}`}
+              </Typography>
+            ) : null}
           </Box>
         ) : (
-          <Typography sx={textSx}>
-            Kliknij na mapie żeby zobaczyć szczegółowe wyniki w wybranej
-            Obwodowej Komisji Wyborczej.
-          </Typography>
+          <Typography sx={textSx}>{helperText[layer]}</Typography>
         )}
         {infoTables}
       </Stack>

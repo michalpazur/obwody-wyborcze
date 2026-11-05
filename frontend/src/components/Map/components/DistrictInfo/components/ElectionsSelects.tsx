@@ -11,6 +11,7 @@ import {
   useElectionsStore,
 } from "../../../../../redux/electionsSlice";
 import { serifFont } from "../../../../../theme";
+import { LayersConfig } from "../../../../../types";
 import {
   getAllWinnersLabel,
   getElectionLabel,
@@ -18,9 +19,17 @@ import {
 } from "../../../../../utils/getLabels";
 import { mergeSx } from "../../../../../utils/mergeSx";
 import { sortCandidates } from "../../../../../utils/sortCandidates";
+import { useElectionConfig } from "../../../../../utils/useElectionConfig";
 import { useElectionResults } from "../../../../../utils/useElectionResults";
 import TextField from "../../../../TextField";
 import { textSx } from "./styles";
+
+const layers: (keyof LayersConfig)[] = ["districts", "gminy", "constituencies"];
+const layerNames: Record<keyof LayersConfig, string> = {
+  districts: "Obwody",
+  gminy: "Gminy",
+  constituencies: "Okręgi",
+};
 
 const ElectionsSelects: React.FC = () => {
   const {
@@ -28,10 +37,13 @@ const ElectionsSelects: React.FC = () => {
     setElections,
     candidate,
     setCandidate,
+    layer,
+    setLayer,
     showTurnout,
     setShowTurnout,
   } = useElectionsStore();
-  const electionConfig = electionsConfig[elections];
+  const electionConfig = useElectionConfig();
+  const layersConfig = electionConfig.layersConfig;
   const { availableElections, localElections } = useContext(MapContext);
   const results = useElectionResults();
 
@@ -40,8 +52,15 @@ const ElectionsSelects: React.FC = () => {
     setElections(elections);
   };
 
-  const onTabChange = (e: React.SyntheticEvent, value: ElectionId) => {
+  const onElectionsTabChange = (e: React.SyntheticEvent, value: ElectionId) => {
     setElections(value);
+  };
+
+  const onLayerChange = (
+    e: React.SyntheticEvent,
+    value: keyof LayersConfig,
+  ) => {
+    setLayer(value);
   };
 
   const onChangeShowTurnout = (
@@ -79,7 +98,7 @@ const ElectionsSelects: React.FC = () => {
           ))}
         </TextField>
       ) : availableElections.length > 1 ? (
-        <Tabs value={elections} onChange={onTabChange}>
+        <Tabs value={elections} onChange={onElectionsTabChange}>
           {availableElections.map((electionId) => (
             <Tab
               key={electionId}
@@ -87,6 +106,16 @@ const ElectionsSelects: React.FC = () => {
               label={getElectionLabel(electionId)}
             />
           ))}
+        </Tabs>
+      ) : null}
+      {layersConfig.gminy || layersConfig.constituencies ? (
+        <Tabs value={layer} onChange={onLayerChange}>
+          {layers.map(
+            (layer) =>
+              layersConfig[layer] && (
+                <Tab key={layer} value={layer} label={layerNames[layer]} />
+              ),
+          )}
         </Tabs>
       ) : null}
       <Tabs

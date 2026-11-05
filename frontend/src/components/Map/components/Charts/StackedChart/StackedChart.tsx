@@ -4,11 +4,11 @@ import { candidatesConfig, tieColorConfig } from "../../../../../config";
 import { useElectionsStore } from "../../../../../redux/electionsSlice";
 import { serifFont } from "../../../../../theme";
 import { Candidate, Results } from "../../../../../types";
+import { formatNumber } from "../../../../../utils/formatNumber";
 import { getWinnerName } from "../../../../../utils/getLabels";
 import Bar from "../components/Bar";
 import BarBackground from "../components/BarBackground";
 import BarLabel from "../components/BarLabel";
-import { formatNumber } from "../utils/formatNumber";
 
 const LegendDot: React.FC<{ candidate: Candidate }> = ({ candidate }) => {
   const color = candidate.color || tieColorConfig.color;

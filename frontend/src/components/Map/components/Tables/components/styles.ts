@@ -7,6 +7,10 @@ export const percentCellSx: SxProps = {
   fontWeight: "bold",
 };
 
+export const numericCellSx: SxProps = {
+  fontVariantNumeric: "tabular-nums",
+};
+
 export const getNameCellSx = (size: InfoRowSize): SxProps => {
   if (size === "small") {
     return {};

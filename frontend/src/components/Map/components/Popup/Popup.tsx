@@ -16,7 +16,7 @@ type PopupProps = {
 };
 
 const Popup: React.FC<PopupProps> = ({ district, position }) => {
-  const { elections, showTurnout } = useElectionsStore();
+  const { elections, layer, showTurnout } = useElectionsStore();
   const isLive = useIsLive();
 
   const popupContent = useMemo(() => {
@@ -25,15 +25,21 @@ const Popup: React.FC<PopupProps> = ({ district, position }) => {
     return (
       <Card variant="outlined" sx={{ p: 2 }}>
         <Typography sx={{ fontFamily: serifFont }}>
-          {district.gmina}{" "}
-          <Typography
-            component="span"
-            sx={(theme) => ({
-              color: theme.palette.secondary.main,
-            })}
-          >
-            OKW {district.number}
-          </Typography>
+          {layer !== "constituencies"
+            ? district.gmina
+            : `Okręg nr ${district.constituency}`}{" "}
+          {layer === "districts" || district.voivodeship ? (
+            <Typography
+              component="span"
+              sx={(theme) => ({
+                color: theme.palette.secondary.main,
+              })}
+            >
+              {layer === "districts"
+                ? `OKW ${district.number}`
+                : district.voivodeship}
+            </Typography>
+          ) : null}
         </Typography>
         {isLive && !district.counted ? (
           <Typography sx={notCountedSx}>Brak wyników.</Typography>

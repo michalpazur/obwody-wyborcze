@@ -9,8 +9,10 @@ export type DistrictInfo = {
   id: GeoJSONFeature["id"]; // feature id
   number: number;
   district: string;
+  constituency?: number;
   teryt: string;
   gmina: string;
+  voivodeship?: string;
   voters: number;
   all_votes: number;
   total: number;

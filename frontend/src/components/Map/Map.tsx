@@ -10,10 +10,11 @@ import React, {
   useState,
 } from "react";
 import { Layer, Map as MapComponent, MapRef } from "react-map-gl/maplibre";
-import { electionsConfig, layerIds } from "../../config";
+import { layerIds } from "../../config";
 import { useElectionsStore } from "../../redux/electionsSlice";
 import { useLiveElectionResults } from "../../services/useLiveElectionResults";
 import { DistrictInfo } from "../../types";
+import { useElectionConfig } from "../../utils/useElectionConfig";
 import { useFeatureSelector } from "../../utils/useFeatureSelector";
 import BoundsController from "./components/BoundsController";
 import DistrictInfoComponent from "./components/DistrictInfo";
@@ -35,6 +36,7 @@ import {
   stateClicked,
   stateHovered,
 } from "./styles";
+import { useLayerConfig } from "../../utils/useLayerConfig";
 
 let hoveredId: GeoJSONFeature["id"];
 
@@ -45,8 +47,9 @@ const Map = () => {
   const [clicked, setClicked] = useState<DistrictInfo>();
   const [hoverPosition, setHoverPosition] = useState<LngLat>();
   const { data: liveResults } = useLiveElectionResults();
-  const { elections, candidate } = useElectionsStore();
-  const selectedElections = electionsConfig[elections];
+  const { elections, layer } = useElectionsStore();
+  const selectedElections = useElectionConfig();
+  const layerConfig = useLayerConfig();
   const featureSelector = useFeatureSelector();
 
   const getDistrictInfo = useCallback(
@@ -63,7 +66,7 @@ const Map = () => {
   useEffect(() => {
     setHovered(undefined);
     setClicked(undefined);
-  }, [elections]);
+  }, [elections, layer]);
 
   useEffect(() => {
     if (!liveResults) {
@@ -183,7 +186,7 @@ const Map = () => {
             id={layerIds.hoverOutline}
             beforeId={layerIds.city}
             type="line"
-            source-layer={selectedElections.sourceLayer}
+            source-layer={layerConfig.sourceLayer}
             paint={{
               "line-width": selectedFeatureOutline,
               "line-color": theme.palette.text.primary,
@@ -221,7 +224,7 @@ const Map = () => {
             id={layerIds.outline}
             beforeId={layerIds.building}
             type="line"
-            source-layer={selectedElections.sourceLayer}
+            source-layer={layerConfig.sourceLayer}
             paint={{
               "line-color": grey[300],
               "line-width": featureOutline,
@@ -231,7 +234,7 @@ const Map = () => {
         </ElectionsDataSource>
       </React.Fragment>
     );
-  }, [selectedElections]);
+  }, [selectedElections, layerConfig.sourceLayer]);
 
   return (
     <MapComponent

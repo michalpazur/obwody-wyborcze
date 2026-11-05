@@ -235,7 +235,11 @@ export const electionsConfig: Record<ElectionId, ElectionConfig> = {
       "rnp",
     ],
     winners: ["pis", "ko", "p2050_psl", "nl", "konfederacja", "pjj", "mn"],
-    sourceLayer: "parl_2023",
+    layersConfig: {
+      districts: { sourceLayer: "parl_2023" },
+      gminy: { sourceLayer: "parl_2023_gminy" },
+      constituencies: { sourceLayer: "parl_2023_constituencies" },
+    },
     turnoutConfig: {
       minGradient: 40,
     },
@@ -270,7 +274,9 @@ export const electionsConfig: Record<ElectionId, ElectionConfig> = {
       "starosielec",
     ],
     winners: ["trzaskowski", "bochenski", "biejat", "wipler"],
-    sourceLayer: "mayor_waw2024",
+    layersConfig: {
+      districts: { sourceLayer: "mayor_waw2024" },
+    },
     candidatesConfig: {
       bochenski: { maxGradient: 50 },
       biejat: { maxGradient: 25 },
@@ -319,7 +325,10 @@ export const electionsConfig: Record<ElectionId, ElectionConfig> = {
       "woch",
     ],
     winners: ["trzaskowski", "nawrocki", "mentzen", "braun", "zandberg"],
-    sourceLayer: "pres_2025_1",
+    layersConfig: {
+      districts: { sourceLayer: "pres_2025_1" },
+      gminy: { sourceLayer: "pres_2025_1_gminy" },
+    },
     turnoutConfig: {
       minGradient: 40,
     },
@@ -348,7 +357,10 @@ export const electionsConfig: Record<ElectionId, ElectionConfig> = {
     type: "president",
     candidates: ["nawrocki", "trzaskowski"],
     winners: ["nawrocki", "trzaskowski"],
-    sourceLayer: "pres_2025_2",
+    layersConfig: {
+      districts: { sourceLayer: "pres_2025_2" },
+      gminy: { sourceLayer: "pres_2025_2_gminy" },
+    },
     turnoutConfig: {
       minGradient: 40,
     },
@@ -374,7 +386,9 @@ export const electionsConfig: Record<ElectionId, ElectionConfig> = {
       "Czy jest Pan/Pani za odwołaniem Pana Aleksandra Jana Miszalskiego z funkcji Prezydenta Miasta Krakowa przed upływem kadencji?",
     candidates: ["yes", "no"],
     winners: ["yes", "no"],
-    sourceLayer: "ref_krk2026_1",
+    layersConfig: {
+      districts: { sourceLayer: "ref_krk2026_1" },
+    },
     hideWinners: true,
     gradientOptions: {
       minGradient: 90,
@@ -412,7 +426,9 @@ export const electionsConfig: Record<ElectionId, ElectionConfig> = {
       "Czy jest Pan/Pani za odwołaniem Rady Miasta Krakowa przed upływem kadencji?",
     candidates: ["yes", "no"],
     winners: ["yes", "no"],
-    sourceLayer: "ref_krk2026_2",
+    layersConfig: {
+      districts: { sourceLayer: "ref_krk2026_2" },
+    },
     hideWinners: true,
     gradientOptions: {
       minGradient: 90,
@@ -442,8 +458,12 @@ export const electionsConfig: Record<ElectionId, ElectionConfig> = {
   },
   mayor_krk2026_1: {
     id: "mayor_krk2026_1",
-    layerId: "mayor_krk2026_1_results",
-    sourceLayer: "mayor_krk2026_1",
+    layersConfig: {
+      districts: {
+        layerId: "mayor_krk2026_1_results",
+        sourceLayer: "mayor_krk2026_1",
+      },
+    },
     htmlTitle: "Wybory prezydenta Krakowa 2026 (I tura)",
     name: "Prezydent Krakowa (I tura)",
     tabName: "I tura",
@@ -492,8 +512,12 @@ export const electionsConfig: Record<ElectionId, ElectionConfig> = {
   },
   mayor_krk2026_2: {
     id: "mayor_krk2026_2",
-    layerId: "mayor_krk2026_2",
-    sourceLayer: "mayor_krk2026_2",
+    layersConfig: {
+      districts: {
+        layerId: "mayor_krk2026_2",
+        sourceLayer: "mayor_krk2026_2",
+      },
+    },
     htmlTitle: "Wybory prezydenta Krakowa 2026 (II tura)",
     name: "Prezydent Krakowa (II tura)",
     tabName: "II tura",

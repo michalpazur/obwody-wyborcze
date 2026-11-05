@@ -4,12 +4,12 @@ import { colors } from "../../../../../colors";
 import { useElectionsStore } from "../../../../../redux/electionsSlice";
 import { serifFont } from "../../../../../theme";
 import { TurnoutResults } from "../../../../../types";
+import { formatNumber } from "../../../../../utils/formatNumber";
 import { getTurnoutColorConfig } from "../../../../../utils/getTurnoutColorConfig";
 import { mergeSx } from "../../../../../utils/mergeSx";
 import Bar from "../components/Bar";
 import BarBackground from "../components/BarBackground";
 import BarLabel from "../components/BarLabel";
-import { formatNumber } from "../utils/formatNumber";
 import { getMaxValue } from "../utils/getMaxValue";
 
 const thresholdBarSx: SxProps<Theme> = {

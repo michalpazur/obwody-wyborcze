@@ -73,6 +73,17 @@ export type VotingHoursConfig = {
   end: string;
 };
 
+export type LayerConfig = {
+  sourceLayer: string;
+  layerId?: string;
+};
+
+export type LayersConfig = {
+  districts: LayerConfig;
+  gminy?: LayerConfig;
+  constituencies?: LayerConfig;
+};
+
 type ElectionConfig = {
   id: ElectionId;
   name: string;
@@ -81,8 +92,7 @@ type ElectionConfig = {
   candidates: CandidateId[];
   winners: CandidateId[];
   votingHours?: VotingHoursConfig;
-  layerId?: string;
-  sourceLayer: string;
+  layersConfig: LayersConfig;
   candidatesConfig?: ElectionCandidatesConfig;
   hideWinners?: boolean;
   gradientOptions?: GradientOptions;

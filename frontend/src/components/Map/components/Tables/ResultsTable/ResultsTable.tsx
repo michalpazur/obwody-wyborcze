@@ -9,11 +9,16 @@ import {
 import React from "react";
 import { useElectionsStore } from "../../../../../redux/electionsSlice";
 import { DistrictInfo, Results } from "../../../../../types";
+import { formatNumber } from "../../../../../utils/formatNumber";
 import { getNameColumnLabel } from "../../../../../utils/getLabels";
 import CandidateCell from "../components/CandidateCell";
-import { getNameCellSx, percentCellSx } from "../components/styles";
-import WinnerInfo from "../components/WinnerInfo";
+import {
+  getNameCellSx,
+  numericCellSx,
+  percentCellSx,
+} from "../components/styles";
 import TurnoutInfo from "../components/TurnoutInfo";
+import WinnerInfo from "../components/WinnerInfo";
 
 type ResultsTableProps = {
   results: Results[];
@@ -49,7 +54,9 @@ const ResultsTable: React.FC<ResultsTableProps> = ({
               candidate={result.candidate}
               size={full ? "full" : "regular"}
             />
-            <TableCell align="right">{result.result}</TableCell>
+            <TableCell align="right" sx={numericCellSx}>
+              {formatNumber(result.result as number)}
+            </TableCell>
             <TableCell align="right" sx={percentCellSx}>
               {result.resultProc}%
             </TableCell>

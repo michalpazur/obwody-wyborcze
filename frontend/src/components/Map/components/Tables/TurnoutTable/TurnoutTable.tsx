@@ -7,8 +7,10 @@ import {
 } from "@mui/material";
 import React, { useMemo } from "react";
 import { DistrictInfo, Results } from "../../../../../types";
+import { formatNumber } from "../../../../../utils/formatNumber";
 import TurnoutInfo from "../components/TurnoutInfo";
 import WinnerInfo from "../components/WinnerInfo";
+import { numericCellSx } from "../components/styles";
 
 type TurnoutInfoRow = {
   label: string;
@@ -35,7 +37,9 @@ const TurnoutTable: React.FC<{
         {rows.map((row) => (
           <TableRow key={row.label}>
             <TableCell>{row.label}</TableCell>
-            <TableCell align="right">{row.value}</TableCell>
+            <TableCell align="right" sx={numericCellSx}>
+              {formatNumber(row.value)}
+            </TableCell>
           </TableRow>
         ))}
       </TableBody>

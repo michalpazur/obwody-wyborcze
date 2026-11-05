@@ -1,12 +1,7 @@
 import { ExpressionSpecification } from "maplibre-gl";
 import { useMemo } from "react";
 import { Layer } from "react-map-gl/maplibre";
-import {
-  electionsConfig,
-  layerIds,
-  mapOpacity,
-  notCountedColor,
-} from "../../../../config";
+import { layerIds, mapOpacity, notCountedColor } from "../../../../config";
 import { useElectionsStore } from "../../../../redux/electionsSlice";
 import {
   generateFillColors,
@@ -16,6 +11,7 @@ import { getCandidateConfig } from "../../../../utils/getCandidateConfig";
 import { getGradientOptions } from "../../../../utils/getGradientOptions";
 import { getTurnoutColorConfig } from "../../../../utils/getTurnoutColorConfig";
 import { useIsLive } from "../../../../utils/useIsLive";
+import { useLayerConfig } from "../../../../utils/useLayerConfig";
 import { ElectionsDataSource } from "./ElectionDataSource";
 
 const isCounted: ExpressionSpecification = [
@@ -25,8 +21,8 @@ const isCounted: ExpressionSpecification = [
 
 const ElectionsResultsLayer: React.FC = () => {
   const { candidate, elections, showTurnout } = useElectionsStore();
-  const electionConfig = electionsConfig[elections];
   const gradientOptions = getGradientOptions(showTurnout, candidate, elections);
+  const layerConfig = useLayerConfig();
   const isLive = useIsLive();
 
   const fillExpression = useMemo(() => {
@@ -72,8 +68,8 @@ const ElectionsResultsLayer: React.FC = () => {
     <ElectionsDataSource>
       <Layer
         id={layerIds.elections}
-        source={elections}
-        source-layer={electionConfig.sourceLayer}
+        source={layerConfig.sourceLayer}
+        source-layer={layerConfig.sourceLayer}
         beforeId={layerIds.water}
         type="fill"
         paint={{ "fill-color": fill, "fill-opacity": mapOpacity }}

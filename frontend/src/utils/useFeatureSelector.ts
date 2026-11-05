@@ -1,17 +1,17 @@
 import { useMemo } from "react";
-import { electionsConfig } from "../config";
 import { useElectionsStore } from "../redux/electionsSlice";
 import { FeatureSelector } from "../types/map";
+import { useLayerConfig } from "./useLayerConfig";
 
 export const useFeatureSelector = (): FeatureSelector => {
-  const { elections } = useElectionsStore();
+  const layerConfig = useLayerConfig();
 
   const source = useMemo(
     () => ({
-      source: elections,
-      sourceLayer: electionsConfig[elections].sourceLayer || elections,
+      source: layerConfig.sourceLayer,
+      sourceLayer: layerConfig.sourceLayer,
     }),
-    [elections],
+    [layerConfig.sourceLayer],
   );
 
   return source;
