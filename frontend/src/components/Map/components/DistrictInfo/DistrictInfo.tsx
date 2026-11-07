@@ -13,7 +13,7 @@ import { electionsConfig } from "../../../../config";
 import { useElectionsStore } from "../../../../redux/electionsSlice";
 import { useLayoutStore } from "../../../../redux/layoutSlice";
 import { serifFont } from "../../../../theme";
-import { DistrictInfo, LayersConfig } from "../../../../types";
+import { DistrictInfo, LayerType } from "../../../../types";
 import { sortResults } from "../../../../utils/sortResults";
 import { useElectionResults } from "../../../../utils/useElectionResults";
 import { useIsLive } from "../../../../utils/useIsLive";
@@ -26,7 +26,7 @@ import LiveResultsInfo from "./components/LiveResultsInfo";
 import SideButtons from "./components/SideButtons";
 import { notCountedSx, stackSpacing, textSx } from "./components/styles";
 
-const helperText: Record<keyof LayersConfig, string> = {
+const helperText: Record<LayerType, string> = {
   districts:
     "Kliknij na mapie żeby zobaczyć szczegółowe wyniki w wybranej Obwodowej Komisji Wyborczej.",
   gminy: "Kliknij na mapie żeby zobaczyć szczegółowe wyniki w wybranej gminie.",

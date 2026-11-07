@@ -1,5 +1,4 @@
 import { useTheme } from "@mui/material";
-import { grey } from "@mui/material/colors";
 import { GeoJSONFeature, LngLat, MapLayerMouseEvent } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import React, {
@@ -10,16 +9,18 @@ import React, {
   useState,
 } from "react";
 import { Layer, Map as MapComponent, MapRef } from "react-map-gl/maplibre";
-import { layerIds } from "../../config";
+import { layerIds, layerTypes } from "../../config";
 import { useElectionsStore } from "../../redux/electionsSlice";
 import { useLiveElectionResults } from "../../services/useLiveElectionResults";
 import { DistrictInfo } from "../../types";
 import { useElectionConfig } from "../../utils/useElectionConfig";
 import { useFeatureSelector } from "../../utils/useFeatureSelector";
+import { useLayerConfig } from "../../utils/useLayerConfig";
 import BoundsController from "./components/BoundsController";
 import DistrictInfoComponent from "./components/DistrictInfo";
 import { ElectionsDataSource } from "./components/Layers/ElectionDataSource";
 import ElectionsResultsLayer from "./components/Layers/ElectionResultsLayer";
+import FeatureOutline from "./components/Layers/FeatureOutline";
 import FeaturesSource from "./components/Layers/FeaturesSource";
 import {
   placeClasses,
@@ -29,14 +30,7 @@ import { TransportationLayer } from "./components/Layers/TransportationLayer";
 import Legend from "./components/Legend";
 import LiveElectionsState from "./components/LiveElectionsState";
 import Popup from "./components/Popup";
-import {
-  featureOutline,
-  featureOutlineOpacity,
-  selectedFeatureOutline,
-  stateClicked,
-  stateHovered,
-} from "./styles";
-import { useLayerConfig } from "../../utils/useLayerConfig";
+import { outlineWidth, stateClicked, stateHovered } from "./styles";
 
 let hoveredId: GeoJSONFeature["id"];
 
@@ -188,7 +182,7 @@ const Map = () => {
             type="line"
             source-layer={layerConfig.sourceLayer}
             paint={{
-              "line-width": selectedFeatureOutline,
+              "line-width": outlineWidth(1),
               "line-color": theme.palette.text.primary,
               "line-opacity": [
                 "case",
@@ -219,19 +213,11 @@ const Map = () => {
             paint={transparentFillPaint}
           />
         </FeaturesSource>
-        <ElectionsDataSource>
-          <Layer
-            id={layerIds.outline}
-            beforeId={layerIds.building}
-            type="line"
-            source-layer={layerConfig.sourceLayer}
-            paint={{
-              "line-color": grey[300],
-              "line-width": featureOutline,
-              "line-opacity": featureOutlineOpacity,
-            }}
-          />
-        </ElectionsDataSource>
+        {layerTypes
+          .slice(layerTypes.findIndex((l) => l === layer))
+          .map((layer) => (
+            <FeatureOutline key={layer} layer={layer} />
+          ))}
       </React.Fragment>
     );
   }, [selectedElections, layerConfig.sourceLayer]);

@@ -2,14 +2,14 @@ import type { PayloadAction } from "@reduxjs/toolkit";
 import { createSlice } from "@reduxjs/toolkit";
 import { useDispatch, useSelector } from "react-redux";
 import { CandidateId, ElectionId, electionsConfig } from "../config";
-import { LayersConfig } from "../types";
+import { LayerType } from "../types";
 import { RootState } from "./store";
 
 export type CandidatesKey = CandidateId | "all";
 export interface ElectionsState {
   elections: keyof typeof electionsConfig;
   candidate: CandidatesKey;
-  layer: keyof LayersConfig;
+  layer: LayerType;
   showTurnout: boolean;
 }
 
@@ -33,7 +33,7 @@ export const electionsSlice = createSlice({
       state.candidate = action.payload;
       state.showTurnout = false;
     },
-    setLayer: (state, action: PayloadAction<keyof LayersConfig>) => {
+    setLayer: (state, action: PayloadAction<LayerType>) => {
       state.layer = action.payload;
     },
     setShowTurnout: (state, action: PayloadAction<boolean>) => {
@@ -56,7 +56,7 @@ export const useElectionsStore = () => {
   const setCandidate = (id: CandidatesKey) =>
     dispatch(electionsSlice.actions.setCandidate(id));
 
-  const setLayer = (layer: keyof LayersConfig) =>
+  const setLayer = (layer: LayerType) =>
     dispatch(electionsSlice.actions.setLayer(layer));
 
   const setShowTurnout = (showTurnout: boolean) => {

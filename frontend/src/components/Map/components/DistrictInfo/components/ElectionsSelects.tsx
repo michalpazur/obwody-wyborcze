@@ -4,6 +4,7 @@ import {
   candidatesConfig,
   ElectionId,
   electionsConfig,
+  layerTypes,
 } from "../../../../../config";
 import { MapContext } from "../../../../../context/MapContext";
 import {
@@ -11,7 +12,7 @@ import {
   useElectionsStore,
 } from "../../../../../redux/electionsSlice";
 import { serifFont } from "../../../../../theme";
-import { LayersConfig } from "../../../../../types";
+import { LayerType } from "../../../../../types";
 import {
   getAllWinnersLabel,
   getElectionLabel,
@@ -24,8 +25,7 @@ import { useElectionResults } from "../../../../../utils/useElectionResults";
 import TextField from "../../../../TextField";
 import { textSx } from "./styles";
 
-const layers: (keyof LayersConfig)[] = ["districts", "gminy", "constituencies"];
-const layerNames: Record<keyof LayersConfig, string> = {
+const layerNames: Record<LayerType, string> = {
   districts: "Obwody",
   gminy: "Gminy",
   constituencies: "Okręgi",
@@ -56,10 +56,7 @@ const ElectionsSelects: React.FC = () => {
     setElections(value);
   };
 
-  const onLayerChange = (
-    e: React.SyntheticEvent,
-    value: keyof LayersConfig,
-  ) => {
+  const onLayerChange = (e: React.SyntheticEvent, value: LayerType) => {
     setLayer(value);
   };
 
@@ -110,7 +107,7 @@ const ElectionsSelects: React.FC = () => {
       ) : null}
       {layersConfig.gminy || layersConfig.constituencies ? (
         <Tabs value={layer} onChange={onLayerChange}>
-          {layers.map(
+          {layerTypes.map(
             (layer) =>
               layersConfig[layer] && (
                 <Tab key={layer} value={layer} label={layerNames[layer]} />

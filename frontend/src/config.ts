@@ -11,6 +11,7 @@ import {
   CandidateId,
   ElectionConfig,
   ElectionId,
+  LayerType,
   LocalElectionId,
   LocalElectionsConfig,
 } from "./types/config";
@@ -600,6 +601,8 @@ export const layerIds = {
   hoverOutline: "hover-outline",
   city: "city",
 };
+
+export const layerTypes: LayerType[] = ["districts", "gminy", "constituencies"];
 
 export type { Candidate, CandidateId, ElectionConfig, ElectionId };
 

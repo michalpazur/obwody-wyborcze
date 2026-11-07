@@ -1,19 +1,25 @@
 import { Source } from "react-map-gl/maplibre";
 import { useElectionsStore } from "../../../../redux/electionsSlice";
-import { LayersConfig } from "../../../../types";
+import { LayerType } from "../../../../types";
 import { useLayerConfig } from "../../../../utils/useLayerConfig";
 
-const promoteId: Record<keyof LayersConfig, string> = {
+const promoteId: Record<LayerType, string> = {
   districts: "district",
   gminy: "teryt",
   constituencies: "constituency",
 };
 
-export const ElectionsDataSource: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+export const ElectionsDataSource: React.FC<{
+  children: React.ReactNode;
+  layer?: LayerType;
+}> = ({ children, layer: layerProp }) => {
   const { layer } = useElectionsStore();
-  const layerConfig = useLayerConfig();
+  const layerConfig = useLayerConfig(layerProp);
+
+  if (!layerConfig) {
+    return null;
+  }
+
   const layerName = layerConfig.layerId ?? layerConfig.sourceLayer;
 
   return (

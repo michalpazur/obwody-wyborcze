@@ -84,6 +84,8 @@ export type LayersConfig = {
   constituencies?: LayerConfig;
 };
 
+export type LayerType = keyof LayersConfig;
+
 type ElectionConfig = {
   id: ElectionId;
   name: string;

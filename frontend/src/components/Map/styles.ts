@@ -18,33 +18,34 @@ export const stateClicked: ExpressionSpecification = [
   false,
 ];
 
-export const featureOutline: DataDrivenPropertyValueSpecification<number> = [
+export const outlineOpacity = (
+  maxZoom: number,
+): DataDrivenPropertyValueSpecification<number> => [
+  "interpolate",
+  ["linear"],
+  ["zoom"],
+  maxZoom,
+  0,
+  maxZoom + 0.5,
+  1,
+];
+
+export const baseOutlineWidth = 1.5;
+export const outlineWidth = (
+  multiplier: number,
+): DataDrivenPropertyValueSpecification<number> => [
   "interpolate",
   ["exponential", exponentialBase],
   ["zoom"],
+  8,
+  baseOutlineWidth * multiplier,
   10,
-  0.2,
-  16,
-  1,
+  3 * multiplier,
+  14,
+  4 * multiplier,
   19,
-  3,
+  7 * multiplier,
 ];
-
-export const featureOutlineOpacity: DataDrivenPropertyValueSpecification<number> =
-  ["interpolate", ["linear"], ["zoom"], 10, 0, 10.5, 1];
-
-export const selectedFeatureOutline: DataDrivenPropertyValueSpecification<number> =
-  [
-    "interpolate",
-    ["exponential", exponentialBase],
-    ["zoom"],
-    10,
-    1.5,
-    14,
-    3.5,
-    19,
-    7,
-  ];
 
 export const transportationLineWidth = (
   multiplier: number = 2,
