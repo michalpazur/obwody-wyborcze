@@ -16,7 +16,7 @@ const barSx: SxProps<Theme> = {
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  p: 1,
+  minWidth: "2px",
   minHeight: "24px",
   transition: (theme) =>
     theme.transitions.create(["width", "flex-basis"], {
