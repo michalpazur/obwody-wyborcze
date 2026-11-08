@@ -594,6 +594,7 @@ export const restThreshold = 1.75;
 
 export const layerIds = {
   elections: "elections",
+  electionsTie: "elections-tie",
   water: "water-layer",
   road: "road",
   building: "building-layer",

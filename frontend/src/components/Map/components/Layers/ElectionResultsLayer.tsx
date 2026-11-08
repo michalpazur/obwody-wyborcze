@@ -3,16 +3,17 @@ import { useMemo } from "react";
 import { Layer } from "react-map-gl/maplibre";
 import { layerIds, mapOpacity, notCountedColor } from "../../../../config";
 import { useElectionsStore } from "../../../../redux/electionsSlice";
+import { getCandidateConfig } from "../../../../utils/getCandidateConfig";
 import {
   generateFillColors,
   getWinnerFillColors,
-} from "../../../../utils/generateFillColors";
-import { getCandidateConfig } from "../../../../utils/getCandidateConfig";
+} from "../../../../utils/getFill";
 import { getGradientOptions } from "../../../../utils/getGradientOptions";
 import { getTurnoutColorConfig } from "../../../../utils/getTurnoutColorConfig";
 import { useIsLive } from "../../../../utils/useIsLive";
 import { useLayerConfig } from "../../../../utils/useLayerConfig";
 import { ElectionsDataSource } from "./ElectionDataSource";
+import TieHatchLayer from "./TieHatchLayer";
 
 const isCounted: ExpressionSpecification = [
   "to-boolean",
@@ -74,6 +75,12 @@ const ElectionsResultsLayer: React.FC = () => {
         type="fill"
         paint={{ "fill-color": fill, "fill-opacity": mapOpacity }}
       />
+      {candidate === "all" && !showTurnout && (
+        <TieHatchLayer
+          gradientOptions={gradientOptions}
+          isCounted={isCounted}
+        />
+      )}
     </ElectionsDataSource>
   );
 };

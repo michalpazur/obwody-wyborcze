@@ -27,7 +27,7 @@ export const ElectionsDataSource: React.FC<{
       id={layerConfig.sourceLayer}
       key={layerConfig.sourceLayer}
       type="vector"
-      promoteId={promoteId[layer]}
+      promoteId={layerProp ? undefined : promoteId[layer]}
       url={`${import.meta.env.VITE_TILE_SERVER_URL}/${layerName}`}
     >
       {children}

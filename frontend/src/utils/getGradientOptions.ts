@@ -1,7 +1,7 @@
 import { candidatesConfig, ElectionId, electionsConfig } from "../config";
 import { CandidatesKey } from "../redux/electionsSlice";
+import { GradientOptions } from "../types/colors";
 import { GRADIENT_COLORS } from "./createColorConfig";
-import { GradientOptions } from "./generateFillColors";
 
 export const getGradientOptions = (
   showTurnout: boolean,
@@ -40,4 +40,14 @@ export const getGradientOptions = (
   }
 
   return gradientOptions;
+};
+
+export const resolveGradientOptions = (options?: GradientOptions) => {
+  const {
+    minGradient = 0,
+    maxGradient = 100,
+    numColors = GRADIENT_COLORS,
+  } = options || {};
+
+  return { minGradient, maxGradient, numColors };
 };

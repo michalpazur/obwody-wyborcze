@@ -1,15 +1,12 @@
 import { ExpressionSpecification } from "maplibre-gl";
-import { ElectionId, ProcentKey } from "../types";
-import { ColorConfig, GRADIENT_COLORS } from "./createColorConfig";
-import { getGradient } from "./getGradient";
 import { electionsConfig, tieColorConfig } from "../config";
+import { ElectionId, ProcentKey } from "../types";
+import { GradientOptions } from "../types/colors";
+import { ColorConfig } from "./createColorConfig";
 import { getCandidateConfig } from "./getCandidateConfig";
-
-export type GradientOptions = {
-  minGradient?: number;
-  maxGradient?: number;
-  numColors?: number;
-};
+import { getGradient } from "./getGradient";
+import { resolveGradientOptions } from "./getGradientOptions";
+import { getGradientThresholds } from "./getGradientThresholds";
 
 export const generateFillColors = (
   key: ProcentKey,
@@ -17,11 +14,7 @@ export const generateFillColors = (
   colorConfig: Partial<ColorConfig>,
   options?: GradientOptions,
 ) => {
-  const {
-    minGradient = 0,
-    maxGradient = 100,
-    numColors = GRADIENT_COLORS,
-  } = options || {};
+  const { numColors } = resolveGradientOptions(options);
 
   if (!colorConfig) {
     return "#616161";
@@ -30,15 +23,10 @@ export const generateFillColors = (
   const gradient = getGradient(colorConfig, numColors);
 
   const arr = ["step", [isLive ? "feature-state" : "get", key]];
-  Array(numColors - 1)
-    .fill(0)
-    .forEach((_, idx) => {
-      arr.push(
-        gradient[idx],
-        // @ts-expect-error
-        ((idx + 1) * (maxGradient - minGradient)) / numColors + minGradient,
-      );
-    });
+  getGradientThresholds(options).forEach((threshold, idx) => {
+    // @ts-expect-error
+    arr.push(gradient[idx], threshold);
+  });
   arr.push(gradient[numColors - 1]);
   return arr as ExpressionSpecification;
 };

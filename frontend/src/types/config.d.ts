@@ -1,6 +1,6 @@
 import { LngLatBoundsLike, LngLatLike } from "maplibre-gl";
 import { ColorConfig } from "../utils/createColorConfig";
-import { GradientOptions } from "../utils/generateFillColors";
+import { GradientOptions } from "./colors";
 import { ElectionResultsInfo } from "./results";
 
 export type CandidateId =
